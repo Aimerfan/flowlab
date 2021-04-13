@@ -1,0 +1,13 @@
+# enviroment
+.idea/
+__pycache__/
+venv/
+
+# web source
+/static/
+/media/
+/log/
+
+# secret
+local_settings.py
+.env

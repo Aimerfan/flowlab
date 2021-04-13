@@ -1,0 +1,16 @@
+DEBUG = True
+
+SECRET_KEY = '+9!hj+(f^$it1ra)11=0ub6hnhfys+u$*mfi4_^_$)oust+(x5'
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+DATABASES = {  # local_settings
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'flowlab',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
+    }
+}
