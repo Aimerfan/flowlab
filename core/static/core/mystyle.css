@@ -1,0 +1,211 @@
+/* 上方導航列 */
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #f3f3f3;
+    /* fixed navigation bar */
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: #000;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+    background-color: #DDDDDD;
+    color: #000;
+}
+
+.active {
+    background-color: #6CC3D5;
+    color: white;
+}
+
+
+
+
+body {
+    background-color: lightblue;
+}
+
+h1 {
+    color: navy;
+    margin-left: 20px;
+}
+
+
+/*FORM*/
+.form_title {
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.form-row {
+    margin-top: 5px;
+}
+
+.form-row label {
+    color: #4D4D4D;
+    font-weight: 800;
+}
+
+/*btn*/
+button {
+    outline: none ! important;
+}
+
+.btn_index_login {
+    color: white;
+    background: #FF6722;
+    border: none;
+    padding: 5px 20px 5px 20px;
+    font-weight: bold;
+    border-radius: 20px;
+    transition: 0.1s linear;
+    cursor: pointer;
+}
+
+.btn_index_login:hover {
+    color: white;
+    background: #633974;
+    transition: 0.1s linear;
+}
+
+.btn_gray {
+    float: right;
+    font-weight: bold;
+    color: white;
+    background: #5FAEC6;
+    border: none;
+    padding: 5px 20px 5px 20px;
+    font-weight: bold;
+    border-radius: 20px;
+    transition: 0.1s linear;
+    cursor: pointer;
+}
+
+.btn_gray:hover {
+    color: white;
+    background: #3290B0;
+}
+
+.btn_nav_login {
+    color: #4D4D4D;
+    background: rgba(0, 0, 0, 0);
+    border: 2px solid #4D4D4D;
+    padding: 5px 20px 5px 20px;
+    font-weight: bold;
+    border-radius: 20px;
+    transition: 0.1s linear;
+}
+
+.btn_nav_login:hover {
+    color: white;
+    background: #4D4D4D;
+    transition: 0.1s linear;
+    cursor: pointer;
+}
+
+/*login page*/
+.login_title {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.login_title > h3 {
+    font-weight: 700;
+    color: #4d4d4d;
+}
+
+.login_content_title {
+    margin: 20px
+}
+
+.login_content_title > h5 {
+    font-weight: 700;
+    color: #633974;
+}
+
+.login_content {
+    margin: 20px;
+}
+
+.login_content_btn {
+    text-align: center;
+}
+
+.login_content_img {
+    position: relative;
+    min-height: 200px
+}
+
+.login_content_img img {
+    width: 100px;
+    height: 46px;
+    position: absolute;
+    top: calc(50% - 23px);
+    left: calc(50% - 50px);
+}
+
+.login_content > input {
+    width: 200px;
+    border: 0px;
+    border-bottom: 2px solid #633974;
+    color: #633974;
+    font-weight: bold;
+    padding: .375rem .75rem;
+}
+
+.login_content > input:hover {
+    border-bottom: 2px solid #FF6722;
+    transition: 0.1s linear;
+}
+
+.login_content > input:focus {
+    border-bottom: 2px solid #FF6722;
+    transition: 0.1s linear;
+    outline: none ! important;
+}
+
+/* register */
+.register_content_title {
+    margin: 20px;
+}
+
+.register_content_title > h5 {
+    font-weight: 700;
+    color: #633974;
+}
+
+.register_content {
+    margin: 20px;
+}
+
+
+
+
+
+
+
+
+.col.md-1,
+.col-md,
+.col-md-auto {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
