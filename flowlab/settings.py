@@ -42,9 +42,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'login_required.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'login_required.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'flowlab.urls'
@@ -122,8 +122,14 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# django-login-required-middleware 使用的白名單，限填 url names
-# 其他格式的白名單參考 https://pypi.org/project/django-login-required-middleware/
+
+# django-login-required-middleware
+# https://pypi.org/project/django-login-required-middleware/
+# regex path 白名單
+LOGIN_REQUIRED_IGNORE_PATHS = [
+    r'/admin*',
+]
+# url names 白名單
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
     'index',
     'login',
