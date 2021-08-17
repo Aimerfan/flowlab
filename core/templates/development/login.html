@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>老虎的前端練習</title>
+    <title>前端練習</title>
     <link rel="stylesheet" type="text/css" href="{% static 'core/mystyle.css' %}">
 {#    <link rel="stylesheet" href="css/hard.css" />#}
 </head>
@@ -12,36 +12,42 @@
 <body>
     <nav>
         <ul>
+            {# logo 圖片來源: https://www4.flamingtext.com/net-fu/jobs/27332323579007012.html #}
+            <li><img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab"
+                     style="display:block; margin:auto; height: 46px; padding: 8px;"></li>
             <li><a href="{% url 'development' %}">Home</a></li>
         </ul>
     </nav>
 
-    <div style="height: 40px"></div>
-    <h1>前端練習-登入頁面</h1>
+    <div style="height: 50px"></div>
 
-    <div class="row">
-        <div class="col.md-1">
-            <div style="width: 250px;">
-                <form>
-                    <div class="login_content_title">
-                        <h4>UserName：</h4>
-                    </div>
-                    <div class="login_content">
-                        <input type="text" id="username" name="username"><br>
-                    </div>
-                    <div class="login_content_title">
-                        <h4>Password：</h4>
-                    </div>
-                    <div class="login_content">
-                        <input type="text" id="password" name="password"><br>
-                    </div>
-                    <div class="login_content login_content_btn">
-                        <button class="btn_index_login" type="submit">登入</button>
-                    </div>
-                </form>
+    <div class="container">
+        <div class="content">
+            <h1>前端練習-登入頁面</h1>
+            <div class="col.md-1">
+                <div>
+                    <form>
+                        <div class="login_content_title">
+                            <h4>UserName：</h4>
+                        </div>
+                        <div class="login_content">
+                            <input type="text" id="username" name="username"><br>
+                        </div>
+                        <div class="login_content_title">
+                            <h4>Password：</h4>
+                        </div>
+                        <div class="login_content">
+                            <input type="text" id="password" name="password"><br>
+                        </div>
+                        <div class="login_content login_content_btn">
+                            <button class="btn_index_login" type="submit">登入</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
 </body>
 
 </html>

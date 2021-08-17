@@ -3,14 +3,17 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <title>老虎的前端練習</title>
+    <meta charset="UTF-8" />
+    <title>前端練習</title>
     <link rel="stylesheet" type="text/css" href="{% static 'core/mystyle.css' %}">
 </head>
 
 <body>
     <nav>
         <ul>
+            {# logo 圖片來源: https://www4.flamingtext.com/net-fu/jobs/27332323579007012.html #}
+            <li><img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab"
+                     style="display:block; margin:auto; height: 46px; padding: 8px;"></li>
             <li><a href="{% url 'development' %}">Home</a></li>
             <li><a href="news.asp">Courses</a></li>
             <li><a href="contact.asp">Repository</a></li>
@@ -22,12 +25,24 @@
         </ul>
     </nav>
 
-    <div style="height: 40px;"></div>
-    <h1>前端練習-首頁</h1>
+    <div style="height: 50px"></div>
 
-    <div style="margin:auto">
-        <img src="{% static 'core/images/devopos.png' %}" alt="DevOps" style="display:block; margin:auto; width: 60%;">
-        資料來源：https://www.softwebsolutions.com/resources/devops-and-microservices.html
+    <div>
+        <div class="container">
+            <div class="content">
+                <h1>FlowLab</h1>
+                <h2>一套模擬 DevOps 與 CI/CD 自動化流程的實驗室。</h2>
+            </div>
+        </div>
+    </div>
+
+    <div id="light">
+        <div class="container">
+            <div class="content">
+                <img src="{% static 'core/images/devopos.png' %}" alt="DevOps" style="display:block; margin:auto; width: 60%;">
+                資料來源：https://www.softwebsolutions.com/resources/devops-and-microservices.html
+            </div>
+        </div>
     </div>
 </body>
 
