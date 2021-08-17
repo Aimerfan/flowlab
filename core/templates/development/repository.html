@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>儲存庫預覽</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'core/mystyle.css' %}">
+</head>
+
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'development' %}">Home</a></li>
+            <li><a href="news.asp">Courses</a></li>
+            <li><a href="{% url 'repository' %}">Repository</a></li>
+            <li><a href="about.asp">Analysis</a></li>
+            <li style="float:right"><a></a></li>
+            <li style="float:right"><a href="{% url 'login' %}">Login</a></li>
+            <li style="float:right"><a>Logout</a></li>
+            <div style="float:right; padding: 14px 16px;"><a>{User Name}</a></div>
+        </ul>
+    </nav>
+
+    <div style="height: 50px;"></div>
+    <div>
+        <div>
+            <form>
+                <a href="{% url 'analysis' %}">
+                    <button class="btn_ci_flow btn-md" type="button">Jenkins File</button>
+                </a>
+                <a href="{% url 'analysis' %}">
+                    <button class="btn_ci_flow btn-md" type="button">analysis</button>
+                </a>
+                <a href="{% url 'analysis' %}">
+                    <button class="btn_ci_flow btn-md" type="button">code</button>
+                </a>
+                <a href="{% url 'analysis' %}">
+                    <button class="btn_ci_flow btn-md" type="button">build</button>
+                </a>
+                <a href="{% url 'analysis' %}">
+                    <button class="btn_ci_flow btn-md" type="button">test</button>
+                </a>
+            </form>
+        </div>
+        <div>
+            <h1>儲存庫預覽區塊</h1>
+        </div>
+    </div>
+</body>
+</html>
