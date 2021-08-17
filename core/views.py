@@ -13,9 +13,9 @@ def index(request):
     return render(request, 'core/index.html', context)
 
 
-def development(request):
+def courses(request):
     context = {}
-    return render(request, 'development/development.html', context)
+    return render(request, 'development/courses.html', context)
 
 
 def repository(request):

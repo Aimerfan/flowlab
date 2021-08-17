@@ -5,8 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Login</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'core/mystyle.css' %}">
-{#    <link rel="stylesheet" href="css/hard.css" />#}
+    <link rel="stylesheet" type="text/css" href="{% static 'core/style.css' %}">
 </head>
 
 <body>
@@ -15,7 +14,7 @@
             {# logo 圖片來源: https://www4.flamingtext.com/net-fu/jobs/27332323579007012.html #}
             <li><img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab"
                      style="display:block; margin:auto; height: 46px; padding: 8px;"></li>
-            <li><a href="{% url 'development' %}">Home</a></li>
+            <li><a href="{% url 'index' %}">Home</a></li>
         </ul>
     </nav>
 

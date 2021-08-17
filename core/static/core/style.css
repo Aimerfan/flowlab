@@ -9,10 +9,11 @@ ul {
     /* fixed navigation bar */
     position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
     /* 垂直置中 */
-    display: flex;
-    align-items: center;
+    /*display: flex;*/
+    /*align-items: center;*/
 }
 
 li {
@@ -23,7 +24,7 @@ li a {
     display: block;
     color: #000;
     text-align: center;
-    padding: 14px 16px;
+    padding: 22px 16px;
     text-decoration: none;
 }
 
@@ -39,6 +40,11 @@ li a:hover {
     color: white;
 }
 
+.ver_mid {
+    /* 垂直置中 */
+    display: flex;
+    align-items: center;
+}
 
 
 
@@ -49,6 +55,7 @@ body {
 h1 {
     color: navy;
     margin-left: 20px;
+    margin-right: 20px;
 }
 
 
@@ -257,6 +264,10 @@ button {
     text-align: center;
 }
 
+.container_close {
+    padding: 20px;
+}
+
 #dark div {
     background-color: #999999;
 }
@@ -278,4 +289,8 @@ button {
     width: 100%;
     padding-right: 15px;
     padding-left: 15px;
+}
+
+.frame {
+    border: 1px solid red;
 }
