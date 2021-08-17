@@ -44,6 +44,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'login_required.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'flowlab.urls'
@@ -120,6 +121,13 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# django-login-required-middleware 使用的白名單，限填 url names
+# 其他格式的白名單參考 https://pypi.org/project/django-login-required-middleware/
+LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
+    'index',
+    'login',
+]
 
 try:
     from .local_settings import *
