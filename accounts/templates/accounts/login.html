@@ -23,22 +23,22 @@
 
     <div class="container">
         <div class="content">
-            <h1>登入 FlowLab</h1>
             <div class="col.md-1">
+                <h1>登入 FlowLab</h1>
                 <div>
-                    <form method="post">
+                    <form method="post" action="">
                         {% csrf_token %}
                         <div class="login_content_title">
-                            <h4>UserName：</h4>
+                            <label>UserName：</label>
                         </div>
                         <div class="login_content">
-                            <input type="text" name="username"><br>
+                            {{ form.username }}
                         </div>
                         <div class="login_content_title">
-                            <h4>Password：</h4>
+                            <label>Password：</label>
                         </div>
                         <div class="login_content">
-                            <input type="text" name="password"><br>
+                            {{ form.password }}
                         </div>
                         <div class="login_content login_content_btn">
                             <button class="btn_index_login" type="submit">登入</button>
