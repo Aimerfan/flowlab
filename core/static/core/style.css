@@ -46,6 +46,11 @@ li a:hover {
     align-items: center;
 }
 
+.align_both_sides {
+    /* 對齊左右兩邊 */
+    display: flex;
+    justify-content: space-between;
+}
 
 
 body {
@@ -58,6 +63,10 @@ h1 {
     margin-right: 20px;
 }
 
+h4 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 
 /*FORM*/
 .form_title {
@@ -210,7 +219,7 @@ button {
 
 .login_content > input {
     width: 200px;
-    border: 0px;
+    border: 0;
     border-bottom: 2px solid #633974;
     color: #633974;
     font-weight: bold;
@@ -289,6 +298,58 @@ button {
     width: 100%;
     padding-right: 15px;
     padding-left: 15px;
+}
+
+.text_left {
+    text-align: left;
+}
+
+/* 儲存庫預覽區塊 */
+.repo_content {
+    /*border: 1px solid blue;*/
+    width: 70%;
+    /* 水平置中 */
+    margin: 0 auto;
+    text-align: left;
+}
+
+.frame_gray {
+    border: 1px solid gray;
+    background-color: whitesmoke;
+    border-radius: 10px 10px 10px 10px;
+}
+
+/* 儲存庫檔案瀏覽區 */
+.frame_files_header {
+    border: 1px solid cornflowerblue;
+    background-color: #d9f5ff;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    margin-top: 20px;
+}
+
+.frame_files_content {
+    border: 1px solid gray;
+    background-color: whitesmoke;
+    border-radius: 0 0 0 0;
+    display: flex;
+}
+
+.frame_files_footer {
+    border: 1px solid gray;
+    background-color: whitesmoke;
+    border-radius: 0 0 10px 10px;
+    display: flex;
+}
+
+.copy_sha {
+    display: flex;
+    border: 1px solid gray;
+    border-radius: 5px 5px 5px 5px;
+    padding-left: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 15px;
 }
 
 .frame {
