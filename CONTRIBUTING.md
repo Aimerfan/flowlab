@@ -21,11 +21,32 @@ Docker, Jenkins, GitLab, Sonarqube
 3. 將 `flowlab` 下的 `local_settings.example` 複製成副檔名為 `.py` 的同名檔案，並配置好內容(參考 example)
 4. `python manage.py runserver 0.0.0.0:8000`
 
+---
+
+## Django Coding Style
+
+[Coding style](https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/coding-style/)
+
+---
+
+## django-app 結構規範
+
+1. FBV or CBV
+原則上使用FBV加速開發，但當符合下列條件時應使用CBV
+    1. url 可以對應兩種以上的 http method, 且兩種方法的程式碼差異達 30% 以上時
+    2. 想要繼承現有的通用 views class 時
+
+使用 CBV 時, 應該把整個 view class 移動到單一檔案中  
+並且如果存在 1 個以上的 views 檔案就應該將所有檔案放到 views 資料夾中
+
+---
+
 ## Git 貢獻提交規範
 > 參考規範  
 > [vue](https://github.com/vuejs/vue/blob/dev/.github/COMMIT_CONVENTION.md)  
 > [Angular](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-angular)  
 > [vben-admin-thin-next](https://github.com/anncwb/vben-admin-thin-next/blob/main/README.md)  
+> [Git Commit Message 這樣寫會更好，替專案引入規範與範例](https://wadehuanglearning.blogspot.com/2019/05/commit-commit-commit-why-what-commit.html)
 
 - `feat`: 增加新功能
 - `fix`: 修復問題/BUG
