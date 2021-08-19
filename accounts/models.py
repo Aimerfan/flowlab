@@ -1,5 +1,13 @@
+from enum import Enum
+
 from django.db import models
 from django.contrib.auth.models import User
+
+
+# 每個繼承 RoleBase 的類別都要在此註冊
+class RoleEnum(Enum):
+    STUDENT = 1
+    TEACHER = 2
 
 
 class RoleBase(models.Model):
