@@ -4,9 +4,11 @@ from django.contrib.auth import authenticate, login, logout
 
 def login_view(request):
     """登入"""
+    next_url = request.GET.get('next', 'index')
+
     # 已登入，重定向到首頁
     if request.user.is_authenticated:
-        redirect('')
+        redirect(next_url)
     # 先驗證 http method
     elif request.method == 'POST':
         username = request.POST['username']
@@ -14,7 +16,7 @@ def login_view(request):
         user = authenticate(username=username, password=password)
         if user and user.is_active:
             login(request, user)
-            return redirect('index')
+            return redirect(next_url)
         else:
             pass
     return render(request, 'accounts/login.html', {})
