@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-hant">
+<head>
+    <meta charset="UTF-8">
+    <title>403</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/style.css' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'core/images/favicon.ico' %}">
+</head>
+<body>
+    <nav>
+        <ul>
+            {# logo 圖片來源: https://www4.flamingtext.com/net-fu/jobs/27332323579007012.html #}
+            <li><img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab"
+                     style="display:block; margin:9px; height: 50px;"></li>
+            <li><a href="{% url 'index' %}">Home</a></li>
+            <li><a href="{% url 'courses' %}">Courses</a></li>
+            <li><a href="{% url 'repository' %}">Repository</a></li>
+            <li><a href="{% url 'analysis' %}">Analysis</a></li>
+            {% if not user.is_authenticated %}
+            <li style="float:right"><a href="{% url 'login' %}">Login</a></li>
+            {% else %}
+            <li style="float:right"><a href="{% url 'logout' %}">Logout</a></li>
+            <div style="float:right; padding: 22px 16px;"><a>{{ username }}</a></div>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div style="height: 60px"></div>
+
+    <div class="container_error text-center">
+        <div class="row">
+            <div class="col-sm-6">
+                <img src="{% static 'core/images/403-word.png' %}" alt="403_forbidden" style="width: 70%">
+                <div class="login_content login_content_btn">
+                    <a href="{% url 'index' %}">
+                        <button class="btn_index_login">回到首頁</button>
+                    </a>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <img src="{% static 'core/images/403-img.png' %}" alt="403_forbidden" style="width: 70%">
+            </div>
+        </div>
+    </div>
+</body>
+</html>

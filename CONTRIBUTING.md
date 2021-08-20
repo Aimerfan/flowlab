@@ -41,6 +41,16 @@ Docker, Jenkins, GitLab, Sonarqube
 
 ---
 
+##　core/static 規範
+
+- 單個 `css`, `images` 或 `js` 的檔案直接放置於 `core/static/core/` 下
+- 若該類別存在 1 個以上的檔案就應該將所有檔案放到 "該類別" 的資料夾中
+
+例如：目前 `core/static/core` 下有 `flowlab-logo.png` 與 `devops.png` 兩份檔案  
+則將這兩份檔案統一放置於 `core/static/core/images/` 下
+
+---
+
 ## Git 貢獻提交規範
 > 參考規範  
 > [vue](https://github.com/vuejs/vue/blob/dev/.github/COMMIT_CONVENTION.md)  

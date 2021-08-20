@@ -10,19 +10,24 @@ def index(request):
     if request.user.is_authenticated:
         context['username'] = request.user.username
 
-    return render(request, 'core/index.html', context)
+    return render(request, 'index.html', context)
 
 
 def courses(request):
     context = {}
-    return render(request, 'development/courses.html', context)
+    return render(request, 'dev/courses.html', context)
 
 
 def repository(request):
     context = {}
-    return render(request, 'development/repository.html', context)
+    return render(request, 'dev/repository.html', context)
 
 
 def analysis(request):
     context = {}
-    return render(request, 'development/analysis.html', context)
+    return render(request, 'dev/analysis.html', context)
+
+
+def dev(request):
+    context = {}
+    return render(request, 'dev/dev.html', context)

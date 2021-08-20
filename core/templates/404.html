@@ -1,19 +1,19 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
-
+<html lang="zh-hant">
 <head>
-    <meta charset="UTF-8" />
-    <title>FlowLab</title>
+    <meta charset="UTF-8">
+    <title>404</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'core/style.css' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'core/images/favicon.ico' %}">
 </head>
-
 <body>
     <nav>
         <ul>
             {# logo 圖片來源: https://www4.flamingtext.com/net-fu/jobs/27332323579007012.html #}
             <li><img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab"
-                     style="display:block; margin:auto; height: 46px; padding: 8px;"></li>
+                     style="display:block; margin:9px; height: 50px;"></li>
             <li><a href="{% url 'index' %}">Home</a></li>
             <li><a href="{% url 'courses' %}">Courses</a></li>
             <li><a href="{% url 'repository' %}">Repository</a></li>
@@ -27,25 +27,22 @@
         </ul>
     </nav>
 
-    <div style="height: 50px"></div>
+    <div style="height: 60px"></div>
 
-    <div>
-        <div class="container">
-            <div class="content">
-                <h1>FlowLab</h1>
-                <h2>一套模擬 DevOps 與 CI/CD 自動化流程的實驗室。</h2>
+    <div class="container_error text-center">
+        <div class="row">
+            <div class="col-sm-6">
+                <img src="{% static 'core/images/404-word.png' %}" alt="404_no_page" style="width: 70%">
+                <div class="login_content login_content_btn">
+                    <a href="{% url 'index' %}">
+                        <button class="btn_index_login">回到首頁</button>
+                    </a>
+                </div>
             </div>
-        </div>
-    </div>
-
-    <div id="light">
-        <div class="container">
-            <div class="content">
-                <img src="{% static 'core/images/devops.png' %}" alt="DevOps" style="display:block; margin:auto; width: 60%;">
-                資料來源：https://www.softwebsolutions.com/resources/devops-and-microservices.html
+            <div class="col-sm-6">
+                <img src="{% static 'core/images/404-img.png' %}" alt="404_not_found" style="width: 70%">
             </div>
         </div>
     </div>
 </body>
-
 </html>

@@ -14,6 +14,7 @@ ul {
     /* 垂直置中 */
     /*display: flex;*/
     /*align-items: center;*/
+    box-sizing: content-box;
 }
 
 li {
@@ -265,6 +266,10 @@ button {
     align-items: center;
 }
 
+.container_error {
+    padding: 100px;
+}
+
 .content {
     /*border: 1px solid blue;*/
     width: 100%;
@@ -286,9 +291,6 @@ button {
 }
 
 
-.row {
-
-}
 
 
 .col.md-1,
