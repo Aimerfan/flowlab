@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>FlowLab</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'core/mystyle.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/style.css' %}">
 </head>
 
 <body>
@@ -15,15 +15,14 @@
             <li><img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab"
                      style="display:block; margin:auto; height: 46px; padding: 8px;"></li>
             <li><a href="{% url 'index' %}">Home</a></li>
-            <li><a href="">Courses</a></li>
-            <li><a href="">Repository</a></li>
-            <li><a href="">Analysis</a></li>
-            <li style="float:right"><a></a></li>
+            <li><a href="{% url 'courses' %}">Courses</a></li>
+            <li><a href="{% url 'repository' %}">Repository</a></li>
+            <li><a href="{% url 'analysis' %}">Analysis</a></li>
             {% if not user.is_authenticated %}
             <li style="float:right"><a href="{% url 'login' %}">Login</a></li>
             {% else %}
             <li style="float:right"><a href="{% url 'logout' %}">Logout</a></li>
-            <div style="float:right; padding: 14px 16px;"><a>{{ username }}</a></div>
+            <div style="float:right; padding: 22px 16px;"><a>{{ username }}</a></div>
             {% endif %}
         </ul>
     </nav>
@@ -42,7 +41,7 @@
     <div id="light">
         <div class="container">
             <div class="content">
-                <img src="{% static 'core/images/devopos.png' %}" alt="DevOps" style="display:block; margin:auto; width: 60%;">
+                <img src="{% static 'core/images/devops.png' %}" alt="DevOps" style="display:block; margin:auto; width: 60%;">
                 資料來源：https://www.softwebsolutions.com/resources/devops-and-microservices.html
             </div>
         </div>

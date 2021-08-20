@@ -5,8 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Login</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'core/mystyle.css' %}">
-{#    <link rel="stylesheet" href="css/hard.css" />#}
+    <link rel="stylesheet" type="text/css" href="{% static 'core/style.css' %}">
 </head>
 
 <body>
@@ -15,7 +14,7 @@
             {# logo 圖片來源: https://www4.flamingtext.com/net-fu/jobs/27332323579007012.html #}
             <li><img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab"
                      style="display:block; margin:auto; height: 46px; padding: 8px;"></li>
-            <li><a href="{% url 'development' %}">Home</a></li>
+            <li><a href="{% url 'index' %}">Home</a></li>
         </ul>
     </nav>
 
@@ -23,22 +22,22 @@
 
     <div class="container">
         <div class="content">
-            <h1>登入 FlowLab</h1>
             <div class="col.md-1">
+                <h1>登入 FlowLab</h1>
                 <div>
-                    <form method="post">
+                    <form method="post" action="">
                         {% csrf_token %}
                         <div class="login_content_title">
-                            <h4>UserName：</h4>
+                            <label>UserName：</label>
                         </div>
                         <div class="login_content">
-                            <input type="text" name="username"><br>
+                            {{ form.username }}
                         </div>
                         <div class="login_content_title">
-                            <h4>Password：</h4>
+                            <label>Password：</label>
                         </div>
                         <div class="login_content">
-                            <input type="text" name="password"><br>
+                            {{ form.password }}
                         </div>
                         <div class="login_content login_content_btn">
                             <button class="btn_index_login" type="submit">登入</button>

@@ -9,10 +9,11 @@ ul {
     /* fixed navigation bar */
     position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
     /* 垂直置中 */
-    display: flex;
-    align-items: center;
+    /*display: flex;*/
+    /*align-items: center;*/
 }
 
 li {
@@ -23,7 +24,7 @@ li a {
     display: block;
     color: #000;
     text-align: center;
-    padding: 14px 16px;
+    padding: 22px 16px;
     text-decoration: none;
 }
 
@@ -39,7 +40,17 @@ li a:hover {
     color: white;
 }
 
+.ver_mid {
+    /* 垂直置中 */
+    display: flex;
+    align-items: center;
+}
 
+.align_both_sides {
+    /* 對齊左右兩邊 */
+    display: flex;
+    justify-content: space-between;
+}
 
 
 body {
@@ -49,8 +60,13 @@ body {
 h1 {
     color: navy;
     margin-left: 20px;
+    margin-right: 20px;
 }
 
+h4 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 
 /*FORM*/
 .form_title {
@@ -124,6 +140,42 @@ button {
     cursor: pointer;
 }
 
+/* button's size */
+.btn-lg {
+    padding: .5rem 1rem;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    border-radius: .3rem
+}
+
+.btn-md {
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: .25rem
+}
+
+.btn-sm {
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    line-height: 1.5;
+    border-radius: .2rem
+}
+
+.btn_ci_flow {
+    color: #1b1b1b;
+    background-color: #aaaaaa;
+    border-radius: 30px 30px 30px 30px;
+    border: 2px solid #4D4D4D;
+}
+
+.btn_ci_flow:hover {
+    color: white;
+    background: #4D4D4D;
+    transition: 0.1s linear;
+    cursor: pointer;
+}
+
 /*login page*/
 .login_title {
     text-align: center;
@@ -167,7 +219,7 @@ button {
 
 .login_content > input {
     width: 200px;
-    border: 0px;
+    border: 0;
     border-bottom: 2px solid #633974;
     color: #633974;
     font-weight: bold;
@@ -221,6 +273,10 @@ button {
     text-align: center;
 }
 
+.container_close {
+    padding: 20px;
+}
+
 #dark div {
     background-color: #999999;
 }
@@ -242,4 +298,60 @@ button {
     width: 100%;
     padding-right: 15px;
     padding-left: 15px;
+}
+
+.text_left {
+    text-align: left;
+}
+
+/* 儲存庫預覽區塊 */
+.repo_content {
+    /*border: 1px solid blue;*/
+    width: 70%;
+    /* 水平置中 */
+    margin: 0 auto;
+    text-align: left;
+}
+
+.frame_gray {
+    border: 1px solid gray;
+    background-color: whitesmoke;
+    border-radius: 10px 10px 10px 10px;
+}
+
+/* 儲存庫檔案瀏覽區 */
+.frame_files_header {
+    border: 1px solid cornflowerblue;
+    background-color: #d9f5ff;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    margin-top: 20px;
+}
+
+.frame_files_content {
+    border: 1px solid gray;
+    background-color: whitesmoke;
+    border-radius: 0 0 0 0;
+    display: flex;
+}
+
+.frame_files_footer {
+    border: 1px solid gray;
+    background-color: whitesmoke;
+    border-radius: 0 0 10px 10px;
+    display: flex;
+}
+
+.copy_sha {
+    display: flex;
+    border: 1px solid gray;
+    border-radius: 5px 5px 5px 5px;
+    padding-left: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 15px;
+}
+
+.frame {
+    border: 1px solid red;
 }

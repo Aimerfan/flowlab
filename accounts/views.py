@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 
+from .forms import LoginForm
+
 
 def login_view(request):
     """登入"""
     next_url = request.GET.get('next', 'index')
+    form = LoginForm(request.POST or None)
 
     # 已登入，重定向到首頁
     if request.user.is_authenticated:
@@ -19,7 +22,7 @@ def login_view(request):
             return redirect(next_url)
         else:
             pass
-    return render(request, 'accounts/login.html', {})
+    return render(request, 'accounts/login.html', {'form': form})
 
 
 def logout_view(request):
