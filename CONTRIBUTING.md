@@ -51,6 +51,15 @@ Docker, Jenkins, GitLab, Sonarqube
 
 ---
 
+## URL 字串格式
+
+除了由 Django 指定格式的欄位以外
+默認 URL 表示方法由順序在後的字串提供分隔符(/)
+即，如果有一個 URL: `https://gitlab.example.com/api/v4/projects`
+則在組織時應該拆分為如右格式: `https://gitlab.example.com` + `/api/v4` + `/projects`
+
+---
+
 ## Git 貢獻提交規範
 > 參考規範  
 > [vue](https://github.com/vuejs/vue/blob/dev/.github/COMMIT_CONVENTION.md)  
