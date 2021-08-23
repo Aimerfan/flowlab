@@ -26,8 +26,3 @@ def repository(request):
 def analysis(request):
     context = {}
     return render(request, 'dev/analysis.html', context)
-
-
-def dev(request):
-    context = {}
-    return render(request, 'dev/dev.html', context)

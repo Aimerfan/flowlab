@@ -1,0 +1,23 @@
+{% load static %}
+{% load nav_tag %}
+<nav>
+    <ul>
+        {# logo 圖片來源: https://www4.flamingtext.com/net-fu/jobs/27332323579007012.html #}
+        <li><img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab"
+                 style="display:block; margin:9px; height: 50px;"></li>
+        <li><a href="{% url 'index' %}">Home</a></li>
+        {# -------------------------------尚未登入------------------------------- #}
+        {% if not user.is_authenticated %}
+        <li style="float:right"><a href="{% url 'login' %}">Login</a></li>
+        {# -------------------------------已經登入------------------------------- #}
+        {% else %}
+        <li><a href="{% url 'courses' %}">Courses</a></li>
+        <li><a href="{% url 'repository' %}">Repository</a></li>
+        <li><a href="{% url 'analysis' %}">Analysis</a></li>
+        <li style="float:right"><a href="{% url 'logout' %}">Logout</a></li>
+        <div style="float:right; padding: 22px 16px;"><a>{% get_name request %}</a></div>
+        {% endif %}
+    </ul>
+</nav>
+
+<div style="height: 70px"></div>

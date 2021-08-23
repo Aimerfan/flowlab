@@ -1,25 +1,9 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="UTF-8" />
-    <title>Login</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'core/style.css' %}">
-</head>
-
-<body>
-    <nav>
-        <ul>
-            {# logo 圖片來源: https://www4.flamingtext.com/net-fu/jobs/27332323579007012.html #}
-            <li><img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab"
-                     style="display:block; margin:auto; height: 46px; padding: 8px;"></li>
-            <li><a href="{% url 'index' %}">Home</a></li>
-        </ul>
-    </nav>
-
-    <div style="height: 50px"></div>
-
+{% block title %}
+    Login
+{% endblock %}
+{% block body %}
     <div class="container">
         <div class="content">
             <div class="col.md-1">
@@ -47,7 +31,4 @@
             </div>
         </div>
     </div>
-
-</body>
-
-</html>
+{% endblock %}

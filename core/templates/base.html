@@ -1,0 +1,17 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-hant">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}FlowLab{% endblock title %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/style.css' %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'core/images/favicon.ico' %}">
+    {% block custom_css %}{% endblock %}
+</head>
+<body>
+    {% include 'nav.html' %}
+    {% block body %}{% endblock %}
+    {% block custom_javascript %}{% endblock %}
+</body>
+</html>
