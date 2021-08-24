@@ -83,6 +83,10 @@ h6 {
     font-weight: 400;
 }
 
+h6 a {
+    text-decoration: none;
+}
+
 /*FORM*/
 .form_title {
     font-weight: 900;
@@ -277,6 +281,14 @@ button {
     /* 水平置中 */
     margin: 0 auto;
     text-align: center;
+}
+
+/* repo_projects 列表 */
+.projects_content {
+    width: 80%;
+    text-align: left;
+    background-color: whitesmoke;
+    border-radius: 10px;
 }
 
 .container_close {
