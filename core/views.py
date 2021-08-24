@@ -2,14 +2,7 @@ from django.shortcuts import render
 
 
 def index(request):
-    context = {
-        'user': request.user,
-        'username': '',
-    }
-
-    if request.user.is_authenticated:
-        context['username'] = request.user.username
-
+    context = {}
     return render(request, 'index.html', context)
 
 

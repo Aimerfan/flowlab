@@ -1,23 +1,36 @@
 {% load static %}
 {% load nav_tag %}
-<nav>
-    <ul>
-        {# logo 圖片來源: https://www4.flamingtext.com/net-fu/jobs/27332323579007012.html #}
-        <li><img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab"
-                 style="display:block; margin:9px; height: 50px;"></li>
-        <li><a href="{% url 'index' %}">Home</a></li>
-        {# -------------------------------尚未登入------------------------------- #}
-        {% if not user.is_authenticated %}
-        <li style="float:right"><a href="{% url 'login' %}">Login</a></li>
-        {# -------------------------------已經登入------------------------------- #}
-        {% else %}
-        <li><a href="{% url 'courses' %}">Courses</a></li>
-        <li><a href="{% url 'repository' %}">Repository</a></li>
-        <li><a href="{% url 'analysis' %}">Analysis</a></li>
-        <li style="float:right"><a href="{% url 'logout' %}">Logout</a></li>
-        <div style="float:right; padding: 22px 16px;"><a>{% get_name request %}</a></div>
-        {% endif %}
-    </ul>
+<nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"><img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab"
+                     style="display:block; margin:9px; height: 50px;"></a>
+        {# -------------------------------手機版------------------------------- #}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#linkbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        {# -------------------------------電腦版------------------------------- #}
+        <div class="collapse navbar-collapse" id="linkbar">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Home</a></li>
+                {# -------------------------------已經登入-------------------------------#}
+                {% if user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'courses' %}">Courses</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'repository' %}">Repository</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'analysis' %}">Analysis</a></li>
+                {% endif %}
+            </ul>
+            <div>
+                <ul class="navbar-nav me-auto">
+                    {# -------------------------------尚未登入-------------------------------#}
+                    {% if not user.is_authenticated %}
+                    <li class="nav-item" style="float:right"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    {# -------------------------------已經登入-------------------------------#}
+                    {% else %}
+                    <div class="show_name"><a>{% get_name request %}</a></div>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
 </nav>
-
-<div style="height: 70px"></div>

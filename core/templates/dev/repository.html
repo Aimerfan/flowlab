@@ -32,7 +32,7 @@
                 <h2>{{ username }} / {{ reponame }}</h2>
             </div>
             <div>
-                <h3>{{ branchsum }} 3 branch {{ commitsum }} 7 commit</h3>
+                <h5>{{ branchsum }} 3 branches</h5>
             </div>
             <hr style="height: 3px; background: #aaaaaa; margin: 0">
             <div class="align_both_sides">
@@ -45,20 +45,20 @@
                         </button>
                     </div>
                     <div>
-                        <h3>{{ path }} path / file {{ file }}</h3>
+                        <h5>{{ path }} path / file {{ file }}</h5>
                     </div>
                 </div>
                 <div class="ver_mid">
                     <div>
-                        <button class="btn-sm ver_mid" style="padding: 10px;">
+                        <button class="btn-sm ver_mid" style="padding: 7px;">
                             <img src="{% static 'core/images/download.png' %}" 
-                                 style="width: 10px; padding-left: 5px;" alt="download">
+                                 style="width: 15px; margin: auto 5px;" alt="download">
                             <img src="{% static 'core/images/arrow-down.png' %}" 
-                                 style="width: 10px; padding-left: 5px; padding-right: 5px;" alt="drop_down">
+                                 style="width: 10px; margin: auto 5px;" alt="drop_down">
                         </button>
                     </div>
                     <div style="padding: 15px;">
-                        <button class="btn-sm ver_mid"><span style="width: 60px;">clone</span></button>
+                        <button class="btn-sm"><span style="width: 60px;">clone</span></button>
                     </div>
                 </div>
             </div>
@@ -66,19 +66,19 @@
             <div class="frame_gray align_both_sides">
                 <div class="ver_mid">
                     <div class="col-md-auto">
-                        <h3>{{ author }}author_name</h3>
+                        <h6>{{ author }}author_name</h6>
                     </div>
-                    <div>
-                        <h3>{{ commit_info }}init</h3>
+                    <div style="color: #585858">
+                        {{ commit_info }}init commit 第一次提交
                     </div>
                 </div>
                 <div class="ver_mid">
                     <div class="col-md-auto">
-                        <h3>{{ time }}1 day ago</h3>
+                        <h6>{{ time }}1 day ago</h6>
                     </div>
                     <div class="copy_sha">
-                        <h4 style="margin-right: 5px;">{{ commit_no }}200ca979</h4>
-                        <button>COPY</button>
+                        <h6 style="margin-right: 5px;">{{ commit_no }}200ca979</h6>
+                        <button class="btn-sm">COPY</button>
                     </div>
                 </div>
             </div>
@@ -86,36 +86,36 @@
             <div>
                 <div class="frame_files_header">
                     <div style="width: 300px;" class="col-md-auto text_left">
-                        <h3>Name</h3>
+                        <h5>Name</h5>
                     </div>
                     <div style="width: calc(100% - 500px);" class="col-md-auto text_left">
-                        <h3>last commit</h3>
+                        <h5>last commit</h5>
                     </div>
                     <div style="width: 200px;" class="col-md-auto text_left">
-                        <h3>last update</h3>
+                        <h5>last update</h5>
                     </div>
                 </div>
 
                 <div class="frame_files_content">
                     <div style="width: 300px;" class="col-md-auto text_left">
-                        <h4>README</h4>
+                        <h6>README</h6>
                     </div>
                     <div style="width: calc(100% - 500px);" class="col-md-auto text_left">
-                        <h4>init</h4>
+                        <h6>init</h6>
                     </div>
                     <div style="width: 200px;" class="col-md-auto text_left">
-                        <h4>1 day ago</h4>
+                        <h6>1 day ago</h6>
                     </div>
                 </div>
                 <div class="frame_files_footer">
                     <div style="width: 300px;" class="col-md-auto text_left">
-                        <h4>{{ filename }}</h4>
+                        <h6>{{ filename }}</h6>
                     </div>
                     <div style="width: calc(100% - 500px);" class="col-md-auto text_left">
-                        <h4>{{ last_commit_info }}</h4>
+                        <h6>{{ last_commit_info }}</h6>
                     </div>
                     <div style="width: 200px; text-align: left;" class="col-md-auto text_left">
-                        <h4>{{ last_update_time }}</h4>
+                        <h6>{{ last_update_time }}</h6>
                     </div>
                 </div>
             </div>
