@@ -1,39 +1,45 @@
 /* 上方導航列 */
-ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    /*background-color: #f3f3f3;*/
-    background-color: #D9F5FFFF;
-    /* fixed navigation bar */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    /* 垂直置中 */
-    /*display: flex;*/
-    /*align-items: center;*/
-    box-sizing: content-box;
+nav {
+    height: 70px;
 }
 
-li {
-    float: left;
+.navbar{
+    background-color: #D9F5FFFF;
 }
 
 li a {
-    display: block;
-    color: #000;
-    text-align: center;
-    padding: 22px 16px;
-    text-decoration: none;
+    color: #000 !important;
+    font-size: 16px;
 }
 
-/* Change the link color to #111 (black) on hover */
+/* Change the link color on hover */
 li a:hover {
-    /*background-color: #DDDDDD;*/
+    color: #000 !important;
     background-color: lightblue;
-    color: #000;
+}
+
+.nav-link {
+    padding: 24px;
+}
+
+.navbar-toggler {
+    background-color: lightgray;
+}
+
+.show_name {
+    padding: 24px 12px;
+}
+
+@media (max-width: 992px) {
+    nav {
+        height: auto;
+    }
+    .nav-link {
+        padding: 10px;
+    }
+    .show_name {
+        display: none;
+    }
 }
 
 .active {
@@ -65,8 +71,16 @@ h1 {
 }
 
 h4 {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin: 10px 0;
+}
+
+h5 {
+    margin: 10px;
+}
+
+h6 {
+    margin: 10px;
+    font-weight: 400;
 }
 
 /*FORM*/
@@ -177,7 +191,7 @@ button {
     cursor: pointer;
 }
 
-/*login page*/
+/* login page */
 .login_title {
     text-align: center;
     margin-top: 50px;
@@ -257,19 +271,6 @@ button {
 
 
 
-.container {
-    /*border: 1px solid red;*/
-    /* 垂直置中 */
-    position: relative;
-    padding: 100px 0;
-    display: flex;
-    align-items: center;
-}
-
-.container_error {
-    padding: 100px;
-}
-
 .content {
     /*border: 1px solid blue;*/
     width: 100%;
@@ -282,25 +283,16 @@ button {
     padding: 20px;
 }
 
-#dark div {
-    background-color: #999999;
+.feature {
+    padding: 100px;
 }
 
-#light div {
+.feature_odd {
     background-color: #d9f5ff;
 }
 
 
 
-
-.col.md-1,
-.col-md,
-.col-md-auto {
-    position: relative;
-    width: 100%;
-    padding-right: 15px;
-    padding-left: 15px;
-}
 
 .text_left {
     text-align: left;
@@ -309,7 +301,7 @@ button {
 /* 儲存庫預覽區塊 */
 .repo_content {
     /*border: 1px solid blue;*/
-    width: 70%;
+    width: 90%;
     /* 水平置中 */
     margin: 0 auto;
     text-align: left;
@@ -348,7 +340,6 @@ button {
     display: flex;
     border: 1px solid gray;
     border-radius: 5px 5px 5px 5px;
-    padding-left: 5px;
     margin-top: 10px;
     margin-bottom: 10px;
     margin-right: 15px;
