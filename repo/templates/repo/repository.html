@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load nav_tag %}
 {% block title %}
     儲存庫預覽
 {% endblock %}
 {% block body %}
+{% get_name request as username %}
     <div class="container container_close">
         <div class="content">
             <form>
@@ -29,17 +31,21 @@
         <div class="repo_content">
             <h1 style="text-align: center">儲存庫預覽區塊</h1>
             <div>
-                <h2>{{ username }} / {{ reponame }}</h2>
+                <h2>{{ username }} / {{ info.name }}</h2>
             </div>
             <div>
-                <h5>{{ branchsum }} 3 branches</h5>
+                {% if info.branch_sum == 1 %}
+                <h5>{{ info.branch_sum }} branch</h5>
+                {% else %}
+                <h5>{{ info.branch_sum }} branches</h5>
+                {% endif %}
             </div>
             <hr style="height: 3px; background: #aaaaaa; margin: 0">
             <div class="align_both_sides">
                 <div class="ver_mid">
                     <div style="padding: 15px;">
                         <button class="btn-sm ver_mid">
-                            <span style="width: 100px;">{{ branchname }}branchname</span>
+                            <span style="width: 100px;">{{ info.branch }}</span>
                             <img src="{% static 'core/images/arrow-down.png' %}"
                                  style="width: 10px; float: right" alt="drop_down">
                         </button>
@@ -66,24 +72,24 @@
             <div class="frame_gray align_both_sides">
                 <div class="ver_mid">
                     <div class="col-md-auto">
-                        <h6>{{ author }}author_name</h6>
+                        <h6>{{ info.author_name }}</h6>
                     </div>
                     <div style="color: #585858">
-                        {{ commit_info }}init commit 第一次提交
+                        {{ info.last_info }}
                     </div>
                 </div>
                 <div class="ver_mid">
                     <div class="col-md-auto">
-                        <h6>{{ time }}1 day ago</h6>
+                        <h6>{{ info.last_time }}</h6>
                     </div>
                     <div class="copy_sha">
-                        <h6 style="margin-right: 5px;">{{ commit_no }}200ca979</h6>
+                        <h6 style="margin-right: 5px;">{{ info.sha }}</h6>
                         <button class="btn-sm">COPY</button>
                     </div>
                 </div>
             </div>
 
-            <div>
+            <div class="frame_files">
                 <div class="frame_files_header">
                     <div style="width: 300px;" class="col-md-auto text_left">
                         <h5>Name</h5>
@@ -95,29 +101,19 @@
                         <h5>last update</h5>
                     </div>
                 </div>
-
+                {% for key, file in files.items %}
                 <div class="frame_files_content">
                     <div style="width: 300px;" class="col-md-auto text_left">
-                        <h6>README</h6>
+                        <h6>{{ file.name }}</h6>
                     </div>
                     <div style="width: calc(100% - 500px);" class="col-md-auto text_left">
-                        <h6>init</h6>
-                    </div>
-                    <div style="width: 200px;" class="col-md-auto text_left">
-                        <h6>1 day ago</h6>
-                    </div>
-                </div>
-                <div class="frame_files_footer">
-                    <div style="width: 300px;" class="col-md-auto text_left">
-                        <h6>{{ filename }}</h6>
-                    </div>
-                    <div style="width: calc(100% - 500px);" class="col-md-auto text_left">
-                        <h6>{{ last_commit_info }}</h6>
+                        <h6>{{ file.last_info }}</h6>
                     </div>
                     <div style="width: 200px; text-align: left;" class="col-md-auto text_left">
-                        <h6>{{ last_update_time }}</h6>
+                        <h6>{{ file.last_time }}</h6>
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
     </div>

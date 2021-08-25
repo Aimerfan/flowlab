@@ -326,25 +326,22 @@ button {
 }
 
 /* 儲存庫檔案瀏覽區 */
+.frame_files {
+    margin-top: 20px;
+    background-color: whitesmoke;
+    border-radius: 10px;
+    border: 1px solid gray;
+}
+
 .frame_files_header {
-    border: 1px solid cornflowerblue;
+    /*border: 1px solid cornflowerblue;*/
     background-color: #d9f5ff;
     border-radius: 10px 10px 0 0;
     display: flex;
-    margin-top: 20px;
 }
 
 .frame_files_content {
-    border: 1px solid gray;
-    background-color: whitesmoke;
-    border-radius: 0 0 0 0;
-    display: flex;
-}
-
-.frame_files_footer {
-    border: 1px solid gray;
-    background-color: whitesmoke;
-    border-radius: 0 0 10px 10px;
+    border-top: 1px solid gray;
     display: flex;
 }
 
