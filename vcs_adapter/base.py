@@ -20,6 +20,7 @@ class VCSAdapter(metaclass=ABCMeta):
         """
         將相差秒數轉換為描述字串
         """
+        # 時間單位與使用該單位的秒數上限
         unit_dict = {
             'second': 60,
             'minute': 60 * 60,
@@ -56,17 +57,11 @@ class VCSAdapter(metaclass=ABCMeta):
     def get_repo(self, user, repo):
         """
         取得 repo 名稱, branch 總數,
-        目前 branch 名稱, 最後 commit sha, 訊息與日期(距離今天多久前)
         :param user:
         :param repo:
         :return: {
             'name': 'flowlab',
-            'branch_sum': 4,
-            'branch': 'master',
-            'sha': '78b3472',
-            'author_name': 'aimerfan',
-            'last_info': 'init commit',
-            'last_time': '3 minutes ago',
+            'default_branch': 'master',
         }
         """
         pass
@@ -77,7 +72,21 @@ class VCSAdapter(metaclass=ABCMeta):
         取得所有 branch 名稱
         :param user:
         :param repo:
-        :return: ['master', 'dev', ...]
+        :return: {
+            'master': {
+                'default': True,
+                'commit': {
+                    'short_id': '78b3472',
+                    'title': 'init commit',
+                    'author_name': 'aimerfan',
+                    'last_activity_at': 'Updated 3 minutes ago',
+                }
+            },
+            'dev': {
+                ...
+            },
+            ...
+        }
         """
         pass
 
@@ -90,10 +99,6 @@ class VCSAdapter(metaclass=ABCMeta):
         :param branch:
         :return: {
             '78b3472': {
-                'sha': '78b3472',
-                'info': 'init commit',
-                'author_name': 'aimerfan',
-                'last_time': '3 minutes ago',
             }, ...
         }
         """

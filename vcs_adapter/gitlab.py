@@ -12,8 +12,8 @@ from .base import VCSAdapter
 def use_self_attr(cls_method):
     @wraps(cls_method)
     def wrap(self, user=None, repo=None, *args, **kwargs):
-        user = self.user if self.user is not None else user
-        repo = self.repo if self.repo is not None else repo
+        user = user if user is not None else self.user
+        repo = repo if repo is not None else self.repo
         return cls_method(self, user, repo, *args, **kwargs)
     return wrap
 
@@ -44,11 +44,36 @@ class GitLabAdapter(VCSAdapter):
 
     @use_self_attr
     def get_repo(self, user, repo):
-        pass
+        project = self.gitlab.projects.get(f'{user}/{repo}')
+        project_dict = {
+            'name': project.name,
+            'default_branch': project.default_branch,
+        }
+        return project_dict
 
     @use_self_attr
     def get_branches(self, user, repo):
-        pass
+        project = self.gitlab.projects.get(f'{user}/{repo}')
+        branches = project.branches.list()
+        br_list = []
+        for br in branches:
+            # origin author_name: 'DESKTOP-15W6XC8\\username'
+            author_name = br.commit['author_name']
+            author_name = author_name.split('\\')[-1]
+            # convert created time as timedelta
+            created_at = datetime.fromisoformat(br.commit['created_at'])
+            delta = timezone.now() - created_at
+
+            br_list.append({
+                'default': br.default,
+                'commit': {
+                    'short_id': br.commit['short_id'],
+                    'title': br.commit['title'],
+                    'author_name': author_name,
+                    'last_activity_at': GitLabAdapter.timedelta_str(delta.seconds),
+                },
+            })
+        return br_list
 
     @use_self_attr
     def get_commits(self, user, repo, branch):
