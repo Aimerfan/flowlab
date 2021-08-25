@@ -15,6 +15,29 @@ class VCSAdapter(metaclass=ABCMeta):
         self.user = user
         self.repo = repo
 
+    @staticmethod
+    def timedelta_str(seconds: int):
+        """
+        將相差秒數轉換為描述字串
+        """
+        unit_dict = {
+            'second': 60,
+            'minute': 60 * 60,
+            'hour': 60 * 60 * 24,
+            'day': 60 * 60 * 24 * 7,
+            'week': 60 * 60 * 24 * 7 * 4,
+            'month': 60 * 60 * 24 * 30 * 12,
+            'year': None
+        }
+        prev_max = 1
+        for unit, max_sec in unit_dict.items():
+            if unit == 'year' or seconds < max_sec:
+                redundant = seconds // prev_max
+                plural = 's' if redundant > 1 else ''
+                return f'Updated {redundant} {unit}{plural} ago'
+            else:
+                prev_max = max_sec
+
     @abstractmethod
     def get_repo_list(self, user):
         """
@@ -22,10 +45,9 @@ class VCSAdapter(metaclass=ABCMeta):
         :param user:
         :return: {
             'flowlab': {
-                'name': 'flowlab',
-                'last_time': '3 minutes ago',
-                'branch_sum': 4,
+                'last_activity_at': 'Updated 3 minutes ago',
             },
+            ...
         }
         """
         pass
@@ -55,7 +77,7 @@ class VCSAdapter(metaclass=ABCMeta):
         取得所有 branch 名稱
         :param user:
         :param repo:
-        :return: ['master', 'dev']
+        :return: ['master', 'dev', ...]
         """
         pass
 
@@ -72,7 +94,7 @@ class VCSAdapter(metaclass=ABCMeta):
                 'info': 'init commit',
                 'author_name': 'aimerfan',
                 'last_time': '3 minutes ago',
-            },
+            }, ...
         }
         """
         pass
