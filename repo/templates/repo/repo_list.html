@@ -10,7 +10,7 @@
     <div class="container_close">
         <div class="content projects_content">
             <ul style="padding: 5px;">
-                {% for project, info in project_info.items %}
+                {% for project, info in projects.items %}
                 <li class="d-flex border-bottom">
                     <div class="col-md-8">
                         <h6><a href="{% url 'repo_project' username project %}">{{ project }}</a></h6>

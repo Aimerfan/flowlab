@@ -102,9 +102,9 @@
                     </div>
                 </div>
                 {% for key, file in files.items %}
-                <div class="frame_files_content">
+                <div class="frame_files_info">
                     <div style="width: 300px;" class="col-md-auto text_left">
-                        <h6>{{ file.name }}</h6>
+                        <h6><a href="{% url 'repo_blob' username info.name file.name %}">{{ file.name }}</a></h6>
                     </div>
                     <div style="width: calc(100% - 500px);" class="col-md-auto text_left">
                         <h6>{{ file.last_info }}</h6>
