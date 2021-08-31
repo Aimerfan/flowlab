@@ -2,3 +2,5 @@ Django==3.2.6
 django-login-required-middleware==0.6.1
 psycopg2-binary==2.9.1
 python-gitlab==2.10.0
+behave==1.2.6
+behave-django==1.4.0
