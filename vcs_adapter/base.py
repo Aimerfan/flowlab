@@ -15,6 +15,30 @@ class VCSAdapter(metaclass=ABCMeta):
         self.user = user
         self.repo = repo
 
+    @staticmethod
+    def timedelta_str(seconds: int):
+        """
+        將相差秒數轉換為描述字串
+        """
+        # 時間單位與使用該單位的秒數上限
+        unit_dict = {
+            'second': 60,
+            'minute': 60 * 60,
+            'hour': 60 * 60 * 24,
+            'day': 60 * 60 * 24 * 7,
+            'week': 60 * 60 * 24 * 7 * 4,
+            'month': 60 * 60 * 24 * 30 * 12,
+            'year': None
+        }
+        prev_max = 1
+        for unit, max_sec in unit_dict.items():
+            if unit == 'year' or seconds < max_sec:
+                redundant = seconds // prev_max
+                plural = 's' if redundant > 1 else ''
+                return f'Updated {redundant} {unit}{plural} ago'
+            else:
+                prev_max = max_sec
+
     @abstractmethod
     def get_repo_list(self, user):
         """
@@ -22,10 +46,9 @@ class VCSAdapter(metaclass=ABCMeta):
         :param user:
         :return: {
             'flowlab': {
-                'name': 'flowlab',
-                'last_time': '3 minutes ago',
-                'branch_sum': 4,
+                'last_activity_at': 'Updated 3 minutes ago',
             },
+            ...
         }
         """
         pass
@@ -34,33 +57,41 @@ class VCSAdapter(metaclass=ABCMeta):
     def get_repo(self, user, repo):
         """
         取得 repo 名稱, branch 總數,
-        目前 branch 名稱, 最後 commit sha, 訊息與日期(距離今天多久前)
         :param user:
         :param repo:
         :return: {
             'name': 'flowlab',
-            'branch_sum': 4,
-            'branch': 'master',
-            'sha': '78b3472',
-            'author_name': 'aimerfan',
-            'last_info': 'init commit',
-            'last_time': '3 minutes ago',
+            'default_branch': 'master',
         }
         """
         pass
 
     @abstractmethod
-    def get_branches(self, user, repo):
+    def get_branches_list(self, user, repo):
         """
         取得所有 branch 名稱
         :param user:
         :param repo:
-        :return: ['master', 'dev']
+        :return: {
+            'master': {
+                'default': True,
+                'commit': {
+                    'short_id': '78b3472',
+                    'title': 'init commit',
+                    'author_name': 'aimerfan',
+                    'last_activity_at': 'Updated 3 minutes ago',
+                }
+            },
+            'dev': {
+                ...
+            },
+            ...
+        }
         """
         pass
 
     @abstractmethod
-    def get_commits(self, user, repo, branch):
+    def get_commit(self, user, repo, branch):
         """
         取得該 branch 下(最新) commit 的 sha, 訊息, 作者名, 日期(距離今天多久前)
         :param user:
@@ -68,11 +99,7 @@ class VCSAdapter(metaclass=ABCMeta):
         :param branch:
         :return: {
             '78b3472': {
-                'sha': '78b3472',
-                'info': 'init commit',
-                'author_name': 'aimerfan',
-                'last_time': '3 minutes ago',
-            },
+            }, ...
         }
         """
         pass
@@ -85,7 +112,15 @@ class VCSAdapter(metaclass=ABCMeta):
         :param repo:
         :param path: 指定要搜尋的樹的路徑
         :param ref: 指定分支(或tag...), 未指定表示預設分支
-        :return: {}
+        :return: [{
+            'id': '785e068b79b6b22b418f11cd1c73a05b76eee728', # full commit sha
+            'name': 'flowlab',
+            'type': 'tree', # 'tree' as directory, or 'blob' as file
+            'path': 'flowlab',
+            'mode': '040000'
+            },
+            ...
+        ]
         """
         pass
 
@@ -95,7 +130,10 @@ class VCSAdapter(metaclass=ABCMeta):
         取得指定的 git 檔案結構樹(tree)
         :param user:
         :param repo:
-        :param blob_sha: 指定要取得的檔案sha
-        :return: {}
+        :param blob_sha: 指定要取得的檔案sha值
+        :return: {
+            'size': 663 # byte(?) file size
+            'content': 'import django ...' # content string
+        }
         """
         pass
