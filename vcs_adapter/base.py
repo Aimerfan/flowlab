@@ -67,7 +67,7 @@ class VCSAdapter(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_branches(self, user, repo):
+    def get_branches_list(self, user, repo):
         """
         取得所有 branch 名稱
         :param user:
@@ -91,7 +91,7 @@ class VCSAdapter(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_commits(self, user, repo, branch):
+    def get_commit(self, user, repo, branch):
         """
         取得該 branch 下(最新) commit 的 sha, 訊息, 作者名, 日期(距離今天多久前)
         :param user:
@@ -112,7 +112,15 @@ class VCSAdapter(metaclass=ABCMeta):
         :param repo:
         :param path: 指定要搜尋的樹的路徑
         :param ref: 指定分支(或tag...), 未指定表示預設分支
-        :return: {}
+        :return: [{
+            'id': '785e068b79b6b22b418f11cd1c73a05b76eee728', # full commit sha
+            'name': 'flowlab',
+            'type': 'tree', # 'tree' as directory, or 'blob' as file
+            'path': 'flowlab',
+            'mode': '040000'
+            },
+            ...
+        ]
         """
         pass
 
@@ -122,7 +130,10 @@ class VCSAdapter(metaclass=ABCMeta):
         取得指定的 git 檔案結構樹(tree)
         :param user:
         :param repo:
-        :param blob_sha: 指定要取得的檔案sha
-        :return: {}
+        :param blob_sha: 指定要取得的檔案sha值
+        :return: {
+            'size': 663 # byte(?) file size
+            'content': 'import django ...' # content string
+        }
         """
         pass

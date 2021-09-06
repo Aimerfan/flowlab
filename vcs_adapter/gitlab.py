@@ -1,5 +1,6 @@
 from datetime import datetime
 from functools import wraps
+from base64 import b64decode
 
 from gitlab import Gitlab
 
@@ -52,7 +53,7 @@ class GitLabAdapter(VCSAdapter):
         return project_dict
 
     @use_self_attr
-    def get_branches(self, user, repo):
+    def get_branches_list(self, user, repo):
         project = self.gitlab.projects.get(f'{user}/{repo}')
         branches = project.branches.list()
         br_list = []
@@ -76,13 +77,19 @@ class GitLabAdapter(VCSAdapter):
         return br_list
 
     @use_self_attr
-    def get_commits(self, user, repo, branch):
+    def get_commit(self, user, repo, branch):
         pass
 
     @use_self_attr
     def get_tree(self, user, repo, path=None, ref=None):
-        pass
+        project = self.gitlab.projects.get(f'{user}/{repo}')
+        return project.repository_tree(path=path, ref=ref)
 
     @use_self_attr
     def get_blob(self, user, repo, blob_sha):
-        pass
+        project = self.gitlab.projects.get(f'{user}/{repo}')
+        blob = project.repository_blob(blob_sha)
+        return {
+            'size': blob['size'],
+            'content': b64decode(blob['content']),
+        }
