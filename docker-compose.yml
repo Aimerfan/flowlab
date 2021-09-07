@@ -3,8 +3,9 @@ version: "3"
 services:
   db:
     image: postgres:13.2
-    # ports:
-    #   - "5432:5432"
+    restart: unless-stopped
+#    ports:
+#      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
@@ -14,6 +15,7 @@ services:
   
   web:
     image: aimerfan/flowlab
+    restart: unless-stopped
     command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/flowlab
@@ -22,5 +24,27 @@ services:
     depends_on:
       - db
 
+  gitlab:
+    restart: unless-stopped
+    image: ${GITLAB_IMG_TAG}
+    privileged: true
+    ports:
+      - "${GITLAB_HTTP_PORT}:80"
+      - "${GITLAB_SSH_PORT}:22"
+    volumes:
+      - gitlab_conf:/etc/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_data:/var/opt/gitlab
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://${GITLAB_HOST}:${GITLAB_HTTP_PORT}'
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        gitlab_rails['initial_root_password'] = '${GITLAB_ROOT_PASSWORD}'
+        gitlab_rails['gitlab_shell_ssh_port'] = ${GITLAB_SSH_PORT}
+
 volumes:
   pgdata:
+  gitlab_conf:
+  gitlab_logs:
+  gitlab_data:

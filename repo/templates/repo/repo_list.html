@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load nav_tag %}
+{% block title %}
+    儲存庫列表
+{% endblock %}
+{% block body %}
+{% get_name request as username %}
+    <h1 style="padding: 20px 0 0 0; text-align: center;">projects</h1>
+    <div class="container_close">
+        <div class="content projects_content">
+            <ul style="padding: 5px;">
+                {% for project, info in projects.items %}
+                <li class="d-flex border-bottom">
+                    <div class="col-md-8">
+                        <h6><a href="{% url 'repo_project' username project %}">{{ project }}</a></h6>
+                    </div>
+                    <div class="col-md-2">
+                        {% if info.branch_sum == 1 %}
+                        <h6>{{ info.branch_sum }} branch</h6>
+                        {% else %}
+                        <h6>{{ info.branch_sum }} branches</h6>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-2">
+                        <h6>{{ info.last_activity_at }}</h6>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

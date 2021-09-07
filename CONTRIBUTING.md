@@ -41,13 +41,28 @@ Docker, Jenkins, GitLab, Sonarqube
 
 ---
 
-##　core/static 規範
+## core/static 規範
 
 - 單個 `css`, `images` 或 `js` 的檔案直接放置於 `core/static/core/` 下
 - 若該類別存在 1 個以上的檔案就應該將所有檔案放到 "該類別" 的資料夾中
 
 例如：目前 `core/static/core` 下有 `flowlab-logo.png` 與 `devops.png` 兩份檔案  
 則將這兩份檔案統一放置於 `core/static/core/images/` 下
+
+---
+
+## view.py 規範
+
+1. 傳遞 `context` 參數時, 需要明確指名變數, 禁用 `locals()` 傳遞所有變數
+
+---
+
+## URL 字串格式
+
+除了由 Django 指定格式的欄位以外
+默認 URL 表示方法由順序在後的字串提供分隔符(/)
+即，如果有一個 URL: `https://gitlab.example.com/api/v4/projects`
+則在組織時應該拆分為如右格式: `https://gitlab.example.com` + `/api/v4` + `/projects`
 
 ---
 

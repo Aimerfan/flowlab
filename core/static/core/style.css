@@ -64,6 +64,25 @@ body {
     background-color: lightblue;
 }
 
+a {
+    color: #000 !important;
+}
+
+#brand a:hover {
+    color: #000 !important;
+    background-color: #D9F5FF;
+}
+
+a:hover {
+    color: #000 !important;
+    background-color: lightblue;
+}
+
+pre {
+    margin: 0;
+    padding-left: 10px;
+}
+
 h1 {
     color: navy;
     margin-left: 20px;
@@ -81,6 +100,10 @@ h5 {
 h6 {
     margin: 10px;
     font-weight: 400;
+}
+
+h6 a {
+    text-decoration: none;
 }
 
 /*FORM*/
@@ -279,6 +302,14 @@ button {
     text-align: center;
 }
 
+/* repo_projects 列表 */
+.projects_content {
+    width: 80%;
+    text-align: left;
+    background-color: whitesmoke;
+    border-radius: 10px;
+}
+
 .container_close {
     padding: 20px;
 }
@@ -314,25 +345,22 @@ button {
 }
 
 /* 儲存庫檔案瀏覽區 */
+.frame_files {
+    margin-top: 20px;
+    background-color: whitesmoke;
+    border-radius: 10px;
+    border: 1px solid gray;
+}
+
 .frame_files_header {
-    border: 1px solid cornflowerblue;
+    /*border: 1px solid cornflowerblue;*/
     background-color: #d9f5ff;
     border-radius: 10px 10px 0 0;
     display: flex;
-    margin-top: 20px;
 }
 
-.frame_files_content {
-    border: 1px solid gray;
-    background-color: whitesmoke;
-    border-radius: 0 0 0 0;
-    display: flex;
-}
-
-.frame_files_footer {
-    border: 1px solid gray;
-    background-color: whitesmoke;
-    border-radius: 0 0 10px 10px;
+.frame_files_info {
+    border-top: 1px solid gray;
     display: flex;
 }
 
@@ -343,6 +371,26 @@ button {
     margin-top: 10px;
     margin-bottom: 10px;
     margin-right: 15px;
+}
+
+.repo_icon {
+    height: 16px;
+    margin: 12px;
+}
+/* 儲存庫檔案檢視 (blob) */
+.line_numbers {
+    /*background-color: lightgray;*/
+    color: #1b1b1b;
+    padding: 1px 10px;
+    text-align: right;
+    font-size: 13px;
+}
+
+.frame_files_context {
+    border-top: 1px solid gray;
+    display: flex;
+    padding: 10px;
+    text-align: left;
 }
 
 .frame {
