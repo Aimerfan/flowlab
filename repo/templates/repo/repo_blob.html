@@ -23,7 +23,11 @@
                         </button>
                     </div>
                     <div>
-                        <h5>{{ path }} path / {{ file.name }}</h5>
+                        {% if blob_path == '' %}
+                        <h5>{{ file.name }}</h5>
+                        {% else %}
+                        <h5>{{ blob_path }}/{{ file.name }}</h5>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -61,7 +65,11 @@
                         {% endwith %}
                     </div>
                     <div class="co-md-11">
+                        {% if line == 0 %}
+                        <pre>Empty file</pre>
+                        {% else %}
                         <pre>{{ file.content }}</pre>
+                        {% endif %}
                     </div>
                 </div>
             </div>
