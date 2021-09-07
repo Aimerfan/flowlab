@@ -373,6 +373,10 @@ button {
     margin-right: 15px;
 }
 
+.repo_icon {
+    height: 16px;
+    margin: 12px;
+}
 /* 儲存庫檔案檢視 (blob) */
 .line_numbers {
     /*background-color: lightgray;*/
