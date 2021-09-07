@@ -66,6 +66,7 @@ class GitLabAdapter(VCSAdapter):
             delta = timezone.now() - created_at
 
             br_list.append({
+                'name': br.name,
                 'default': br.default,
                 'commit': {
                     'short_id': br.commit['short_id'],
