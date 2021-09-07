@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load nav_tag %}
+{% load range %}
+{% block title %}
+    儲存庫檔案預覽
+{% endblock %}
+{% block body %}
+{% get_name request as username %}
+    <div class="container container_close">
+        <div class="repo_content">
+            <div>
+                <h2>{{ username }} / {{ info.name }}</h2>
+            </div>
+            <hr style="height: 3px; background: #aaaaaa; margin: 0">
+            <div class="align_both_sides">
+                <div class="ver_mid">
+                    <div style="padding: 15px;">
+                        <button class="btn-sm ver_mid">
+                            <span style="width: 100px;">{{ info.branch }}</span>
+                            <img src="{% static 'core/images/arrow-down.png' %}"
+                                 style="width: 10px; float: right" alt="drop_down">
+                        </button>
+                    </div>
+                    <div>
+                        {% if blob_path == '' %}
+                        <h5>{{ file.name }}</h5>
+                        {% else %}
+                        <h5>{{ blob_path }}/{{ file.name }}</h5>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="frame_gray align_both_sides" style="padding: 5px;">
+                <div class="ver_mid">
+                    <div class="col-md-auto">
+                        <h6>{{ info.author_name }}</h6>
+                    </div>
+                    <div style="color: #585858">
+                        {{ info.last_info }}
+                    </div>
+                </div>
+                <div class="ver_mid">
+                    <div class="col-md-auto">
+                        <h6>Latest commit <a style="font-size: 13px;">{{ info.sha }}</a> {{ info.last_time }}</h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="frame_files">
+                <div class="frame_files_header">
+                    <div class="col-md-auto text_left">
+                        <h5>{{ file.name }}</h5>
+                    </div>
+                </div>
+                <div class="frame_files_context">
+                    <div class="co-md-1">
+                        {% with line|add:"1" as line%}
+                        {% for i in 1|range:line %}
+                        <div class="line_numbers">
+                            {{ i }}
+                        </div>
+                        {% endfor %}
+                        {% endwith %}
+                    </div>
+                    <div class="co-md-11">
+                        {% if line == 0 %}
+                        <pre>Empty file</pre>
+                        {% else %}
+                        <pre>{{ file.content }}</pre>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

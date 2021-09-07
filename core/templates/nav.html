@@ -3,7 +3,7 @@
 {% get_name request as username %}
 <nav class="navbar navbar-expand-lg navbar-light sticky-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">
+        <a id="brand" class="navbar-brand" href="{% url 'index' %}">
             <img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab" style="display:block; margin:9px; height: 50px;">
         </a>
         {# -------------------------------手機版------------------------------- #}

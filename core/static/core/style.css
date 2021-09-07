@@ -64,6 +64,25 @@ body {
     background-color: lightblue;
 }
 
+a {
+    color: #000 !important;
+}
+
+#brand a:hover {
+    color: #000 !important;
+    background-color: #D9F5FF;
+}
+
+a:hover {
+    color: #000 !important;
+    background-color: lightblue;
+}
+
+pre {
+    margin: 0;
+    padding-left: 10px;
+}
+
 h1 {
     color: navy;
     margin-left: 20px;
@@ -340,7 +359,7 @@ button {
     display: flex;
 }
 
-.frame_files_content {
+.frame_files_info {
     border-top: 1px solid gray;
     display: flex;
 }
@@ -352,6 +371,26 @@ button {
     margin-top: 10px;
     margin-bottom: 10px;
     margin-right: 15px;
+}
+
+.repo_icon {
+    height: 16px;
+    margin: 12px;
+}
+/* 儲存庫檔案檢視 (blob) */
+.line_numbers {
+    /*background-color: lightgray;*/
+    color: #1b1b1b;
+    padding: 1px 10px;
+    text-align: right;
+    font-size: 13px;
+}
+
+.frame_files_context {
+    border-top: 1px solid gray;
+    display: flex;
+    padding: 10px;
+    text-align: left;
 }
 
 .frame {

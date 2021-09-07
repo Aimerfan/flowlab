@@ -24,9 +24,9 @@ class GitLabAdapter(VCSAdapter):
     def __init__(self, url=None, token=None, user=None, repo=None):
         if url is None:
             try:
-                url = f'http://gitlab:{ENVIRON.GITLAB_HTTP_PORT}'
+                url = f'http://{ENVIRON["GITLAB_HOST"]}:{ENVIRON["GITLAB_HTTP_PORT"]}'
             except KeyError:
-                raise KeyError("'GITLAB_HTTP_PORT' attr dose not exist in .env file.")
+                raise KeyError("'GITLAB_HTTP_PORT' or 'GITLAB_HOST' attr. dose not exist in .env file.")
         if token is None:
             token = ENVIRON.get('GITLAB_ROOT_PRIVATE_TOKEN', None)
         super().__init__(url, token, user, repo)
@@ -66,6 +66,7 @@ class GitLabAdapter(VCSAdapter):
             delta = timezone.now() - created_at
 
             br_list.append({
+                'name': br.name,
                 'default': br.default,
                 'commit': {
                     'short_id': br.commit['short_id'],
