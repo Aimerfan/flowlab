@@ -22,6 +22,7 @@ def enter_login_page(context, url):
 @then('The user login success')
 def test_login_success(context):
     User.objects.create_user(username=context.username, password=context.password)
-    context.test.client.login(username=context.username, password=context.password)
+    response = context.test.client.login(username=context.username, password=context.password)
+    context.test.assertTrue(response)
     response = context.test.client.get(context.url)
     context.test.assertContains(response, 'Logout')
