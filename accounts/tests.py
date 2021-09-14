@@ -1,5 +1,6 @@
 from django.test import TestCase, client
 from django.contrib.auth.models import User
+from django.db import transaction
 
 
 class IndexTestCase(TestCase):
@@ -18,6 +19,7 @@ class IndexTestCase(TestCase):
 class LoginTestCase(TestCase):
 
     def setUp(self):
+        self.sid = transaction.savepoint()
         self.c = client.Client()
         User.objects.create_user(username='user', password='abcde')
 
@@ -31,4 +33,5 @@ class LoginTestCase(TestCase):
         response = self.c.get('')
         self.assertEqual(response.status_code, 200)
         result = self.assertContains(response, 'Logout')
+        transaction.savepoint_rollback(self.sid)
         return result
