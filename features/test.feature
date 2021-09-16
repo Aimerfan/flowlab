@@ -6,7 +6,7 @@ Feature:
         When Enter the /accounts/login/ page
         Then The user login success
 
-    Scenario: login and visit 'repository' page
-        Given username: user2, password: abcdefg
+    Scenario: use exist user to login and visit 'repository' page
+        Given username: usertest, password: passpass1
         When Visit the 'repository' page
         Then Show 'project' title

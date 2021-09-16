@@ -1,22 +1,17 @@
-from behave import given, when, then, step
-from django.db import transaction
-from django.contrib.auth.models import User
+from behave import given, when, then
 
 
 @given('username: {username}, password: {password}')
 def given_user_info(context, username, password):
     context.username = username
-    User.objects.create_user(username=username, password=password)
-    response = context.test.client.login(username=username, password=password)
-    context.test.assertTrue(response)
+    context.test.client.post('/accounts/login/', {'username': username, 'password': password})
     response = context.test.client.get('')
     context.test.assertContains(response, 'Logout')
 
 
 @when("Visit the 'repository' page")
 def visit_repo_page(context):
-    # context.response = context.test.client.get(f'/repo/{context.username}/')
-    context.response = context.test.client.get(f'/repo/selab/')
+    context.response = context.test.client.get(f'/repo/{context.username}/')
     context.test.assertEqual(context.response.status_code, 200)
 
 
