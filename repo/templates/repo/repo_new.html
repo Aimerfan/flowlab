@@ -11,41 +11,30 @@
             <form method="post" action="">
                 {% csrf_token %}
                 <div class="mb-3">
-                    <label for="repo_name" style="margin: 10px 0;">Project Name</label>
-                    <input type="text" class="form-control" id="repo_name" required>
+                    <label for="{{ form.name.id_for_label }}" style="margin: 10px 0;">專案名稱</label>
+                    {{ form.name }}
                 </div>
                 <div class="mb-3">
-                    <label for="repo_description" style="margin: 10px 0;">Project Description (選填)</label>
-                    <textarea class="form-control" id="repo_description" rows="3" placeholder="Description format"></textarea>
+                    <label for="{{ form.description.id_for_label }}" style="margin: 10px 0;">專案敘述 (選填)</label>
+                    {{ form.description }}
                 </div>
                 <hr style="height: 3px; background: #0000A6;">
+                {% for visible in form.visibility %}
                 <div class="form-check">
-                    <label class="form-check-label" for="repo_visibility_true">
-                        <div>
-                            Internal<br>
-                            <span style="color: #5A5A5A;">The project can be accessed by any logged in user except external users.</span>
-                        </div>
+                    {{ visible.tag }}
+                    <label class="form-check-label" for="{{ visible.id_for_label }}">
+                        {{ visible.choice_label.name }}<br>
+                        <span style="color: #5A5A5A;">{{ visible.choice_label.info }}</span>
                     </label>
-                    <input class="form-check-input" type="radio" name="repo_visibility" id="repo_visibility_true" required>
                 </div>
-                <div class="form-check">
-                    <label class="form-check-label" for="repo_visibility_false">
-                        <div>
-                            Private<br>
-                            <span style="color: #5A5A5A;">Project access must be granted explicitly to each user. If this project is part of a group, access will be granted to members of the group.</span>
-                        </div>
-                    </label>
-                    <input class="form-check-input" type="radio" name="repo_visibility" id="repo_visibility_false" required>
-                </div>
+                {% endfor %}
                 <hr style="height: 3px; background: #0000A6;">
+                {% for file in form.add_file %}
                 <div class="form-check">
-                    <label class="form-check-label" for="add_jenkinsfile">Initialize repository with a Jenkinsfile</label>
-                    <input class="form-check-input" type="checkbox" value="" id="add_jenkinsfile" checked disabled>
+                    {{ file.tag }}
+                    <label class="form-check-label" for="{{ file.id_for_label }}">{{ file.choice_label }}</label>
                 </div>
-                <div class="form-check">
-                    <label class="form-check-label" for="add_readme">Initialize repository with a README</label>
-                    <input class="form-check-input" type="checkbox" value="" id="add_readme">
-                </div>
+                {% endfor %}
                 <div class="high_content">
                     <button type="submit">Create Project</button>
                 </div>

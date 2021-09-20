@@ -4,6 +4,7 @@ from django.shortcuts import render
 
 from vcs_adapter import GitLabAdapter
 from repo.utils import get_repo_title, get_tree
+from .forms import RepoForm
 
 
 def repo_list_view(request, user):
@@ -65,5 +66,12 @@ def repo_blob_view(request, user, project, file):
 
 def repo_new_view(request):
     """新增儲存庫"""
+    form = RepoForm(request.POST or None)
 
-    return render(request, 'repo/repo_new.html', {})
+    if request.method == 'POST':
+        name = request.POST['name']
+        description = request.POST['description']
+        visibility = request.POST['visibility']
+        add_file = request.POST.getlist('add_file')
+
+    return render(request, 'repo/repo_new.html', {'form': form})
