@@ -7,6 +7,9 @@
 {% block body %}
 {% get_name request as username %}
     <h1 style="padding: 20px 0 0 0; text-align: center;">projects</h1>
+    <div class="right_content">
+        <button type="button" onclick="location.href='{% url 'repo_new' %}'">New Project</button>
+    </div>
     <div class="container_close">
         <div class="content projects_content">
             <ul style="padding: 5px;">

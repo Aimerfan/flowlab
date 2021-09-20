@@ -61,3 +61,9 @@ def repo_blob_view(request, user, project, file):
         line = file['content'].count('\n') + 1
 
     return render(request, 'repo/repo_blob.html', {'info': project_info, 'blob_path': blob_path, 'file': file, 'line': line})
+
+
+def repo_new_view(request):
+    """新增儲存庫"""
+
+    return render(request, 'repo/repo_new.html', {})

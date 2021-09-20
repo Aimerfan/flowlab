@@ -1,3 +1,6 @@
+/* 常用顏色*/
+/* 深灰色: #313335 */
+
 /* 上方導航列 */
 nav {
     height: 70px;
@@ -302,6 +305,14 @@ button {
     text-align: center;
 }
 
+.high_content {
+    width: 100%;
+    padding: 20px;
+    /* 水平置中 */
+    margin: 0 auto;
+    text-align: center;
+}
+
 /* repo_projects 列表 */
 .projects_content {
     width: 80%;
@@ -377,6 +388,7 @@ button {
     height: 16px;
     margin: 12px;
 }
+
 /* 儲存庫檔案檢視 (blob) */
 .line_numbers {
     /*background-color: lightgray;*/
@@ -395,4 +407,30 @@ button {
 
 .frame {
     border: 1px solid red;
+}
+
+/* 新增儲存庫 */
+.new_repo_context {
+    width: 80%;
+    /* 水平置中 */
+    margin: 0 auto;
+    text-align: left;
+}
+
+/* 靠右 */
+.right_content {
+    margin-right: 12%;
+    text-align: right;
+}
+
+/* 靠左 */
+.left_content {
+    margin-left: 12%;
+    /*padding: 10px;*/
+    text-align: left;
+}
+
+/* 字體顏色 */
+#gray {
+    color: #313335;
 }
