@@ -4,7 +4,7 @@ from django.shortcuts import render
 
 from vcs_adapter import GitLabAdapter
 from repo.utils import get_repo_title, get_tree
-from .forms import RepoForm
+from .forms import RepoForm, DelRepoForm
 
 
 def repo_list_view(request, user):
@@ -20,7 +20,19 @@ def repo_list_view(request, user):
 
 def repo_view(request, user, project):
     """儲存庫專案"""
+    form = DelRepoForm(request.POST or None)
+
+    confirm_info = f'{user}/{project}'
+    if request.method == 'POST':
+        if request.POST['project_info'] == confirm_info:
+            # todo: 刪除儲存庫
+            pass
+        else:
+            # todo: 輸入錯誤的提示
+            pass
+
     project_info = get_repo_title(user, project)
+
     if project_info['branch_sum'] == 0:
         folders = ''
         files = ''
@@ -29,7 +41,8 @@ def repo_view(request, user, project):
         folders, files = get_tree(user, project)
         root_path = f'{project}/'
 
-    return render(request, 'repo/repository.html', {'info': project_info, 'root_path': root_path, 'folders': folders, 'files': files})
+    return render(request, 'repo/repository.html', {'info': project_info, 'root_path': root_path, 'folders': folders,
+                                                    'files': files, 'form': form})
 
 
 def repo_tree_view(request, user, project, file):
@@ -38,7 +51,8 @@ def repo_tree_view(request, user, project, file):
     folders, files = get_tree(user, project, file)
     tree_path = request.path.split('tree/')[1]
 
-    return render(request, 'repo/repo_tree.html', {'info': project_info, 'tree_path': tree_path, 'folders': folders, 'files': files})
+    return render(request, 'repo/repo_tree.html', {'info': project_info, 'tree_path': tree_path, 'folders': folders,
+                                                   'files': files})
 
 
 def repo_blob_view(request, user, project, file):
@@ -66,7 +80,8 @@ def repo_blob_view(request, user, project, file):
     else:
         line = file['content'].count('\n') + 1
 
-    return render(request, 'repo/repo_blob.html', {'info': project_info, 'blob_path': blob_path, 'file': file, 'line': line})
+    return render(request, 'repo/repo_blob.html', {'info': project_info, 'blob_path': blob_path, 'file': file,
+                                                   'line': line})
 
 
 def repo_new_view(request):

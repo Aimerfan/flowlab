@@ -35,7 +35,33 @@
             <h1 style="text-align: center">儲存庫預覽區塊</h1>
             <div class="align_both_sides ver_mid">
                 <h2>{{ username }} / {{ info.name }}</h2>
-                <button type="button" onclick="location.href=''" style="height: fit-content;">Delete Project</button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#delModal"
+                        style="height: fit-content;">
+                    Delete Project
+                </button>
+                {#  刪除儲存庫的互動視窗  #}
+                <div class="modal fade" id="delModal" tabindex="-1" aria-labelledby="delModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form method="post" action="">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="delModalLabel">你確定要刪除該儲存庫嗎?</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <h6>此動作無法撤銷，將永久刪除此儲存庫。</h6><br>
+                                    <h6>請輸入 <span style="background: #B2B7BC">{{ username }}/{{ info.name }}</span> 並再次確認</h6>
+                                    {{ form.project_info }}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="submit" class="btn btn-primary">確定刪除</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
             {#    儲存庫內尚無檔案    #}
             {% if info.branch_sum == 0 %}
