@@ -1,5 +1,7 @@
 /* 常用顏色*/
 /* 深灰色: #313335 */
+/* 淺淺藍色: #82A3D6 */
+/* 淺藍色: #A3C3E0 */
 
 /* 上方導航列 */
 nav {
@@ -355,6 +357,11 @@ button {
     border-radius: 10px 10px 10px 10px;
 }
 
+/* command line 區塊 */
+.command_context {
+    background-color: #A3C3E0;
+}
+
 /* 儲存庫檔案瀏覽區 */
 .frame_files {
     margin-top: 20px;
@@ -421,6 +428,7 @@ button {
 .right_content {
     margin-right: 12%;
     text-align: right;
+    padding: 10px 0;
 }
 
 /* 靠左 */

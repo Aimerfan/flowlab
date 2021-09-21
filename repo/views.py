@@ -21,8 +21,13 @@ def repo_list_view(request, user):
 def repo_view(request, user, project):
     """儲存庫專案"""
     project_info = get_repo_title(user, project)
-    folders, files = get_tree(user, project)
-    root_path = f'{project}/'
+    if project_info['branch_sum'] == 0:
+        folders = ''
+        files = ''
+        root_path = ''
+    else:
+        folders, files = get_tree(user, project)
+        root_path = f'{project}/'
 
     return render(request, 'repo/repository.html', {'info': project_info, 'root_path': root_path, 'folders': folders, 'files': files})
 
