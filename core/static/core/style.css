@@ -206,15 +206,15 @@ button {
 }
 
 .btn_ci_flow {
-    color: #1b1b1b;
-    background-color: #aaaaaa;
+    color: #33577E;
+    background-color: #BCDCFF;
     border-radius: 30px 30px 30px 30px;
-    border: 2px solid #4D4D4D;
+    border: 2px solid #33577E;
 }
 
 .btn_ci_flow:hover {
     color: white;
-    background: #4D4D4D;
+    background: #8298B1;
     transition: 0.1s linear;
     cursor: pointer;
 }

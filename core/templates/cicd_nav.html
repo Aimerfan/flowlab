@@ -1,0 +1,24 @@
+{% load static %}
+{% load nav_tag %}
+{% get_name request as username %}
+<div class="container container_close">
+    <div class="content">
+        <form>
+            <a href="{% url 'jenkins_file' username project%}">
+                <button class="btn_ci_flow btn-md" type="button">Jenkins File</button>
+            </a>
+            <a href="{% url 'analysis' %}">
+                <button class="btn_ci_flow btn-md" type="button">analysis</button>
+            </a>
+            <a href="{% url 'repo_project' username project %}">
+                <button class="btn_ci_flow btn-md" type="button">code</button>
+            </a>
+            <a href="{% url 'analysis' %}">
+                <button class="btn_ci_flow btn-md" type="button">build</button>
+            </a>
+            <a href="{% url 'analysis' %}">
+                <button class="btn_ci_flow btn-md" type="button">test</button>
+            </a>
+        </form>
+    </div>
+</div>

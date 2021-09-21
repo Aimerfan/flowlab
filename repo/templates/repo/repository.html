@@ -9,27 +9,7 @@
 {% get_name request as username %}
 {% get_gitlab_url username info.name as gitlab_url %}
 {% get_gitlab_ssh username info.name as gitlab_ssh %}
-    <div class="container container_close">
-        <div class="content">
-            <form>
-                <a href="{% url 'analysis' %}">
-                    <button class="btn_ci_flow btn-md" type="button">Jenkins File</button>
-                </a>
-                <a href="{% url 'analysis' %}">
-                    <button class="btn_ci_flow btn-md" type="button">analysis</button>
-                </a>
-                <a href="{% url 'analysis' %}">
-                    <button class="btn_ci_flow btn-md" type="button">code</button>
-                </a>
-                <a href="{% url 'analysis' %}">
-                    <button class="btn_ci_flow btn-md" type="button">build</button>
-                </a>
-                <a href="{% url 'analysis' %}">
-                    <button class="btn_ci_flow btn-md" type="button">test</button>
-                </a>
-            </form>
-        </div>
-    </div>
+{% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="repo_content">
             <h1 style="text-align: center">儲存庫預覽區塊</h1>
