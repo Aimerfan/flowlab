@@ -424,6 +424,89 @@ button {
     text-align: left;
 }
 
+/* jenkins file page*/
+/* 拼圖區塊 */
+.jenkins_puzzle {
+    text-align: left;
+    padding: 5px;
+    /*margin: 2px 0;*/
+    background-color: whitesmoke;
+}
+
+.puz_add:hover {
+    background-color: #87939A;
+    color: whitesmoke;
+}
+
+.puz_2 {
+    padding-left: 30px;
+}
+
+.puz_3 {
+    padding-left: 60px;
+}
+
+.puz_4 {
+    padding-left: 90px;
+}
+
+.puz_5 {
+    padding-left: 120px;
+}
+
+.puz_form {
+    display: inline;
+    width: auto;
+    padding: 0 .75rem;
+}
+
+/*.puz_bl_2 {*/
+/*    margin: .1rem -.3rem;*/
+/*    padding: 0 .2rem;*/
+/*    border-color: red;*/
+/*    border-width: .1rem;*/
+/*    border-style: dashed;*/
+/*    !*background-color: #8298B1;*!*/
+/*}*/
+
+/*.puz_bl_3 {*/
+/*    margin: .1rem -.1rem;*/
+/*    border-color: #33577E;*/
+/*    border-width: .1rem;*/
+/*    border-style: dashed*/
+/*}*/
+
+.puz_bl_2:hover {
+    margin: .1rem -.4rem;
+    padding: 0 .2rem;
+    border-color: red;
+    border-width: .1rem;
+    border-style: dashed;
+    /*background-color: #8298B1;*/
+}
+
+.puz_bl_3:hover {
+    margin: .1rem -.3rem;
+    border-color: #33577E;
+    border-width: .1rem;
+    border-style: dashed
+}
+
+.puz_bl_4:hover {
+    margin: .1rem -.2rem;
+    border-color: #337e36;
+    border-width: .1rem;
+    border-style: dashed
+}
+
+/* 程式碼區塊 */
+.jenkins_code_content {
+    /*width: 80%;*/
+    text-align: left;
+    background-color: whitesmoke;
+    /*border-radius: 10px;*/
+}
+
 /* 靠右 */
 .right_content {
     margin-right: 12%;
