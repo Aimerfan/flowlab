@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load nav_tag %}
+{% block title %}
+    新增儲存庫
+{% endblock %}
+{% block body %}
+    <h1 style="padding: 20px 0 0 0; text-align: center;">新增儲存庫</h1>
+    <div class="container_close">
+        <div class="new_repo_context">
+            <form method="post" action="">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="{{ form.name.id_for_label }}" style="margin: 10px 0;">專案名稱</label>
+                    {{ form.name }}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.description.id_for_label }}" style="margin: 10px 0;">專案敘述 (選填)</label>
+                    {{ form.description }}
+                </div>
+                <hr style="height: 3px; background: #0000A6;">
+                {% for visible in form.visibility %}
+                <div class="form-check">
+                    {{ visible.tag }}
+                    <label class="form-check-label" for="{{ visible.id_for_label }}">
+                        {{ visible.choice_label.name }}<br>
+                        <span style="color: #5A5A5A;">{{ visible.choice_label.info }}</span>
+                    </label>
+                </div>
+                {% endfor %}
+                <hr style="height: 3px; background: #0000A6;">
+                {% for file in form.add_file %}
+                <div class="form-check">
+                    {{ file.tag }}
+                    <label class="form-check-label" for="{{ file.id_for_label }}">{{ file.choice_label }}</label>
+                </div>
+                {% endfor %}
+                <div class="high_content">
+                    <button type="submit">Create Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

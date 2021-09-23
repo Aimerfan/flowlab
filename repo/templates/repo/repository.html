@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load nav_tag %}
+{% load url %}
 {% block title %}
     儲存庫預覽
 {% endblock %}
 {% block body %}
 {% get_name request as username %}
+{% get_gitlab_url username info.name as gitlab_url %}
+{% get_gitlab_ssh username info.name as gitlab_ssh %}
     <div class="container container_close">
         <div class="content">
             <form>
@@ -30,66 +33,166 @@
     <div class="container container_close">
         <div class="repo_content">
             <h1 style="text-align: center">儲存庫預覽區塊</h1>
-            <div>
+            <div class="align_both_sides ver_mid">
                 <h2>{{ username }} / {{ info.name }}</h2>
-            </div>
-            <div>
-                {% if info.branch_sum == 1 %}
-                <h5>{{ info.branch_sum }} branch</h5>
-                {% else %}
-                <h5>{{ info.branch_sum }} branches</h5>
-                {% endif %}
-            </div>
-            <hr style="height: 3px; background: #aaaaaa; margin: 0">
-            <div class="align_both_sides">
-                <div class="ver_mid">
-                    <div style="padding: 15px;">
-                        <button class="btn-sm ver_mid">
-                            <span style="width: 100px;">{{ info.branch }}</span>
-                            <img src="{% static 'core/images/arrow-down.png' %}"
-                                 style="width: 10px; float: right" alt="drop_down">
-                        </button>
-                    </div>
-                    <div>
-                        <h5>{{ root_path }}</h5>
-                    </div>
-                </div>
-                <div class="ver_mid">
-                    <div>
-                        <button class="btn-sm ver_mid" style="padding: 7px;">
-                            <img src="{% static 'core/images/download.png' %}" 
-                                 style="width: 15px; margin: auto 5px;" alt="download">
-                            <img src="{% static 'core/images/arrow-down.png' %}" 
-                                 style="width: 10px; margin: auto 5px;" alt="drop_down">
-                        </button>
-                    </div>
-                    <div style="padding: 15px;">
-                        <button class="btn-sm"><span style="width: 60px;">clone</span></button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#delModal"
+                        style="height: fit-content;">
+                    Delete Project
+                </button>
+                {#  刪除儲存庫的互動視窗  #}
+                <div class="modal fade" id="delModal" tabindex="-1" aria-labelledby="delModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form method="post" action="">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="delModalLabel">你確定要刪除該儲存庫嗎?</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <h6>此動作無法撤銷，將永久刪除此儲存庫。</h6><br>
+                                    <h6>請輸入 <span style="background: #B2B7BC">{{ username }}/{{ info.name }}</span> 並再次確認</h6>
+                                    {{ form.project_info }}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="submit" class="btn btn-primary">確定刪除</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
+            {#    儲存庫內尚無檔案    #}
+            {% if info.branch_sum == 0 %}
+                <div>
+                    <h5 style="font-weight: bold; padding-top: 20px; margin: 0;">該專案的儲存庫目前沒有內容</h5>
+                    <h6>你可以藉由 clone 儲存庫開始 或 使用下方選項添加一些文件。</h6>
+                </div>
+                <div style="padding: 20px; display: flex;">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownClone"
+                                data-bs-toggle="dropdown" aria-expanded="false">Clone</button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownClone">
+                            <li style="padding-left: 10px;">使用 SSH clone</li>
+                            <li><a class="dropdown-item" href="#" onclick="copyEvent('ssh_clone')">
+                                <span id="ssh_clone">{{ gitlab_ssh }}</span></a>
+                            </li>
+                            <li style="padding-left: 10px;">使用 HTTP clone</li>
+                            <li><a class="dropdown-item" href="#" onclick="copyEvent('http_clone')">
+                                <span id="http_clone">{{ gitlab_url }}</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <button style="border-style: dashed; margin-left: 20px;">Add Jenkins File</button>
+                </div>
+                <hr style="height: 3px; background: #aaaaaa; margin: 0">
+                <div>
+                    <h5 style="font-weight: bold; padding-top: 20px; margin: 0;">Command line 說明</h5>
+                    <h6>你可以使用以下指令，從你的電腦上傳現有的文件。</h6>
+                </div>
+                <h6 style="font-weight: bold; padding: 10px 0; margin: 0;">Git 全局設置</h6>
+                <div class="command_context" style="background-color: #A3C3E0;">
+                    <pre>
+                        <code>
+git config --global user.name "{{ username }}"
+git config --global user.email "{{ request.user.email }}"</code>
+                    </pre>
+                </div>
+                <h6 style="font-weight: bold; padding: 10px 0; margin: 0;">建立一個新的儲存庫</h6>
+                <div class="command_context" style="background-color: #A3C3E0;">
+                    <pre>
+                        <code>
+git clone {{ gitlab_url }}
+cd {{ info.name }}
+git switch -c main
+touch README.md
+git add README.md
+git commit -m "add README"
+git push -u origin main</code>
+                    </pre>
+                </div>
+                <h6 style="font-weight: bold; padding: 10px 0; margin: 0;">Push 一個已存在的資料夾</h6>
+                <div class="command_context" style="background-color: #A3C3E0;">
+                    <pre>
+                        <code>
+cd existing_folder
+git init --initial-branch=main
+git remote add origin {{ gitlab_url }}
+git add .
+git commit -m "Initial commit"
+git push -u origin main</code>
+                    </pre>
+                </div>
+                <h6 style="font-weight: bold; padding: 10px 0; margin: 0;">Push 一個已存在的 Git 儲存庫</h6>
+                <div class="command_context" style="background-color: #A3C3E0;">
+                    <pre>
+                        <code>
+cd existing_repo
+git remote rename origin old-origin
+git remote add origin {{ gitlab_url }}
+git push -u origin --all
+git push -u origin --tags</code>
+                    </pre>
+                </div>
+            {#    儲存庫內已有檔案    #}
+            {% else %}
+                <div>
+                    {% if info.branch_sum == 1 %}
+                    <h5>{{ info.branch_sum }} branch</h5>
+                    {% else %}
+                    <h5>{{ info.branch_sum }} branches</h5>
+                    {% endif %}
+                </div>
+                <hr style="height: 3px; background: #aaaaaa; margin: 0">
+                <div class="align_both_sides">
+                    <div class="ver_mid">
+                        <div style="padding: 15px;">
+                            <button class="btn-sm ver_mid">
+                                <span style="width: 100px;">{{ info.branch }}</span>
+                                <img src="{% static 'core/images/arrow-down.png' %}"
+                                     style="width: 10px; float: right" alt="drop_down">
+                            </button>
+                        </div>
+                        <div>
+                            <h5>{{ root_path }}</h5>
+                        </div>
+                    </div>
+                    <div class="ver_mid">
+                        <div>
+                            <button class="btn-sm ver_mid" style="padding: 7px;">
+                                <img src="{% static 'core/images/download.png' %}"
+                                     style="width: 15px; margin: auto 5px;" alt="download">
+                                <img src="{% static 'core/images/arrow-down.png' %}"
+                                     style="width: 10px; margin: auto 5px;" alt="drop_down">
+                            </button>
+                        </div>
+                        <div style="padding: 15px;">
+                            <button class="btn-sm"><span style="width: 60px;">clone</span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="frame_gray align_both_sides">
+                    <div class="ver_mid">
+                        <div class="col-md-auto">
+                            <h6>{{ info.author_name }}</h6>
+                        </div>
+                        <div style="color: #585858">
+                            {{ info.last_info }}
+                        </div>
+                    </div>
+                    <div class="ver_mid">
+                        <div class="col-md-auto">
+                            <h6>{{ info.last_activity_at }}</h6>
+                        </div>
+                        <div class="copy_sha">
+                            <h6 style="margin-right: 5px;">{{ info.sha }}</h6>
+                            <button class="btn-sm">COPY</button>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="frame_gray align_both_sides">
-                <div class="ver_mid">
-                    <div class="col-md-auto">
-                        <h6>{{ info.author_name }}</h6>
-                    </div>
-                    <div style="color: #585858">
-                        {{ info.last_info }}
-                    </div>
-                </div>
-                <div class="ver_mid">
-                    <div class="col-md-auto">
-                        <h6>{{ info.last_activity_at }}</h6>
-                    </div>
-                    <div class="copy_sha">
-                        <h6 style="margin-right: 5px;">{{ info.sha }}</h6>
-                        <button class="btn-sm">COPY</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="frame_files">
+                <div class="frame_files">
                 <div class="frame_files_header">
                     <div style="width: 300px;" class="col-md-auto text_left">
                         <h5>Name</h5>
@@ -138,6 +241,7 @@
                 </div>
                 {% endfor %}
             </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
