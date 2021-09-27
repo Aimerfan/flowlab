@@ -428,7 +428,7 @@ button {
 /* 拼圖區塊 */
 .jenkins_puzzle {
     text-align: left;
-    padding: 5px;
+    padding: 1px;
     /*margin: 2px 0;*/
     background-color: whitesmoke;
 }
@@ -452,6 +452,14 @@ button {
 
 .puz_5 {
     padding-left: 120px;
+}
+
+.puz_6 {
+    padding-left: 150px;
+}
+
+.puz_7 {
+    padding-left: 180px;
 }
 
 .puz_form {
@@ -495,6 +503,20 @@ button {
 .puz_bl_4:hover {
     margin: .1rem -.2rem;
     border-color: #337e36;
+    border-width: .1rem;
+    border-style: dashed
+}
+
+.puz_bl_5:hover {
+    margin: .1rem -.1rem;
+    border-color: #FE672F;
+    border-width: .1rem;
+    border-style: dashed
+}
+
+.puz_bl_6:hover {
+    margin: .1rem -.1rem;
+    border-color: #198CA2;
     border-width: .1rem;
     border-style: dashed
 }

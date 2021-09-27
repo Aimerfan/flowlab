@@ -12,104 +12,179 @@
             <div class="col-md-5">
                 <h5>Jenkins File Puzzle</h5>
                 <div class="jenkins_puzzle">pipeline</div>
-                <div class="jenkins_puzzle puz_add puz_2">+ options</div>
-                <div class="jenkins_puzzle puz_add puz_2">+ stages</div>
+                <div class="jenkins_puzzle puz_add puz_2">+ agent</div>
+{#                <div class="jenkins_puzzle puz_add puz_2">#}
+{#                    + stages#}
+{#                    <img src="{% static 'core/images/question-mark.png' %}" alt="" style="width: 20px;">#}
+{#                </div>#}
                 <div class="puz_bl_2">
                     <div class="jenkins_puzzle puz_2">
-                        agent
-                        <label>
-                            <input type="text" value="none" class="form-control puz_form">
-                        </label>
+                        stages
                     </div>
-                </div>
-                <div class="puz_bl_2">
-                    <div class="jenkins_puzzle puz_2">stages</div>
-                    <div class="jenkins_puzzle puz_add puz_3">+ stage</div>
-                    {#        第一個 stage        #}
                     <div class="puz_bl_3">
                         <div class="jenkins_puzzle puz_3">
-                            stage(
+                            stage (
                             <label>
                                 <input type="text" value="Build" class="form-control puz_form">
                             </label>
                             )
                         </div>
-                        <div class="jenkins_puzzle puz_add puz_4">+ stage</div>
+                        <div class="jenkins_puzzle puz_4">+ when</div>
                         <div class="puz_bl_4">
-                            <div class="jenkins_puzzle puz_4">agent</div>
-                            <div class="jenkins_puzzle puz_5">
-                                <label>
-                                    <input type="text" value="docker 'maven:3-alpine'" class="form-control puz_form">
-                                </label>
+                            <div class="jenkins_puzzle puz_4">
+                                steps
                             </div>
-                        </div>
-                        <div class="puz_bl_4">
-                            <div class="jenkins_puzzle puz_4">steps</div>
+                            <div class="jenkins_puzzle puz_add puz_5">+ sh</div>
+                            <div class="jenkins_puzzle puz_add puz_5">+ echo</div>
+                            <div class="puz_bl_5">
                                 <div class="jenkins_puzzle puz_5">
+                                    sh
                                     <label>
-                                        <textarea class="form-control puz_form">
-echo 'Hello, Maven'
-sh 'mvn --version'</textarea>
+                                        <input type="text" value="./gradlew build" class="form-control puz_form">
                                     </label>
                                 </div>
+                            </div>
                         </div>
                     </div>
-                    {#        第二個 stage        #}
+
                     <div class="puz_bl_3">
+{# Test Stage #}
                         <div class="jenkins_puzzle puz_3">
-                            stage(
+                            stage (
                             <label>
                                 <input type="text" value="Test" class="form-control puz_form">
                             </label>
                             )
                         </div>
-                        <div class="jenkins_puzzle puz_add puz_4">+ stage</div>
                         <div class="puz_bl_4">
-                            <div class="jenkins_puzzle puz_4">agent</div>
-                            <div class="jenkins_puzzle puz_5">
-                                <label>
-                                    <input type="text" value="docker 'openjdk:8-jre'" class="form-control puz_form">
-                                </label>
+{#                            <div class="jenkins_puzzle puz_4">+ when</div>#}
+                            <div class="jenkins_puzzle puz_4">
+                                when
+                            </div>
+                            <div class="puz_bl_5">
+                                <div class="jenkins_puzzle puz_5">
+                                    branch
+                                    <label>
+                                        <input type="text" value="dev" class="form-control puz_form">
+                                    </label>
+                                </div>
                             </div>
                         </div>
+
                         <div class="puz_bl_4">
-                            <div class="jenkins_puzzle puz_4">steps</div>
-                            <div class="jenkins_puzzle puz_5">
-                                <label>
-                                    <textarea class="form-control puz_form">
-echo 'Hello, JDK'
-sh 'java -version'</textarea>
-                                </label>
+        {# Parallel #}
+                            <div class="jenkins_puzzle puz_4">
+                                parallel
                             </div>
-                        </div>
+                            <div class="jenkins_puzzle puz_add puz_5">+ stage</div>
+        {# Parallel Stage-1 #}
+                            <div class="puz_bl_5">
+                                <div class="jenkins_puzzle puz_5">
+                                    stage
+                                    <label>
+                                        <input type="text" value="test-login" class="form-control puz_form">
+                                    </label>
+                                </div>
+                                <div class="jenkins_puzzle puz_6">+ when</div>
+                                <div class="puz_bl_6">
+                                    <div class="jenkins_puzzle puz_6">
+                                        steps
+                                    </div>
+                                    <div class="jenkins_puzzle puz_add puz_7">+ sh</div>
+                                    <div class="jenkins_puzzle puz_add puz_7">+ echo</div>
+                                    <div class="jenkins_puzzle puz_7">
+                                        sh
+                                        <label>
+                                            <input type="text" value="chmod +x ./gradlew" class="form-control puz_form">
+                                        </label>
+                                    </div>
+                                    <div class="jenkins_puzzle puz_7">
+                                        sh
+                                        <label>
+                                            <input type="text" value="./gradlew test --tests account.login" class="form-control puz_form">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+        {# Parallel Stage-2 #}
+                            <div class="puz_bl_5">
+                                <div class="jenkins_puzzle puz_5">
+                                    stage
+                                    <label>
+                                        <input type="text" value="test-logout" class="form-control puz_form">
+                                    </label>
+                                </div>
+                                <div class="jenkins_puzzle puz_6">+ when</div>
+                                <div class="puz_bl_6">
+                                    <div class="jenkins_puzzle puz_6">
+                                        steps
+                                    </div>
+                                    <div class="jenkins_puzzle puz_add puz_7">+ sh</div>
+                                    <div class="jenkins_puzzle puz_add puz_7">+ echo</div>
+                                    <div class="jenkins_puzzle puz_7">
+                                        sh
+                                        <label>
+                                            <input type="text" value="chmod +x ./gradlew" class="form-control puz_form">
+                                        </label>
+                                    </div>
+                                    <div class="jenkins_puzzle puz_7">
+                                        sh
+                                        <label>
+                                            <input type="text" value="./gradlew test --tests account.logout" class="form-control puz_form">
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
                     </div>
                 </div>
+
+{#                <div class="puz_bl_2">#}
+{#                    <div class="jenkins_puzzle puz_2">#}
+{#                        when#}
+{#                    </div>#}
+{#                    <div class="jenkins_puzzle puz_add puz_3">+ branch</div>#}
+{#                    <div class="jenkins_puzzle puz_add puz_3">#}
+{#                        + not#}
+{#                    </div>#}
+{#                    <div class="jenkins_puzzle puz_add puz_3">#}
+{#                        + allOf#}
+{#                    </div>#}
+{#                    <div class="jenkins_puzzle puz_add puz_3">#}
+{#                        + anyOf#}
+{#                    </div>#}
+{#                </div>#}
             </div>
-            <div class="col-md-5">
+            <div class="col-md-6">
                 <div class="align_both_sides">
                     <h5>Jenkinsfile</h5>
                     <button class="btn btn-secondary">Download</button>
                 </div>
                 <div class="jenkins_code_content">
-                <pre><code style="font-size: 16px;">pipeline {
-    agent none
+                    <pre><code style="font-size: 16px;">pipeline {
     stages {
         stage('Build') {
-            agent {
-                docker 'maven:3-alpine'
-            }
             steps {
-                echo 'Hello, Maven'
-                sh 'mvn --version'
+                sh './gradlew build'
             }
         }
         stage('Test') {
-            agent {
-                docker 'openjdk:8-jre'
+            when {
+                branch 'dev'
             }
-            steps {
-                echo 'Hello, JDK'
-                sh 'java -version'
+            parallel {
+                stage('test-login') {
+                    steps {
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew test --tests account.login'
+                    }
+                }
+                stage('test-logout') {
+                    steps {
+                        sh 'chmod +x ./gradlew'
+                        sh './gradlew test --tests account.logout'
+                    }
+                }
             }
         }
     }
