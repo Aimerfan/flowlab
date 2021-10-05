@@ -1,3 +1,17 @@
+function get_jenkins_file() {
+  // 以隱藏的表單送資料至後端
+  let jenkins_file = document.querySelector(".jenkins_file");
+  let block = document.getElementById("stages");
+  let input_frame = document.createElement("input");
+  input_frame.value = Base64.encode(jenkins_file.innerHTML);
+  input_frame.name = "context";
+  input_frame.type = "hidden";
+  block.appendChild(input_frame);
+
+  document.forms["form"].submit();
+}
+
+
 function newStages() {
   let layer = 2;
   document.getElementById("addStages").style.display = "none";
@@ -5,7 +19,7 @@ function newStages() {
 
   let stages = document.createElement("div");
   stages.textContent = "stages";
-  stages.className = "jenkins_puzzle puz_" + layer;
+  stages.className = "stages jenkins_puzzle puz_" + layer;
 
   let choiceStage = document.createElement("div");
   choiceStage.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
@@ -39,12 +53,14 @@ function newStages() {
     stages.appendChild(block);
 
     let stageLabel = document.createElement("label");
+    stageLabel.id = "stage_" + idStage;
     let stageInput = document.createElement("input");
     stageInput.type = "text";
     stageInput.className = "form-control puz_form";
+    stageInput.name = "stage";
     stageLabel.appendChild(stageInput)
     let stage = document.createElement("div");
-    stage.className = "jenkins_puzzle puz_" + layer;
+    stage.className = "stage jenkins_puzzle puz_" + layer;
     stage.append("stage(", stageLabel, ")")
 
     let choiceWhen = document.createElement("div");
@@ -99,7 +115,7 @@ function newWhen(layer, idStage, idWhen) {
   }
 
   let when = document.createElement("div");
-  when.className = "jenkins_puzzle puz_" + layer;
+  when.className = "when jenkins_puzzle puz_" + layer;
   when.textContent = "when";
 
   block.appendChild(when);
@@ -118,18 +134,18 @@ function newSteps(layer, idStage, idSteps) {
   stage.appendChild(block);
 
   let steps = document.createElement("div");
-  steps.className = "jenkins_puzzle puz_" + layer;
+  steps.className = "steps jenkins_puzzle puz_" + layer;
   steps.textContent = "steps";
 
   let choiceSingleSh = document.createElement("div");
   choiceSingleSh.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
-  choiceSingleSh.textContent = "+ sh (單行)";
+  choiceSingleSh.textContent = "+ sh (single row)";
   choiceSingleSh.id = "addSingleSh_" + idSteps;
   choiceSingleSh.addEventListener("click", newSingleSh.bind(this, (layer + 1), idSteps));
 
   let choiceMultiSh = document.createElement("div");
   choiceMultiSh.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
-  choiceMultiSh.textContent = "+ sh (多行)";
+  choiceMultiSh.textContent = "+ sh (multi row)";
   choiceMultiSh.id = "addMultiSh_" + idSteps;
   choiceMultiSh.addEventListener("click", newMultiSh.bind(this, (layer + 1), idSteps));
 
@@ -154,7 +170,7 @@ function newParallel(layer, idStage, idParallel) {
   stage.appendChild(block);
 
   let parallel = document.createElement("div");
-  parallel.className = "jenkins_puzzle puz_" + layer;
+  parallel.className = "parallel jenkins_puzzle puz_" + layer;
   parallel.textContent = "parallel";
 
   let choiceStage = document.createElement("div");
@@ -176,16 +192,18 @@ function newParallel(layer, idStage, idParallel) {
     let block = document.createElement("div");
     block.className = "puz_bl_" + layer;
     idSingleSh += 1;
-    block.id = "singleSh_" + idSteps + "_" + idSingleSh;
+    block.id = "single_sh_" + idSteps + "_" + idSingleSh;
     steps.appendChild(block);
 
     let shLabel = document.createElement("label");
+    shLabel.id = "single_sh_" + idSingleSh;
     let shInput = document.createElement("input");
     shInput.type = "text";
     shInput.className = "form-control puz_form";
+    shInput.name = "single_sh";
     shLabel.appendChild(shInput)
     let singleSh = document.createElement("div");
-    singleSh.className = "jenkins_puzzle puz_" + layer;
+    singleSh.className = "single_sh jenkins_puzzle puz_" + layer;
     singleSh.append("sh", shLabel)
 
     block.appendChild(singleSh);
@@ -202,15 +220,17 @@ function newParallel(layer, idStage, idParallel) {
     let block = document.createElement("div");
     block.className = "puz_bl_" + layer;
     idMultiSh += 1;
-    block.id = "multiSh_" + idSteps + "_" + idMultiSh;
+    block.id = "multi_sh_" + idSteps + "_" + idMultiSh;
     steps.appendChild(block);
 
     let shLabel = document.createElement("label");
+      shLabel.id = "multi_sh_" + idMultiSh;
     let shTextarea = document.createElement("textarea");
     shTextarea.className = "form-control puz_form";
+    shTextarea.name = "multi_sh";
     shLabel.appendChild(shTextarea)
     let multiSh = document.createElement("div");
-    multiSh.className = "jenkins_puzzle puz_" + layer;
+    multiSh.className = "multi_sh jenkins_puzzle puz_" + layer;
     multiSh.append("sh", shLabel)
 
     block.appendChild(multiSh);
@@ -227,16 +247,18 @@ function newParallel(layer, idStage, idParallel) {
     let block = document.createElement("div");
     block.className = "puz_bl_" + layer;
     idEcho += 1;
-    block.id = "multiSh_" + idSteps + "_" + idEcho;
+    block.id = "echo_" + idSteps + "_" + idEcho;
     steps.appendChild(block)
 
     let echoLabel = document.createElement("label");
+    echoLabel.id = "echo_" + idEcho;
     let echoInput = document.createElement("input");
     echoInput.type = "text";
     echoInput.className = "form-control puz_form";
+    echoInput.name = "echo";
     echoLabel.appendChild(echoInput)
     let multiSh = document.createElement("div");
-    multiSh.className = "jenkins_puzzle puz_" + layer;
+    multiSh.className = "echo jenkins_puzzle puz_" + layer;
     multiSh.append("echo", echoLabel)
 
     block.appendChild(multiSh);

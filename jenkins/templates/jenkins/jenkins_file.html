@@ -5,6 +5,7 @@
     Jenkins File
 {% endblock %}
 {% block body %}
+<script src="https://cdn.jsdelivr.net/npm/js-base64@3.7.2/base64.min.js"></script>
 <script src="{% static 'jenkins_file.js' %}"></script>
 {% get_name request as username %}
 {% include 'cicd_nav.html' with project=info.name %}
@@ -12,14 +13,21 @@
         <div class="align_both_sides">
             <div class="col-md-5">
                 <h5>Jenkins File Puzzle</h5>
-                <div class="jenkins_puzzle">pipeline</div>
-{#                <div class="jenkins_puzzle puz_add puz_2">+ agent</div>#}
-                <div id="stages" class="puz_bl_2">
-                    <div class="jenkins_puzzle puz_add puz_2" id="addStages" onclick="newStages()">
-                        + stages
-                        <img src="{% static 'core/images/question-mark.png' %}" alt="" style="width: 20px;">
+                <form method="post" action="" name="pipeline" id="form">
+                    {% csrf_token %}
+                    <div class="jenkins_file">
+                        <div class="pipeline jenkins_puzzle">
+                            pipeline
+                            <div id="stages" class="puz_bl_2">
+                                <div class="jenkins_puzzle puz_add puz_2" id="addStages" onclick="newStages()">
+                                    + stages
+                                    <img src="{% static 'core/images/question-mark.png' %}" alt="" style="width: 20px;">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                    <button type="button" class="btn btn-primary" onclick="get_jenkins_file()">確認修改</button>
+                </form>
             </div>
             <div class="col-md-6">
                 <div class="align_both_sides">
