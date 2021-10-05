@@ -1,14 +1,27 @@
 import os
 
-from django.shortcuts import render
+from gitlab import Gitlab
 
+from django.shortcuts import render, redirect
+
+from core.utils import ENVIRON
 from vcs_adapter import GitLabAdapter
 from repo.utils import get_repo_title, get_tree
 from .forms import RepoForm, DelRepoForm
 
+gitlab_inst = None
+try:
+    gitlab_url = f'http://{ENVIRON["GITLAB_HOST"]}:{ENVIRON["GITLAB_HTTP_PORT"]}'
+    root_token = ENVIRON.get('GITLAB_ROOT_PRIVATE_TOKEN', None)
+except KeyError:
+    raise KeyError("'GITLAB_HTTP_PORT' or 'GITLAB_HOST' attr. dose not exist in .env file.")
+else:
+    gitlab_inst = Gitlab(gitlab_url, root_token)
+    del root_token
+
 
 def repo_list_view(request, user):
-    """儲存庫專案列表"""
+    """儲存庫列表"""
     gl = GitLabAdapter()
     projects = gl.get_repo_list(user)
     for project, info in projects.items():
@@ -19,14 +32,15 @@ def repo_list_view(request, user):
 
 
 def repo_view(request, user, project):
-    """儲存庫專案"""
+    """檢視儲存庫"""
     form = DelRepoForm(request.POST or None)
 
-    confirm_info = f'{user}/{project}'
+    full_project_name = f'{user}/{project}'
     if request.method == 'POST':
-        if request.POST['project_info'] == confirm_info:
-            # todo: 刪除儲存庫
-            pass
+        if request.POST['project_info'] == full_project_name:
+            project = gitlab_inst.projects.get(full_project_name)
+            project.delete()
+            return redirect('repo_list', user=user)
         else:
             # todo: 輸入錯誤的提示
             pass
@@ -41,8 +55,14 @@ def repo_view(request, user, project):
         folders, files = get_tree(user, project)
         root_path = f'{project}/'
 
-    return render(request, 'repo/repository.html', {'info': project_info, 'root_path': root_path, 'folders': folders,
-                                                    'files': files, 'form': form})
+    content = {
+        'info': project_info,
+        'root_path': root_path,
+        'folders': folders,
+        'files': files,
+        'form': form
+    }
+    return render(request, 'repo/repository.html', content)
 
 
 def repo_tree_view(request, user, project, file):
@@ -89,9 +109,21 @@ def repo_new_view(request):
     form = RepoForm(request.POST or None)
 
     if request.method == 'POST':
-        name = request.POST['name']
-        description = request.POST['description']
-        visibility = request.POST['visibility']
+        username = request.user.username
+        repo_meta = {
+            'name': request.POST['name'],
+            'description': request.POST['description'],
+            'visibility': request.POST['visibility'],
+        }
+        # TODO: add file when create repo
         add_file = request.POST.getlist('add_file')
+
+        gitlab_user = gitlab_inst.users.list(username=username)[0]
+        user_project = gitlab_user.projects.create(repo_meta)
+        # TODO: error message tips
+        if user_project is None:
+            raise Exception('repo create error.')
+
+        return redirect('repo_project', user=username, project=repo_meta['name'])
 
     return render(request, 'repo/repo_new.html', {'form': form})
