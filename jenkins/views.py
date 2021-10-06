@@ -12,6 +12,7 @@ def jenkins_file_view(request, user, project):
         print(request.POST.getlist('single_sh'))
         print(request.POST.getlist('multi_sh'))
         print(request.POST.getlist('echo'))
+        print(request.POST.get('data', ''))
         print(request.POST.get('context', ''))
 
     return render(request, 'jenkins/jenkins_file.html', {'info': project_info})

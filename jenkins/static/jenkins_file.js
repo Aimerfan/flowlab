@@ -1,12 +1,40 @@
 function get_jenkins_file() {
+  let data = {};
+
+  function record_input_data(element, keyword) {
+    for (let i = 0; i < element.length; i++) {
+      let index = keyword + "_" + (i + 1);
+      data[index] = element[i].value;
+    }
+  }
+
+  // 取表單中的值
+  let stageElement = document.getElementsByName("stage");
+  record_input_data(stageElement, "stage");
+
+  let singleShElement = document.getElementsByName("single_sh");
+  record_input_data(singleShElement, "single_sh");
+
+  let multiShElement = document.getElementsByName("multi_sh");
+  record_input_data(multiShElement, "multi_sh");
+
+  let echoElement = document.getElementsByName("echo");
+  record_input_data(echoElement, "echo");
+
   // 以隱藏的表單送資料至後端
   let jenkins_file = document.querySelector(".jenkins_file");
   let block = document.getElementById("stages");
+  // 傳遞 html 區塊
   let input_frame = document.createElement("input");
   input_frame.value = Base64.encode(jenkins_file.innerHTML);
   input_frame.name = "context";
   input_frame.type = "hidden";
-  block.appendChild(input_frame);
+  // 傳遞 form 資料
+  let input_value = document.createElement("input");
+  input_value.value = JSON.stringify(data);
+  input_value.name = "data";
+  input_value.type = "hidden";
+  block.append(input_frame, input_value);
 
   document.forms["form"].submit();
 }
