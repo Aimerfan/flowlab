@@ -49,6 +49,47 @@
 
     document.forms["pipe_form"].submit();
   }
+
+
+  /**
+   * DOM to Json
+   * @param target 需轉成 Json 形式的 DOM
+   * @returns {string} Json 形式的字串
+   */
+  function showStringifyResult(target) {
+    return JSON.stringify(stringify(target), null, ' ');
+  }
+
+
+  /**
+   * 將 DOM 重新整理, 並加入 form 的 values
+   * @param element html 元素
+   * @returns {{}} 整理過後的 DOM
+   */
+  function stringify(element) {
+    let obj = {};
+    obj.name = element.localName;
+    obj.attributes = [];
+    obj.children = [];
+    let valueExist = 0;
+    Array.from(element.attributes).forEach(a => {
+      // 若為 input/textarea tag 且尚無 value 時, 增加 value 屬性
+      if ((obj.name === "input" || obj.name === "textarea") && !valueExist) {
+        // 由 input.id 找相對應的 input.value
+        if (a.name === "id") {
+          let value = formData[a.value];
+          obj.attributes.push({name: "value", value: value});
+          valueExist = 1;
+        }
+      }
+      obj.attributes.push({ name: a.name, value: a.value });
+    });
+    Array.from(element.children).forEach(c => {
+      obj.children.push(stringify(c));
+    });
+
+    return obj;
+  }
 }
 
 
@@ -93,9 +134,10 @@ function newStages() {
     stages.appendChild(block);
 
     let stageLabel = document.createElement("label");
-    stageLabel.id = "stage_" + idStage;
+    stageLabel.for = "stage_" + idStage;
     let stageInput = document.createElement("input");
     stageInput.type = "text";
+    stageInput.id  = "stage_" + idStage;
     stageInput.className = "form-control puz_form";
     stageInput.name = "stage";
     stageLabel.appendChild(stageInput)
@@ -236,9 +278,10 @@ function newParallel(layer, idStage, idParallel) {
     steps.appendChild(block);
 
     let shLabel = document.createElement("label");
-    shLabel.id = "single_sh_" + idSingleSh;
+    shLabel.for = "single_sh_" + idSingleSh;
     let shInput = document.createElement("input");
     shInput.type = "text";
+    shInput.id = "single_sh_" + idSingleSh;
     shInput.className = "form-control puz_form";
     shInput.name = "single_sh";
     shLabel.appendChild(shInput)
@@ -264,8 +307,9 @@ function newParallel(layer, idStage, idParallel) {
     steps.appendChild(block);
 
     let shLabel = document.createElement("label");
-      shLabel.id = "multi_sh_" + idMultiSh;
+    shLabel.for = "multi_sh_" + idMultiSh;
     let shTextarea = document.createElement("textarea");
+    shTextarea.id = "multi_sh_" + idMultiSh;
     shTextarea.className = "form-control puz_form";
     shTextarea.name = "multi_sh";
     shLabel.appendChild(shTextarea)
@@ -291,9 +335,10 @@ function newParallel(layer, idStage, idParallel) {
     steps.appendChild(block)
 
     let echoLabel = document.createElement("label");
-    echoLabel.id = "echo_" + idEcho;
+    echoLabel.for = "echo_" + idEcho;
     let echoInput = document.createElement("input");
     echoInput.type = "text";
+    echoInput.id = "echo_" + idEcho;
     echoInput.className = "form-control puz_form";
     echoInput.name = "echo";
     echoLabel.appendChild(echoInput)

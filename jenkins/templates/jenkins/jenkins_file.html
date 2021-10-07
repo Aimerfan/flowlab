@@ -13,16 +13,14 @@
         <div class="align_both_sides">
             <div class="col-md-5">
                 <h5>Jenkins File Puzzle</h5>
-                <form method="post" action="" name="pipeline" id="form">
+                <form method="post" action="" name="pipeline" id="pipe_form">
                     {% csrf_token %}
-                    <div class="jenkins_file">
-                        <div class="pipeline jenkins_puzzle">
-                            pipeline
-                            <div id="stages" class="puz_bl_2">
-                                <div class="jenkins_puzzle puz_add puz_2" id="addStages" onclick="newStages()">
-                                    + stages
-                                    <img src="{% static 'core/images/question-mark.png' %}" alt="" style="width: 20px;">
-                                </div>
+                    <div class="pipeline jenkins_puzzle">
+                        pipeline
+                        <div id="stages" class="puz_bl_2">
+                            <div class="jenkins_puzzle puz_add puz_2" id="addStages" onclick="newStages()">
+                                + stages
+                                <img src="{% static 'core/images/question-mark.png' %}" alt="" style="width: 20px;">
                             </div>
                         </div>
                     </div>
