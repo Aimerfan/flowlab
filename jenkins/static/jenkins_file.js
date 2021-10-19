@@ -1,5 +1,6 @@
 {
   let formData = {};
+  let pipeline_data = {};
 
   /**
    * 取表單中的值
@@ -28,26 +29,13 @@
   }
 
 
-  function getJenkinsFile() {
-
-    getFormValue()
-
-    // 以隱藏的表單送資料至後端
+  /**
+   * 將 class="pipeline" 的 DOM 轉成 json, 並加上 form 的值
+   */
+  function combinePipeline() {
     let jenkins_file = document.querySelector(".pipeline");
-    let block = document.getElementById("pipe_form");
-    // 傳遞 html 區塊 (json 格式)
-    let input_frame = document.createElement("input");
-    input_frame.value = showStringifyResult(jenkins_file);
-    input_frame.name = "context";
-    input_frame.type = "hidden";
-    // 傳遞 form 資料 (json 格式)
-    let input_value = document.createElement("input");
-    input_value.value = JSON.stringify(formData);
-    input_value.name = "data";
-    input_value.type = "hidden";
-    block.append(input_frame, input_value);
-
-    document.forms["pipe_form"].submit();
+    getFormValue()
+    pipeline_data = showStringifyResult(jenkins_file)
   }
 
 
@@ -92,6 +80,21 @@
   }
 
 
+  /* 使用 ajax 將 pipeline 資料 (json 格式) 傳遞至後端 */
+  function sendData() {
+    let send_data = {
+      "context": pipeline_data,
+      "csrfmiddlewaretoken": $.cookie("csrftoken"),
+    }
+    $.ajax({
+      method: "POST",
+      async: true,
+      data: send_data,
+      datatype: "json"
+    });
+  }
+
+
   /* 使用 ajax 將 pipeline 資料 (json 格式) 顯示於網頁上 */
   let xhr = new XMLHttpRequest();
   xhr.open("get","",true);
@@ -100,9 +103,9 @@
     let info = document.querySelector(".info");
     let btn = document.querySelector(".btn_pipe");
     btn.onclick = function(e){
-      let jenkins_file = document.querySelector(".pipeline");
-      getFormValue()
-      info.innerHTML += showStringifyResult(jenkins_file);
+      combinePipeline()
+      info.innerHTML += pipeline_data;
+      sendData();
     };
   };
 }
