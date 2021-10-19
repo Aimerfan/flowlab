@@ -24,7 +24,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-primary" onclick="getJenkinsFile()">確認修改</button>
+                    <button type="button" class="btn btn-primary btn_pipe">確認修改</button>
                 </form>
             </div>
             <div class="col-md-6">
@@ -33,34 +33,7 @@
                     <button class="btn btn-secondary">Download</button>
                 </div>
                 <div class="jenkins_code_content">
-                    <pre><code style="font-size: 16px;">pipeline {
-    stages {
-        stage('Build') {
-            steps {
-                sh './gradlew build'
-            }
-        }
-        stage('Test') {
-            when {
-                branch 'dev'
-            }
-            parallel {
-                stage('test-login') {
-                    steps {
-                        sh 'chmod +x ./gradlew'
-                        sh './gradlew test --tests account.login'
-                    }
-                }
-                stage('test-logout') {
-                    steps {
-                        sh 'chmod +x ./gradlew'
-                        sh './gradlew test --tests account.logout'
-                    }
-                }
-            }
-        }
-    }
-}</code></pre>
+                    <pre><code style="font-size: 16px;" class="info"></code></pre>
                 </div>
             </div>
         </div>

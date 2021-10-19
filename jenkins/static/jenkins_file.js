@@ -90,6 +90,21 @@
 
     return obj;
   }
+
+
+  /* 使用 ajax 將 pipeline 資料 (json 格式) 顯示於網頁上 */
+  let xhr = new XMLHttpRequest();
+  xhr.open("get","",true);
+  xhr.send(null);
+  xhr.onload = function(){
+    let info = document.querySelector(".info");
+    let btn = document.querySelector(".btn_pipe");
+    btn.onclick = function(e){
+      let jenkins_file = document.querySelector(".pipeline");
+      getFormValue()
+      info.innerHTML += showStringifyResult(jenkins_file);
+    };
+  };
 }
 
 
