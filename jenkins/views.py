@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
@@ -18,9 +20,8 @@ def post_jenkinsfile_api(request):
     # valid ajax request
     if not request.is_ajax() or request.method != 'POST':
         return HttpResponseBadRequest('error request type, must be ajax by POST method.')
-
-    pipe_tree = PipeParser.parse(request.body)
-
+    
+    pipe_tree = PipeParser.parse(json.loads(request.body))
     return HttpResponse(pipe_tree.__str__(), headers={
         'Content-Type': 'text/plain',
     })
