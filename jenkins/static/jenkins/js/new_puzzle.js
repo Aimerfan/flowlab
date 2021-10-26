@@ -1,118 +1,12 @@
-{
-  let formData = {};
-  let pipeline_data = {};
-
-  /**
-   * 取表單中的值
-   * 以 formData = { id: value, ... } 的格式儲存
-   */
-  function getFormValue() {
-
-    function record_input_data(element, keyword) {
-      for (let i = 0; i < element.length; i++) {
-        let index = keyword + "_" + (i + 1);
-        formData[index] = element[i].value;
-      }
-    }
-
-    let stageElement = document.getElementsByName("stage");
-    record_input_data(stageElement, "stage");
-
-    let singleShElement = document.getElementsByName("single_sh");
-    record_input_data(singleShElement, "single_sh");
-
-    let multiShElement = document.getElementsByName("multi_sh");
-    record_input_data(multiShElement, "multi_sh");
-
-    let echoElement = document.getElementsByName("echo");
-    record_input_data(echoElement, "echo");
-  }
-
-
-  /**
-   * 將 class="pipeline" 的 DOM 轉成 json, 並加上 form 的值
-   */
-  function combinePipeline() {
-    let jenkins_file = document.querySelector(".pipeline");
-    getFormValue()
-    pipeline_data = showStringifyResult(jenkins_file)
-  }
-
-
-  /**
-   * DOM to Json
-   * @param target 需轉成 Json 形式的 DOM
-   * @returns {string} Json 形式的字串
-   */
-  function showStringifyResult(target) {
-    return JSON.stringify(stringify(target), null, "");
-  }
-
-
-  /**
-   * 將 DOM 重新整理, 並加入 form 的 values
-   * @param element html 元素
-   * @returns {{}} 整理過後的 DOM
-   */
-  function stringify(element) {
-    let obj = {};
-    obj.name = element.localName;
-    obj.attributes = [];
-    obj.children = [];
-    let valueExist = 0;
-    Array.from(element.attributes).forEach(a => {
-      // 若為 input/textarea tag 且尚無 value 時, 增加 value 屬性
-      if ((obj.name === "input" || obj.name === "textarea") && !valueExist) {
-        // 由 input.id 找相對應的 input.value
-        if (a.name === "id") {
-          let value = formData[a.value];
-          obj.attributes.push({name: "value", value: value});
-          valueExist = 1;
-        }
-      }
-      obj.attributes.push({ name: a.name, value: a.value });
-    });
-    Array.from(element.children).forEach(c => {
-      obj.children.push(stringify(c));
-    });
-
-    return obj;
-  }
-
-
-  /* 使用 ajax 將 pipeline 資料 (json 格式) 傳遞至後端 */
-  let btn = document.querySelector(".btn_pipe");
-  btn.onclick = function() {
-    // 抓取頁面元素，準備 json 資料(使 pipeline_data 可用)
-    combinePipeline();
-    // jquery ajax
-    let code_sector = document.querySelector(".info");
-    const pipeparser_url = "/jenkins/pipeparser/";
-    $.ajax({
-      type: "POST",
-      url:pipeparser_url,
-      contentType: "application/json",
-      data: pipeline_data,
-      datatype: "text/plain",
-      success: function (response) {
-        code_sector.innerHTML = response;
-      },
-      error: function (response) {
-        code_sector.innerHTML = "Oops! Something error when parse jenkinsfile."
-      }
-    });
-  };
-}
-
-
 function newStages() {
   let layer = 2;
   document.getElementById("addStages").style.display = "none";
   let block = document.getElementById("stages");
+  block.className += " stages"
 
   let stages = document.createElement("div");
   stages.textContent = "stages";
-  stages.className = "stages jenkins_puzzle puz_" + layer;
+  stages.className = "jenkins_puzzle puz_" + layer;
 
   let choiceStage = document.createElement("div");
   choiceStage.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
@@ -140,7 +34,7 @@ function newStages() {
     let stages = document.getElementById(parentId);
 
     let block = document.createElement("div");
-    block.className = "puz_bl_" + layer;
+    block.className = "puz_bl_" + layer + " stage";
     idStage += 1;
     block.id = "stage_" + idStage;
     stages.appendChild(block);
@@ -154,7 +48,7 @@ function newStages() {
     stageInput.name = "stage";
     stageLabel.appendChild(stageInput)
     let stage = document.createElement("div");
-    stage.className = "stage jenkins_puzzle puz_" + layer;
+    stage.className = "jenkins_puzzle puz_" + layer;
     stage.append("stage(", stageLabel, ")")
 
     let choiceWhen = document.createElement("div");
@@ -192,7 +86,7 @@ function newWhen(layer, idStage, idWhen) {
   let stage = document.getElementById("stage_" + idStage);
 
   let block = document.createElement("div");
-  block.className = "puz_bl_" + layer;
+  block.className = "puz_bl_" + layer + " when";
   block.id = "when_" + idWhen;
 
   let steps = document.getElementById("steps_" + idStage);
@@ -209,7 +103,7 @@ function newWhen(layer, idStage, idWhen) {
   }
 
   let when = document.createElement("div");
-  when.className = "when jenkins_puzzle puz_" + layer;
+  when.className = "jenkins_puzzle puz_" + layer;
   when.textContent = "when";
 
   block.appendChild(when);
@@ -223,12 +117,12 @@ function newSteps(layer, idStage, idSteps) {
   let stage = document.getElementById("stage_" + idStage);
 
   let block = document.createElement("div");
-  block.className = "puz_bl_" + layer;
+  block.className = "puz_bl_" + layer + " steps";
   block.id = "steps_" + idSteps;
   stage.appendChild(block);
 
   let steps = document.createElement("div");
-  steps.className = "steps jenkins_puzzle puz_" + layer;
+  steps.className = "jenkins_puzzle puz_" + layer;
   steps.textContent = "steps";
 
   let choiceSingleSh = document.createElement("div");
@@ -259,12 +153,12 @@ function newParallel(layer, idStage, idParallel) {
   let stage = document.getElementById("stage_" + idStage);
 
   let block = document.createElement("div");
-  block.className = "puz_bl_" + layer;
+  block.className = "puz_bl_" + layer + " parallel";
   block.id = "parallel_" + idParallel;
   stage.appendChild(block);
 
   let parallel = document.createElement("div");
-  parallel.className = "parallel jenkins_puzzle puz_" + layer;
+  parallel.className = "jenkins_puzzle puz_" + layer;
   parallel.textContent = "parallel";
 
   let choiceStage = document.createElement("div");
@@ -284,7 +178,7 @@ function newParallel(layer, idStage, idParallel) {
     let steps = document.getElementById("steps_" + idSteps);
 
     let block = document.createElement("div");
-    block.className = "puz_bl_" + layer;
+    block.className = "puz_bl_" + layer + " single_sh";
     idSingleSh += 1;
     block.id = "single_sh_" + idSteps + "_" + idSingleSh;
     steps.appendChild(block);
@@ -298,7 +192,7 @@ function newParallel(layer, idStage, idParallel) {
     shInput.name = "single_sh";
     shLabel.appendChild(shInput)
     let singleSh = document.createElement("div");
-    singleSh.className = "single_sh jenkins_puzzle puz_" + layer;
+    singleSh.className = "jenkins_puzzle puz_" + layer;
     singleSh.append("sh", shLabel)
 
     block.appendChild(singleSh);
@@ -313,7 +207,7 @@ function newParallel(layer, idStage, idParallel) {
     let steps = document.getElementById("steps_" + idSteps);
 
     let block = document.createElement("div");
-    block.className = "puz_bl_" + layer;
+    block.className = "puz_bl_" + layer + " multi_sh";
     idMultiSh += 1;
     block.id = "multi_sh_" + idSteps + "_" + idMultiSh;
     steps.appendChild(block);
@@ -326,7 +220,7 @@ function newParallel(layer, idStage, idParallel) {
     shTextarea.name = "multi_sh";
     shLabel.appendChild(shTextarea)
     let multiSh = document.createElement("div");
-    multiSh.className = "multi_sh jenkins_puzzle puz_" + layer;
+    multiSh.className = "jenkins_puzzle puz_" + layer;
     multiSh.append("sh", shLabel)
 
     block.appendChild(multiSh);
@@ -341,7 +235,7 @@ function newParallel(layer, idStage, idParallel) {
     let steps = document.getElementById("steps_" + idSteps);
 
     let block = document.createElement("div");
-    block.className = "puz_bl_" + layer;
+    block.className = "puz_bl_" + layer + " echo";
     idEcho += 1;
     block.id = "echo_" + idSteps + "_" + idEcho;
     steps.appendChild(block)
@@ -355,7 +249,7 @@ function newParallel(layer, idStage, idParallel) {
     echoInput.name = "echo";
     echoLabel.appendChild(echoInput)
     let multiSh = document.createElement("div");
-    multiSh.className = "echo jenkins_puzzle puz_" + layer;
+    multiSh.className = "jenkins_puzzle puz_" + layer;
     multiSh.append("echo", echoLabel)
 
     block.appendChild(multiSh);
