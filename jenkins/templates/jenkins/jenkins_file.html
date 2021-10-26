@@ -5,10 +5,9 @@
     Jenkins File
 {% endblock %}
 {% block body %}
-<script src="https://cdn.jsdelivr.net/npm/js-base64@3.7.2/base64.min.js"></script>
-<script src="https://cdn.staticfile.org/jquery/3.4.0/jquery.min.js"></script>
-<script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-<script src="{% static 'jenkins_file.js' %}"></script>
+<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'js/jquery.cookie-1.4.1.min.js' %}"></script>
+<script src="{% static 'jenkins/jenkins_file.js' %}"></script>
 {% get_name request as username %}
 {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">

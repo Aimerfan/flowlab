@@ -7,7 +7,7 @@
 ### 背景知識
 
 網站開發:
-docker > python > django
+docker > python > django > {front end: html,css,javascript} > jquery
 
 系統開發:
 Docker, Jenkins, GitLab, Sonarqube
@@ -41,9 +41,9 @@ Docker, Jenkins, GitLab, Sonarqube
 
 ---
 
-## core/static 規範
+## static resources 規範
 
-- 單個 `css`, `images` 或 `js` 的檔案直接放置於 `core/static/core/` 下
+- 單個 `css`, `images` 或 `js` 的檔案直接放置於 `{app root}/static/{app name}/` 下
 - 若該類別存在 1 個以上的檔案就應該將所有檔案放到 "該類別" 的資料夾中
 
 例如：目前 `core/static/core` 下有 `flowlab-logo.png` 與 `devops.png` 兩份檔案  
