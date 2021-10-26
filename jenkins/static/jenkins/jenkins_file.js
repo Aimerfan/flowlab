@@ -45,7 +45,7 @@
    * @returns {string} Json 形式的字串
    */
   function showStringifyResult(target) {
-    return JSON.stringify(stringify(target), null, ' ');
+    return JSON.stringify(stringify(target), null, "");
   }
 
 
@@ -81,32 +81,26 @@
 
 
   /* 使用 ajax 將 pipeline 資料 (json 格式) 傳遞至後端 */
-  function sendData() {
-    let send_data = {
-      "context": pipeline_data,
-      "csrfmiddlewaretoken": $.cookie("csrftoken"),
-    }
+  let btn = document.querySelector(".btn_pipe");
+  btn.onclick = function() {
+    // 抓取頁面元素，準備 json 資料(使 pipeline_data 可用)
+    combinePipeline();
+    // jquery ajax
+    let code_sector = document.querySelector(".info");
+    const pipeparser_url = "/jenkins/pipeparser/";
     $.ajax({
-      method: "POST",
-      async: true,
-      data: send_data,
-      datatype: "json"
+      type: "POST",
+      url:pipeparser_url,
+      contentType: "application/json",
+      data: pipeline_data,
+      datatype: "text/plain",
+      success: function (response) {
+        code_sector.innerHTML = response;
+      },
+      error: function (response) {
+        code_sector.innerHTML = "Oops! Something error when parse jenkinsfile."
+      }
     });
-  }
-
-
-  /* 使用 ajax 將 pipeline 資料 (json 格式) 顯示於網頁上 */
-  let xhr = new XMLHttpRequest();
-  xhr.open("get","",true);
-  xhr.send(null);
-  xhr.onload = function(){
-    let info = document.querySelector(".info");
-    let btn = document.querySelector(".btn_pipe");
-    btn.onclick = function(e){
-      combinePipeline()
-      info.innerHTML += pipeline_data;
-      sendData();
-    };
   };
 }
 

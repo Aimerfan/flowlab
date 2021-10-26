@@ -7,7 +7,6 @@
 {% block body %}
 <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
 <script src="{% static 'js/jquery.cookie-1.4.1.min.js' %}"></script>
-<script src="{% static 'jenkins/jenkins_file.js' %}"></script>
 {% get_name request as username %}
 {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
@@ -39,4 +38,5 @@
             </div>
         </div>
     </div>
+<script src="{% static 'jenkins/jenkins_file.js' %}"></script>
 {% endblock %}
