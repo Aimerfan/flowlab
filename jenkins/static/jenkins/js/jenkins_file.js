@@ -103,3 +103,18 @@
     });
   };
 }
+
+{
+  let btnDownload = document.querySelector('#btn_download')
+  btnDownload.onclick = function () {
+    let aTag = document.createElement('a');
+    let pipelineText = document.querySelector('.info').innerHTML;
+    let blob = new Blob([pipelineText], {
+      type: "text/plain",
+    })
+    aTag.download = 'jenkinsfile';
+    aTag.href = URL.createObjectURL(blob);
+    aTag.click();
+    URL.revokeObjectURL(aTag.href);
+  }
+}
