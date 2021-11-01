@@ -135,17 +135,11 @@ function newSteps(layer, idStage, idSteps) {
   steps.className = "jenkins_puzzle puz_" + layer;
   steps.textContent = "steps";
 
-  let choiceSingleSh = document.createElement("div");
-  choiceSingleSh.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
-  choiceSingleSh.textContent = "+ sh (single row)";
-  choiceSingleSh.id = "addSingleSh_" + idSteps;
-  choiceSingleSh.addEventListener("click", newSingleSh.bind(this, (layer + 1), idSteps));
-
-  let choiceMultiSh = document.createElement("div");
-  choiceMultiSh.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
-  choiceMultiSh.textContent = "+ sh (multi row)";
-  choiceMultiSh.id = "addMultiSh_" + idSteps;
-  choiceMultiSh.addEventListener("click", newMultiSh.bind(this, (layer + 1), idSteps));
+  let choiceSh = document.createElement("div");
+  choiceSh.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
+  choiceSh.textContent = "+ sh";
+  choiceSh.id = "addSh_" + idSteps;
+  choiceSh.addEventListener("click", newSh.bind(this, (layer + 1), idSteps));
 
   let choiceEcho = document.createElement("div");
   choiceEcho.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
@@ -153,7 +147,7 @@ function newSteps(layer, idStage, idSteps) {
   choiceEcho.id = "addEcho_" + idSteps;
   choiceEcho.addEventListener("click", newEcho.bind(this, (layer + 1), idSteps));
 
-  block.append(steps, choiceSingleSh, choiceMultiSh, choiceEcho);
+  block.append(steps, choiceSh, choiceEcho);
 }
 
 
@@ -182,58 +176,29 @@ function newParallel(layer, idStage, idParallel) {
 
 
 {
-  let idSingleSh = 0;
+  let idSh = 0;
 
-  function newSingleSh(layer, idSteps) {
+  function newSh(layer, idSteps) {
     let steps = document.getElementById("steps_" + idSteps);
 
     let block = document.createElement("div");
-    block.className = "puz_bl_" + layer + " single_sh";
-    idSingleSh += 1;
-    block.id = "single_sh_" + idSteps + "_" + idSingleSh;
+    block.className = "puz_bl_" + layer + " sh";
+    idSh += 1;
+    block.id = "sh_" + idSh;
     steps.appendChild(block);
 
     let shLabel = document.createElement("label");
-    shLabel.for = "single_sh_" + idSingleSh;
-    let shInput = document.createElement("input");
-    shInput.type = "text";
-    shInput.id = "single_sh_" + idSingleSh;
-    shInput.className = "form-control puz_form";
-    shInput.name = "single_sh";
-    shLabel.appendChild(shInput)
-    let singleSh = document.createElement("div");
-    singleSh.className = "jenkins_puzzle puz_" + layer;
-    singleSh.append("sh", shLabel)
-
-    block.appendChild(singleSh);
-  }
-}
-
-
-{
-  let idMultiSh = 0;
-
-  function newMultiSh(layer, idSteps) {
-    let steps = document.getElementById("steps_" + idSteps);
-
-    let block = document.createElement("div");
-    block.className = "puz_bl_" + layer + " multi_sh";
-    idMultiSh += 1;
-    block.id = "multi_sh_" + idSteps + "_" + idMultiSh;
-    steps.appendChild(block);
-
-    let shLabel = document.createElement("label");
-    shLabel.for = "multi_sh_" + idMultiSh;
+    shLabel.for = "sh_" + idSh;
     let shTextarea = document.createElement("textarea");
-    shTextarea.id = "multi_sh_" + idMultiSh;
-    shTextarea.className = "form-control puz_form";
-    shTextarea.name = "multi_sh";
+    shTextarea.id = "sh_" + idSh;
+    shTextarea.className = "form-control puz_form width_textarea";
+    shTextarea.name = "sh";
     shLabel.appendChild(shTextarea)
-    let multiSh = document.createElement("div");
-    multiSh.className = "jenkins_puzzle puz_" + layer;
-    multiSh.append("sh", shLabel)
+    let sh = document.createElement("div");
+    sh.className = "ver_top jenkins_puzzle puz_" + layer;
+    sh.append("sh", shLabel)
 
-    block.appendChild(multiSh);
+    block.appendChild(sh);
   }
 }
 
@@ -258,10 +223,10 @@ function newParallel(layer, idStage, idParallel) {
     echoInput.className = "form-control puz_form";
     echoInput.name = "echo";
     echoLabel.appendChild(echoInput)
-    let multiSh = document.createElement("div");
-    multiSh.className = "jenkins_puzzle puz_" + layer;
-    multiSh.append("echo", echoLabel)
+    let sh = document.createElement("div");
+    sh.className = "jenkins_puzzle puz_" + layer;
+    sh.append("echo", echoLabel)
 
-    block.appendChild(multiSh);
+    block.appendChild(sh);
   }
 }

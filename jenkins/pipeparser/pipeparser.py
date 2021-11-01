@@ -96,7 +96,13 @@ class LeafTextSection(BaseSection):
 
     def __str__(self, tabwidth=4, level=0):
         indent = ' ' * tabwidth * level
-        return f"{indent}{self.html_class} '{self.section_context}'\n"
+        context_indent = ' ' * tabwidth * (level + 1)
+        context_list = self.section_context.split('\n')
+        indented_context = ''
+        # 縮排 context_indent 的每行文字
+        for line in context_list:
+            indented_context = indented_context + f"{context_indent}{line}\n"
+        return f"{indent}{self.html_class} {{\n" + f"{indented_context}" + f"{indent}}}\n"
 
     def _dfs_input_str(self, remain_dict, tag):
         """深度優先(dfs)搜尋到第一個 <{tag}>，返回其中的 input value"""
@@ -156,21 +162,11 @@ class When(LeafTextSection):
         super().__init__(remain_dict)
         self.section_context = self._dfs_input_str(remain_dict, 'textarea')
 
-    def __str__(self, tabwidth=4, level=0):
-        indent = ' ' * tabwidth * level
-        context_indent = ' ' * tabwidth * (level+1)
-        context_list = self.section_context.split('\n')
-        indented_context = ''
-        # 縮排 context_indent 的每行
-        for line in context_list:
-            indented_context = indented_context + f"{context_indent}{line}\n"
-        return f"{indent}{self.html_class} {{\n" + f"{indented_context}" + f"{indent}}}\n"
-
 
 class Steps(NonLeafSection):
 
     html_class = 'steps'
-    allowed_subsections = ['single_sh', 'multi_sh', 'echo']
+    allowed_subsections = ['sh', 'echo']
 
 
 class Parallel(NonLeafSection):
@@ -179,22 +175,32 @@ class Parallel(NonLeafSection):
     allowed_subsections = ['stage']
 
 
-class SingleSh(LeafTextSection):
+class Sh(LeafTextSection):
 
-    html_class = 'single_sh'
+    html_class = 'sh'
 
-
-class MultiSh(LeafTextSection):
-
-    html_class = 'multi_sh'
+    def __init__(self, remain_dict):
+        super().__init__(remain_dict)
+        self.section_context = self._dfs_input_str(remain_dict, 'textarea')
 
     def __str__(self, tabwidth=4, level=0):
-        return f"{self.html_class} '''\n{self.section_context}\n'''\n"
+        original_context = super().__str__(tabwidth, level)
+        if '\n' in self.section_context:
+            original_context = original_context.replace('{', "'''")
+            original_context = original_context.replace('}', "'''")
+            return original_context
+        else:
+            indent = ' ' * tabwidth * level
+            return f"{indent}{self.html_class} '{self.section_context}'\n"
 
 
 class Echo(LeafTextSection):
 
     html_class = 'echo'
+
+    def __str__(self, tabwidth=4, level=0):
+        indent = ' ' * tabwidth * level
+        return f"{indent}{self.html_class} '{self.section_context}'\n"
 
 
 # {'html class name': python class name, ...}
@@ -205,7 +211,6 @@ _SECTION_DICT = {
     'when': When,
     'steps': Steps,
     'parallel': Parallel,
-    'single_sh': SingleSh,
-    'multi_sh': MultiSh,
+    'sh': Sh,
     'echo': Echo,
 }

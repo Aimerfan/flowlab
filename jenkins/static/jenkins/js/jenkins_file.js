@@ -21,11 +21,8 @@
     let whenElement = document.getElementsByName("when");
     record_input_data(whenElement, "when_child");
 
-    let singleShElement = document.getElementsByName("single_sh");
-    record_input_data(singleShElement, "single_sh");
-
-    let multiShElement = document.getElementsByName("multi_sh");
-    record_input_data(multiShElement, "multi_sh");
+    let singleShElement = document.getElementsByName("sh");
+    record_input_data(singleShElement, "sh");
 
     let echoElement = document.getElementsByName("echo");
     record_input_data(echoElement, "echo");
