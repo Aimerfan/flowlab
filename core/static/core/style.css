@@ -58,6 +58,12 @@ li a:hover {
     align-items: center;
 }
 
+.ver_top {
+    /* 垂直靠上 */
+    display: flex;
+    align-items: flex-start;
+}
+
 .align_both_sides {
     /* 對齊左右兩邊 */
     display: flex;
@@ -541,6 +547,10 @@ button {
     margin-left: 12%;
     /*padding: 10px;*/
     text-align: left;
+}
+
+.width_textarea {
+    width: 120%;
 }
 
 /* 字體顏色 */

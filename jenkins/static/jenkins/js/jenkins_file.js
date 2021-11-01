@@ -18,6 +18,9 @@
     let stageElement = document.getElementsByName("stage");
     record_input_data(stageElement, "stage");
 
+    let whenElement = document.getElementsByName("when");
+    record_input_data(whenElement, "when_child");
+
     let singleShElement = document.getElementsByName("single_sh");
     record_input_data(singleShElement, "single_sh");
 

@@ -93,20 +93,30 @@ function newWhen(layer, idStage, idWhen) {
   let parallel = document.getElementById("parallel_" + idStage);
   // 若已有 "steps" 區塊, 則在該 "steps" 區塊前 加入 "when" 區塊
   if (steps) {
-    stage.insertBefore(block, steps)
+    stage.insertBefore(block, steps);
   }
   // 若已有 "parallel" 區塊, 則在該 "parallel" 區塊前 加入 "when" 區塊
   else if (parallel) {
-    stage.insertBefore(block, parallel)
+    stage.insertBefore(block, parallel);
   } else {
     stage.appendChild(block);
   }
 
+  let whenChildLabel = document.createElement("label");
+  whenChildLabel.for = "when_child_" + idWhen;
+  let whenChildInput = document.createElement("textarea");
+  whenChildInput.type = "text";
+  whenChildInput.id  = "when_child_" + idWhen;
+  whenChildInput.className = "form-control puz_form width_textarea";
+  whenChildInput.name = "when";
+  whenChildLabel.appendChild(whenChildInput)
+
   let when = document.createElement("div");
-  when.className = "jenkins_puzzle puz_" + layer;
+  when.className = "ver_top jenkins_puzzle puz_" + layer;
   when.textContent = "when";
 
-  block.appendChild(when);
+  when.appendChild(whenChildLabel);
+  block.append(when);
 }
 
 

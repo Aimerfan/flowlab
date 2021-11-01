@@ -92,28 +92,28 @@ class LeafTextSection(BaseSection):
 
     def __init__(self, remain_dict):
         super().__init__(remain_dict)
-        self.section_context = self._dfs_input_str(remain_dict)
+        self.section_context = self._dfs_input_str(remain_dict, 'input')
 
     def __str__(self, tabwidth=4, level=0):
         indent = ' ' * tabwidth * level
         return f"{indent}{self.html_class} '{self.section_context}'\n"
 
-    def _dfs_input_str(self, remain_dict):
-        """深度優先(dfs)搜尋到第一個 <input>，返回其中的 input value"""
-        # 自己是 <input> 的時候
-        if remain_dict['name'] == 'input':
+    def _dfs_input_str(self, remain_dict, tag):
+        """深度優先(dfs)搜尋到第一個 <{tag}>，返回其中的 input value"""
+        # 自己是 <{tag}> 的時候
+        if remain_dict['name'] == tag:
             tag_attrs = remain_dict['attributes']
             for attr in tag_attrs:
                 if attr['name'] == 'value':
                     return attr['value']
-        # 嘗試找子孫有沒有 <input>
+        # 嘗試找子孫有沒有 <{tag}>
         else:
             children = remain_dict['children']
             for child in children:
-                search_child = self._dfs_input_str(child)
+                search_child = self._dfs_input_str(child, tag)
                 if search_child:
                     return search_child
-        # 什麼都沒找到(自己跟後代都沒有)，或是 <input> 沒有 value attr.
+        # 什麼都沒找到(自己跟後代都沒有)，或是 <{tag}> 沒有 value attr.
         return ''
 
 
@@ -151,6 +151,20 @@ class Stage(NonLeafTextSection):
 class When(LeafTextSection):
 
     html_class = 'when'
+
+    def __init__(self, remain_dict):
+        super().__init__(remain_dict)
+        self.section_context = self._dfs_input_str(remain_dict, 'textarea')
+
+    def __str__(self, tabwidth=4, level=0):
+        indent = ' ' * tabwidth * level
+        context_indent = ' ' * tabwidth * (level+1)
+        context_list = self.section_context.split('\n')
+        indented_context = ''
+        # 縮排 context_indent 的每行
+        for line in context_list:
+            indented_context = indented_context + f"{context_indent}{line}\n"
+        return f"{indent}{self.html_class} {{\n" + f"{indented_context}" + f"{indent}}}\n"
 
 
 class Steps(NonLeafSection):
