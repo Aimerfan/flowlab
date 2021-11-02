@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'accounts.apps.AccountsConfig',
     'repo.apps.RepoConfig',
-    'jenkins.apps.JenkinsConfig',
+    'ci.apps.CiConfig',
     'behave_django',
 ]
 
