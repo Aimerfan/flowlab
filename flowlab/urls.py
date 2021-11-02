@@ -21,4 +21,5 @@ urlpatterns = [
     path('', include('core.urls')),
     path('accounts/', include('accounts.urls')),
     path('repo/', include('repo.urls')),
+    path('ci/', include('ci.urls'))
 ]

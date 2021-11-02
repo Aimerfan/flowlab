@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load nav_tag %}
+{% block title %}
+    Jenkins File
+{% endblock %}
+{% block body %}
+<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'js/jquery.cookie-1.4.1.min.js' %}"></script>
+{% get_name request as username %}
+{% include 'cicd_nav.html' with project=info.name %}
+    <div class="container container_close">
+        <div class="align_both_sides">
+            <div class="col-md-5">
+                <h5>Jenkins File Puzzle</h5>
+                <form method="post" action="" name="pipeline" id="pipe_form">
+                    {% csrf_token %}
+                    <div class="pipeline jenkins_puzzle">
+                        pipeline
+                        <div id="stages" class="puz_bl_2">
+                            <div class="jenkins_puzzle puz_add puz_2" id="addStages" onclick="newStages()">
+                                + stages
+                                <img src="{% static 'core/images/question-mark.png' %}" alt="" style="width: 20px;">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary btn_pipe">確認修改</button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <div class="align_both_sides">
+                    <h5>Jenkinsfile</h5>
+                    <button id="btn_download" class="btn btn-secondary">Download</button>
+                </div>
+                <div class="jenkins_code_content">
+                    <pre><code style="font-size: 16px;" class="info"></code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+<script src="{% static 'jenkins/js/new_puzzle.js' %}"></script>
+<script src="{% static 'jenkins/js/jenkins_file.js' %}"></script>
+{% endblock %}
