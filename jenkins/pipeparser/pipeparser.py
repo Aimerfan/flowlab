@@ -13,13 +13,18 @@ class BaseSection:
     html_class = ''
 
     @classmethod
-    def _get_tag_class(cls, tag_dict):
+    def _get_tag_attr(cls, tag, attr_name):
+        attrs = tag.get('attributes', [])
+        for attr in attrs:
+            if attr['name'] == attr_name:
+                return attr['value']
+        return ''
+
+    @classmethod
+    def _get_tag_class(cls, tag):
         """以 set() 返回 html tag 中，所有 class 屬性的值"""
-        for attr in tag_dict['attributes']:
-            if attr['name'] == 'class':
-                return set(attr['value'].split(' '))
-        else:
-            return set()
+        class_str = cls._get_tag_attr(tag, 'class')
+        return set(class_str.split(' ')) if class_str else set()
 
     @classmethod
     def _valid_html_class(cls, tag_dict):
@@ -31,6 +36,23 @@ class BaseSection:
             return ''
         else:
             raise Exception('More than 1 valid section keyword in HTML classes.')
+
+    @classmethod
+    def _find_tag_dfs(cls, tag, tag_name):
+        """深度優先(dfs)搜尋到第一個 <{tag}>，返回該 tag 的 dict"""
+        # 自己是 <{tag_name}> 的時候
+        if tag['name'] == tag_name:
+            return tag
+        # 嘗試找子孫有沒有 <{tag_name}>
+        elif tag['children']:
+            children = tag['children']
+            for child in children:
+                find_tag = cls._find_tag_dfs(child, tag_name)
+                if find_tag:
+                    return find_tag
+        # 什麼都沒找到(自己跟後代都沒有)
+        else:
+            return {}
 
     def __init__(self, remain_dict):
         # 驗證 html class 正確對應 python class 型態
@@ -87,12 +109,24 @@ class NonLeafSection(BaseSection):
                 self.subsections.append(sub)
 
 
-class LeafTextSection(BaseSection):
+class LeafInputSection(BaseSection):
     """有 Input, 沒有子節點"""
-
     def __init__(self, remain_dict):
         super().__init__(remain_dict)
-        self.section_context = self._dfs_input_str(remain_dict, 'input')
+        first_input = self._find_tag_dfs(remain_dict, 'input')
+        self.section_context = self._get_tag_attr(first_input, 'value')
+
+    def __str__(self, tabwidth=4, level=0):
+        indent = ' ' * tabwidth * level
+        return f"{indent}{self.html_class} '{self.section_context}'\n"
+
+
+class LeafTextSection(BaseSection):
+    """有 Textarea, 沒有子節點"""
+    def __init__(self, remain_dict):
+        super().__init__(remain_dict)
+        first_input = self._find_tag_dfs(remain_dict, 'textarea')
+        self.section_context = self._get_tag_attr(first_input, 'value')
 
     def __str__(self, tabwidth=4, level=0):
         indent = ' ' * tabwidth * level
@@ -102,35 +136,17 @@ class LeafTextSection(BaseSection):
         # 縮排 context_indent 的每行文字
         for line in context_list:
             indented_context = indented_context + f"{context_indent}{line}\n"
-        return f"{indent}{self.html_class} {{\n" + f"{indented_context}" + f"{indent}}}\n"
-
-    def _dfs_input_str(self, remain_dict, tag):
-        """深度優先(dfs)搜尋到第一個 <{tag}>，返回其中的 input value"""
-        # 自己是 <{tag}> 的時候
-        if remain_dict['name'] == tag:
-            tag_attrs = remain_dict['attributes']
-            for attr in tag_attrs:
-                if attr['name'] == 'value':
-                    return attr['value']
-        # 嘗試找子孫有沒有 <{tag}>
-        else:
-            children = remain_dict['children']
-            for child in children:
-                search_child = self._dfs_input_str(child, tag)
-                if search_child:
-                    return search_child
-        # 什麼都沒找到(自己跟後代都沒有)，或是 <{tag}> 沒有 value attr.
-        return ''
+        return f"{indent}{self.html_class} {{\n{indented_context}{indent}}}\n"
 
 
 # inherit order is important, can't be changed arbitrarily.
-class NonLeafTextSection(NonLeafSection, LeafTextSection):
+class NonLeafInputSection(NonLeafSection, LeafInputSection):
     """有 Input, 有子節點"""
-
     def __init__(self, remain_dict):
         super().__init__(remain_dict)
 
     def __str__(self, tabwidth=4, level=0):
+        # 先取得帶子節點的 str, 再用取代的方式填入 input 的資料
         sub_str = super().__str__(tabwidth, level)
         sub_str = sub_str.replace(' {', f"('{self.section_context}') {{", 1)
         return sub_str
@@ -148,7 +164,7 @@ class Stages(NonLeafSection):
     allowed_subsections = ['stage']
 
 
-class Stage(NonLeafTextSection):
+class Stage(NonLeafInputSection):
 
     html_class = 'stage'
     allowed_subsections = ['when', 'steps', 'parallel']
@@ -157,10 +173,6 @@ class Stage(NonLeafTextSection):
 class When(LeafTextSection):
 
     html_class = 'when'
-
-    def __init__(self, remain_dict):
-        super().__init__(remain_dict)
-        self.section_context = self._dfs_input_str(remain_dict, 'textarea')
 
 
 class Steps(NonLeafSection):
@@ -179,10 +191,6 @@ class Sh(LeafTextSection):
 
     html_class = 'sh'
 
-    def __init__(self, remain_dict):
-        super().__init__(remain_dict)
-        self.section_context = self._dfs_input_str(remain_dict, 'textarea')
-
     def __str__(self, tabwidth=4, level=0):
         original_context = super().__str__(tabwidth, level)
         if '\n' in self.section_context:
@@ -194,13 +202,9 @@ class Sh(LeafTextSection):
             return f"{indent}{self.html_class} '{self.section_context}'\n"
 
 
-class Echo(LeafTextSection):
+class Echo(LeafInputSection):
 
     html_class = 'echo'
-
-    def __str__(self, tabwidth=4, level=0):
-        indent = ' ' * tabwidth * level
-        return f"{indent}{self.html_class} '{self.section_context}'\n"
 
 
 # {'html class name': python class name, ...}
