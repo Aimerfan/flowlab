@@ -1,6 +1,8 @@
 import os
+import jenkins
 
 from gitlab import Gitlab
+from jenkins import Jenkins
 
 from django.shortcuts import render, redirect
 
@@ -18,6 +20,14 @@ except KeyError:
 else:
     gitlab_inst = Gitlab(gitlab_url, root_token)
     del root_token
+
+jenkins_inst = None
+try:
+    jenkins_url = f'http://{ENVIRON["JENKINS_HOST"]}:{ENVIRON["JENKINS_PORT"]}'
+except KeyError:
+    raise KeyError("'JENKINS_HOST' or 'JENKINS_PORT' attr. dose not exist in .env file.")
+else:
+    jenkins_inst = Jenkins(jenkins_url, username=ENVIRON['JENKINS_ROOT_USERNAME'], password=ENVIRON['JENKINS_ROOT_PASSWORD'])
 
 
 def repo_list_view(request, user):
@@ -123,6 +133,13 @@ def repo_new_view(request):
         # TODO: error message tips
         if user_project is None:
             raise Exception('repo create error.')
+
+        # 建置 Jenkins Job
+        job_name = f"{username}_{repo_meta['name']}"
+        if job_name == jenkins_inst.get_job_name(job_name):
+            raise Exception('job already exists.')
+        jenkins_inst.create_job(job_name, jenkins.EMPTY_CONFIG_XML)
+        jenkins_inst.build_job(job_name)
 
         return redirect('repo_project', user=username, project=repo_meta['name'])
 
