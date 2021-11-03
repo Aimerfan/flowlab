@@ -11,6 +11,7 @@ from vcs_adapter import GitLabAdapter
 from repo.utils import get_repo_title, get_tree
 from .forms import RepoForm, DelRepoForm
 
+"""新增一個共用的 GitLab Instance"""
 gitlab_inst = None
 try:
     gitlab_url = f'http://{ENVIRON["GITLAB_HOST"]}:{ENVIRON["GITLAB_HTTP_PORT"]}'
@@ -21,6 +22,7 @@ else:
     gitlab_inst = Gitlab(gitlab_url, root_token)
     del root_token
 
+"""新增一個共用的 Jenkins Instance"""
 jenkins_inst = None
 try:
     jenkins_url = f'http://{ENVIRON["JENKINS_HOST"]}:{ENVIRON["JENKINS_PORT"]}'
@@ -48,8 +50,17 @@ def repo_view(request, user, project):
     full_project_name = f'{user}/{project}'
     if request.method == 'POST':
         if request.POST['project_info'] == full_project_name:
+            job_name = f'{user}_{project}'
+
             project = gitlab_inst.projects.get(full_project_name)
             project.delete()
+
+            # 刪除 Jenkins Job
+            print(job_name)
+            print('----------')
+            if jenkins_inst.get_job_name(job_name) is None:
+                raise Exception('job does not exist.')
+            jenkins_inst.delete_job(job_name)
             return redirect('repo_list', user=user)
         else:
             # todo: 輸入錯誤的提示
