@@ -1,45 +1,38 @@
-import os
+from datetime import datetime
+from pathlib import PurePosixPath
+from base64 import b64decode
+
 import jenkins
 
-from gitlab import Gitlab
-from jenkins import Jenkins
-
 from django.shortcuts import render, redirect
+from django.utils import timezone
 
-from core.utils import ENVIRON
-from vcs_adapter import GitLabAdapter
-from repo.utils import get_repo_title, get_tree
+from ci.jenkins import jenkins_inst
+from .gitlab import gitlab_inst
+from .utils import timedelta_str, get_repo_verbose, get_tree
 from .forms import RepoForm, DelRepoForm
-
-"""新增一個共用的 GitLab Instance"""
-gitlab_inst = None
-try:
-    gitlab_url = f'http://{ENVIRON["GITLAB_HOST"]}:{ENVIRON["GITLAB_HTTP_PORT"]}'
-    root_token = ENVIRON.get('GITLAB_ROOT_PRIVATE_TOKEN', None)
-except KeyError:
-    raise KeyError("'GITLAB_HTTP_PORT' or 'GITLAB_HOST' attr. dose not exist in .env file.")
-else:
-    gitlab_inst = Gitlab(gitlab_url, root_token)
-    del root_token
-
-"""新增一個共用的 Jenkins Instance"""
-jenkins_inst = None
-try:
-    jenkins_url = f'http://{ENVIRON["JENKINS_HOST"]}:{ENVIRON["JENKINS_PORT"]}'
-except KeyError:
-    raise KeyError("'JENKINS_HOST' or 'JENKINS_PORT' attr. dose not exist in .env file.")
-else:
-    jenkins_inst = Jenkins(jenkins_url, username=ENVIRON['JENKINS_ROOT_USERNAME'], password=ENVIRON['JENKINS_ROOT_PASSWORD'])
 
 
 def repo_list_view(request, user):
     """儲存庫列表"""
-    gl = GitLabAdapter()
-    projects = gl.get_repo_list(user)
-    for project, info in projects.items():
-        br_list = gl.get_branches_list(user, project)
-        info['branch_sum'] = len(br_list)
+    gitlab_user = gitlab_inst.users.list(username=user)[0]
+    project_list = gitlab_user.projects.list()
 
+    projects = {}
+    for project_meta in project_list:
+        # 取得專案最後的活動時間
+        last_updated = project_meta.last_activity_at.replace('Z', '+00:00')
+        now_last_delta = timezone.now() - datetime.fromisoformat(last_updated)
+
+        # 根據 project meta 資訊獲得更詳細的的 project obj, 以計算 branches 數
+        project = gitlab_inst.projects.get(f'{user}/{project_meta.name}')
+        branch_list = project.branches.list()
+
+        # 放進 projects 清單
+        projects[project_meta.name] = {
+            'last_activity_at': timedelta_str(now_last_delta.seconds),
+            'branch_sum': len(branch_list),
+        }
     return render(request, 'repo/repo_list.html', {'projects': projects})
 
 
@@ -50,23 +43,18 @@ def repo_view(request, user, project):
     full_project_name = f'{user}/{project}'
     if request.method == 'POST':
         if request.POST['project_info'] == full_project_name:
-            job_name = f'{user}_{project}'
-
-            project = gitlab_inst.projects.get(full_project_name)
-            project.delete()
+            gitlab_inst.projects.get(full_project_name).delete()
 
             # 刪除 Jenkins Job
-            print(job_name)
-            print('----------')
-            if jenkins_inst.get_job_name(job_name) is None:
-                raise Exception('job does not exist.')
-            jenkins_inst.delete_job(job_name)
+            job_name = f'{user}_{project}'
+            if jenkins_inst.get_job_name(job_name):
+                jenkins_inst.delete_job(job_name)
             return redirect('repo_list', user=user)
         else:
             # todo: 輸入錯誤的提示
             pass
 
-    project_info = get_repo_title(user, project)
+    project_info = get_repo_verbose(user, project)
 
     if project_info['branch_sum'] == 0:
         folders = ''
@@ -86,32 +74,37 @@ def repo_view(request, user, project):
     return render(request, 'repo/repository.html', content)
 
 
-def repo_tree_view(request, user, project, file):
+def repo_tree_view(request, user, project, path):
     """儲存庫專案資料夾"""
-    project_info = get_repo_title(user, project)
-    folders, files = get_tree(user, project, file)
+    project_info = get_repo_verbose(user, project)
+    folders, files = get_tree(user, project, path)
     tree_path = request.path.split('tree/')[1]
 
-    return render(request, 'repo/repo_tree.html', {'info': project_info, 'tree_path': tree_path, 'folders': folders,
-                                                   'files': files})
+    content = {
+        'info': project_info,
+        'tree_path': tree_path,
+        'folders': folders,
+        'files': files
+    }
+    return render(request, 'repo/repo_tree.html', content)
 
 
-def repo_blob_view(request, user, project, file):
+def repo_blob_view(request, user, project, path):
     """儲存庫專案檔案"""
-    gl = GitLabAdapter()
-    project_info = get_repo_title(user, project)
+    url_as_path = PurePosixPath(path)
+    blob_path = str(url_as_path.parent)
+    file = url_as_path.name
 
-    blob_path = os.path.split(file)[0]
-    file = os.path.split(file)[1]
-    trees = gl.get_tree(user, project, blob_path)
-    print(blob_path, file)
+    project_inst = gitlab_inst.projects.get(f'{user}/{project}')
+    project_info = get_repo_verbose(user, project)
+    trees = project_inst.repository_tree(path=blob_path)
 
     for tree in trees:
         if tree['type'] == 'blob' and tree['name'] == file:
-            blob = gl.get_blob(user, project, tree['id'])
+            blob = project_inst.repository_blob(tree['id'])
             file = {
                 'name': tree['name'],
-                'content': blob['content'].decode('utf-8'),
+                'content': b64decode(blob['content']).decode('utf-8'),
             }
 
     if file['content'] == '':
@@ -121,8 +114,12 @@ def repo_blob_view(request, user, project, file):
     else:
         line = file['content'].count('\n') + 1
 
-    return render(request, 'repo/repo_blob.html', {'info': project_info, 'blob_path': blob_path, 'file': file,
-                                                   'line': line})
+    return render(request, 'repo/repo_blob.html', {
+        'info': project_info,
+        'blob_path': blob_path,
+        'file': file,
+        'line': line
+    })
 
 
 def repo_new_view(request):

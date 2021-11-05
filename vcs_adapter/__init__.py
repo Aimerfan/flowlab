@@ -1,1 +1,0 @@
-from .gitlab import GitLabAdapter
