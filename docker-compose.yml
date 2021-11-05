@@ -43,8 +43,24 @@ services:
         gitlab_rails['initial_root_password'] = '${GITLAB_ROOT_PASSWORD}'
         gitlab_rails['gitlab_shell_ssh_port'] = ${GITLAB_SSH_PORT}
 
+  jenkins:
+    restart: unless-stopped
+    image: ${JENKINS_IMG_TAG}
+    environment:
+      JAVA_OPTS: "-Djava.awt.headless=true \
+                  -Dhudson.model.DirectoryBrowserSupport.CSP=\"script-src 'self' 'unsafe-inline'\" \
+                  -Duser.timezone=Asia/Taipei
+                 "
+    ports:
+      - "${JENKINS_PORT}:8080"
+      - "${JENKINS_AGENT_PORT}:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+
+
 volumes:
   pgdata:
   gitlab_conf:
   gitlab_logs:
   gitlab_data:
+  jenkins_home:
