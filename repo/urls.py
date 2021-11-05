@@ -7,6 +7,6 @@ urlpatterns = [
     path('<str:user>/', repo_list_view, name='repo_list'),
     path('new', repo_new_view, name='repo_new'),
     path('<str:user>/<str:project>/', repo_view, name='repo_project'),
-    path('<str:user>/<str:project>/-/tree/<path:file>/', repo_tree_view, name='repo_tree'),
-    path('<str:user>/<str:project>/-/blob/<path:file>/', repo_blob_view, name='repo_blob'),
+    path('<str:user>/<str:project>/-/tree/<path:path>/', repo_tree_view, name='repo_tree'),
+    path('<str:user>/<str:project>/-/blob/<path:path>/', repo_blob_view, name='repo_blob'),
 ]
