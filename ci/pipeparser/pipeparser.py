@@ -155,7 +155,15 @@ class NonLeafInputSection(NonLeafSection, LeafInputSection):
 class Pipeline(NonLeafSection):
 
     html_class = 'pipeline'
-    allowed_subsections = ['stages']
+    allowed_subsections = ['agent', 'stages']
+
+
+class Agent(LeafInputSection):
+    html_class = 'agent'
+
+    def __str__(self, tabwidth=4, level=0):
+        original_context = super().__str__(tabwidth, level)
+        return original_context.replace("'", '')
 
 
 class Stages(NonLeafSection):
@@ -210,6 +218,7 @@ class Echo(LeafInputSection):
 # {'html class name': python class name, ...}
 _SECTION_DICT = {
     'pipeline': Pipeline,
+    'agent': Agent,
     'stages': Stages,
     'stage': Stage,
     'when': When,
