@@ -1,3 +1,27 @@
+function newAgent() {
+  let layer = 2;
+  let idAgent = 1;
+
+  document.getElementById("addAgent").style.display = "none";
+  let block = document.getElementById("agent");
+  block.className += " agent"
+  block.id = "agent_" + idAgent;
+
+  let agentLabel = document.createElement("label");
+  agentLabel.for = "agent";
+  let agentInput = document.createElement("input");
+  agentInput.type = "text";
+  agentInput.id  = "agent_" + idAgent;
+  agentInput.className = "form-control puz_form";
+  agentInput.name = "agent";
+  agentLabel.appendChild(agentInput)
+  let agent = document.createElement("div");
+  agent.className = "jenkins_puzzle puz_" + layer;
+  agent.append("agent ", agentLabel)
+
+  block.appendChild(agent);
+}
+
 function newStages() {
   let layer = 2;
   document.getElementById("addStages").style.display = "none";

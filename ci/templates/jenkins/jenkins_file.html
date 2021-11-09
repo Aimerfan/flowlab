@@ -17,6 +17,12 @@
                     {% csrf_token %}
                     <div class="pipeline jenkins_puzzle">
                         pipeline
+                        <div id="agent" class="puz_bl_2">
+                            <div class="jenkins_puzzle puz_add puz_2" id="addAgent" onclick="newAgent()">
+                                + agent
+                                <img src="{% static 'core/images/question-mark.png' %}" alt="" style="width: 20px;">
+                            </div>
+                        </div>
                         <div id="stages" class="puz_bl_2">
                             <div class="jenkins_puzzle puz_add puz_2" id="addStages" onclick="newStages()">
                                 + stages

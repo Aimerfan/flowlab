@@ -15,6 +15,9 @@
       }
     }
 
+    let agentElement = document.getElementsByName("agent");
+    record_input_data(agentElement, "agent");
+
     let stageElement = document.getElementsByName("stage");
     record_input_data(stageElement, "stage");
 
