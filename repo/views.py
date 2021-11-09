@@ -7,7 +7,7 @@ import jenkins
 from django.shortcuts import render, redirect
 from django.utils import timezone
 
-from ci.jenkins import jenkins_inst
+from ci.jenkins import jenkins_inst, jenkins_url
 from .gitlab import gitlab_inst
 from .utils import timedelta_str, get_repo_verbose, get_tree
 from .forms import RepoForm, DelRepoForm
@@ -148,6 +148,18 @@ def repo_new_view(request):
             raise Exception('job already exists.')
         jenkins_inst.create_job(job_name, jenkins.EMPTY_CONFIG_XML)
         jenkins_inst.build_job(job_name)
+
+        # 建立 GitLab webhook
+        jenkins_webhook_url = f'{jenkins_url}/project/{job_name}'
+        gitlab_webhook = {
+            'url': jenkins_webhook_url,
+            'push_events': 1,
+            'merge_requests_events': 1,
+        }
+        project = gitlab_inst.projects.get(user_project.id)
+        if project.hooks.list():
+            raise Exception('webhook in github already exists.')
+        project.hooks.create(gitlab_webhook)
 
         return redirect('repo_project', user=username, project=repo_meta['name'])
 
