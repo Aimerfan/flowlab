@@ -2,13 +2,12 @@ from datetime import datetime
 from pathlib import PurePosixPath
 from base64 import b64decode
 
-import jenkins
-
 from django.shortcuts import render, redirect
 from django.utils import timezone
 
+from core.utils import CONFIG_XML
 from ci.jenkins import jenkins_inst, jenkins_url
-from .gitlab import gitlab_inst
+from .gitlab import gitlab_inst, gitlab_url
 from .utils import timedelta_str, get_repo_verbose, get_tree
 from .forms import RepoForm, DelRepoForm
 
@@ -142,12 +141,13 @@ def repo_new_view(request):
         if user_project is None:
             raise Exception('repo create error.')
 
-        # 建置 Jenkins Job
+        # 建置 Jenkins Job (Multibranch Pipeline)
         job_name = f"{username}_{repo_meta['name']}"
         if job_name == jenkins_inst.get_job_name(job_name):
             raise Exception('job already exists.')
-        jenkins_inst.create_job(job_name, jenkins.EMPTY_CONFIG_XML)
-        jenkins_inst.build_job(job_name)
+        gitlab_webhook_url = f"{gitlab_url}/{username}/{repo_meta['name']}"
+        config_xml = CONFIG_XML.replace('set_remote', gitlab_webhook_url)
+        jenkins_inst.create_job(job_name, config_xml)
 
         # 建立 GitLab webhook
         jenkins_webhook_url = f'{jenkins_url}/project/{job_name}'
