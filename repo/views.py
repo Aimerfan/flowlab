@@ -1,3 +1,5 @@
+import requests
+
 from datetime import datetime
 from pathlib import PurePosixPath
 from base64 import b64decode
@@ -6,7 +8,7 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 
 from core.utils import CONFIG_XML
-from ci.jenkins import jenkins_inst, jenkins_url
+from ci.jenkins import jenkins_inst, jenkins_url, root
 from .gitlab import gitlab_inst, gitlab_url
 from .utils import timedelta_str, get_repo_verbose, get_tree
 from .forms import RepoForm, DelRepoForm
@@ -164,3 +166,13 @@ def repo_new_view(request):
         return redirect('repo_project', user=username, project=repo_meta['name'])
 
     return render(request, 'repo/repo_new.html', {'form': form})
+
+
+def repo_build_view(request, user, project):
+    project_info = get_repo_verbose(user, project)
+    branch_name = 'master'
+    job_name = f'{user}_{project}'
+    console_url = f'{jenkins_url}/job/{job_name}/job/{branch_name}/lastBuild/consoleText'
+    build_info = requests.get(console_url, auth=root).content.decode()
+
+    return render(request, 'build.html', {'info': project_info, 'build_info': build_info})

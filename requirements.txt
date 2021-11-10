@@ -5,3 +5,4 @@ python-gitlab==2.10.0
 python-jenkins==1.7.0
 behave~=1.2.6
 behave-django==1.4.0
+requests~=2.26.0
