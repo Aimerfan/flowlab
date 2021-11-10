@@ -1,0 +1,7 @@
+Stable jenkins requirement
+
+docker plugin + jenkins/inbound-agent
+v1.2.3 + 4.9-1
+or
+v1.2.3 + 4.9> + Remote File System Root = '/home/jenkins'
+
