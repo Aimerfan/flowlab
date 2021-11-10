@@ -5,6 +5,15 @@ from django.utils import timezone
 from .gitlab import gitlab_inst
 
 
+def get_job_name(user, project, branch=''):
+    # multibranch pipline 專案實際上比較像 "每個分支一個 job 的 folder"
+    # 因此如果給定 branch name, job_name 要把原本 job_name 當成 folder, 再加上分支名稱
+    if branch:
+        return f'{user}_{project}/{branch}'
+    else:
+        return f'{user}_{project}'
+
+
 def timedelta_str(seconds):
     """將相差秒數轉換為描述字串"""
     # 時間單位與使用該單位的秒數上限
@@ -28,7 +37,18 @@ def timedelta_str(seconds):
 
 
 def get_repo_verbose(user, project):
-    """合併"""
+    """
+    合併 project meta info 與 default branch 的部分訊息
+    :return: {
+        'name': project name (without <username>/),
+        'branch_sum': total branches account,
+        'branch': default branch name,
+        'sha': 7-character width short commit id of default branch last commit
+        'auther_name': auther name of default branch last commit
+        'last_info': summary line(title) of default branch last commit
+        'last_activity_at': commit time of default branch last commit
+    }
+    """
     project = gitlab_inst.projects.get(f'{user}/{project}')
     branches = project.branches.list()
 
