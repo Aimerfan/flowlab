@@ -1,14 +1,15 @@
+import requests
+
 from datetime import datetime
 from pathlib import PurePosixPath
 from base64 import b64decode
 
-import jenkins
-
 from django.shortcuts import render, redirect
 from django.utils import timezone
 
-from ci.jenkins import jenkins_inst
-from .gitlab import gitlab_inst
+from core.utils import CONFIG_XML
+from ci.jenkins import jenkins_inst, jenkins_url, root
+from .gitlab import gitlab_inst, gitlab_url
 from .utils import timedelta_str, get_repo_verbose, get_tree
 from .forms import RepoForm, DelRepoForm
 
@@ -142,13 +143,36 @@ def repo_new_view(request):
         if user_project is None:
             raise Exception('repo create error.')
 
-        # 建置 Jenkins Job
+        # 建置 Jenkins Job (Multibranch Pipeline)
         job_name = f"{username}_{repo_meta['name']}"
         if job_name == jenkins_inst.get_job_name(job_name):
             raise Exception('job already exists.')
-        jenkins_inst.create_job(job_name, jenkins.EMPTY_CONFIG_XML)
-        jenkins_inst.build_job(job_name)
+        gitlab_webhook_url = f"{gitlab_url}/{username}/{repo_meta['name']}"
+        config_xml = CONFIG_XML.replace('set_remote', gitlab_webhook_url)
+        jenkins_inst.create_job(job_name, config_xml)
+
+        # 建立 GitLab webhook
+        jenkins_webhook_url = f'{jenkins_url}/project/{job_name}'
+        gitlab_webhook = {
+            'url': jenkins_webhook_url,
+            'push_events': 1,
+            'merge_requests_events': 1,
+        }
+        project = gitlab_inst.projects.get(user_project.id)
+        if project.hooks.list():
+            raise Exception('webhook in github already exists.')
+        project.hooks.create(gitlab_webhook)
 
         return redirect('repo_project', user=username, project=repo_meta['name'])
 
     return render(request, 'repo/repo_new.html', {'form': form})
+
+
+def repo_build_view(request, user, project):
+    project_info = get_repo_verbose(user, project)
+    branch_name = 'master'
+    job_name = f'{user}_{project}'
+    console_url = f'{jenkins_url}/job/{job_name}/job/{branch_name}/lastBuild/consoleText'
+    build_info = requests.get(console_url, auth=root).content.decode()
+
+    return render(request, 'build.html', {'info': project_info, 'build_info': build_info})

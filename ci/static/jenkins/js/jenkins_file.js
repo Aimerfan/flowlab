@@ -15,6 +15,9 @@
       }
     }
 
+    let agentElement = document.getElementsByName("agent");
+    record_input_data(agentElement, "agent");
+
     let stageElement = document.getElementsByName("stage");
     record_input_data(stageElement, "stage");
 
@@ -110,9 +113,9 @@
     let aTag = document.createElement('a');
     let pipelineText = document.querySelector('.info').innerHTML;
     let blob = new Blob([pipelineText], {
-      type: "text/plain",
+      type: "application/octet-stream",
     })
-    aTag.download = 'jenkinsfile';
+    aTag.download = 'Jenkinsfile';
     aTag.href = URL.createObjectURL(blob);
     aTag.click();
     URL.revokeObjectURL(aTag.href);

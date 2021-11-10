@@ -4,8 +4,8 @@ services:
   db:
     image: postgres:13.2
     restart: unless-stopped
-#    ports:
-#      - "5432:5432"
+    ports:
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
@@ -15,14 +15,14 @@ services:
   
   web:
     image: aimerfan/flowlab
-    restart: unless-stopped
-    command: python3 manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/flowlab
-    ports:
-      - "8000:8000"
     depends_on:
       - db
+    restart: unless-stopped
+    command: python3 manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/flowlab
 
   gitlab:
     restart: unless-stopped
@@ -46,16 +46,20 @@ services:
   jenkins:
     restart: unless-stopped
     image: ${JENKINS_IMG_TAG}
-    environment:
-      JAVA_OPTS: "-Djava.awt.headless=true \
-                  -Dhudson.model.DirectoryBrowserSupport.CSP=\"script-src 'self' 'unsafe-inline'\" \
-                  -Duser.timezone=Asia/Taipei
-                 "
+    privileged: true
+    group_add:
+       - ${DOCKER_GID}
     ports:
       - "${JENKINS_PORT}:8080"
       - "${JENKINS_AGENT_PORT}:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock # 使 Jenkins 可以控制本機 docker
+    environment:
+      JAVA_OPTS: "-Djava.awt.headless=true \
+                  -Dhudson.model.DirectoryBrowserSupport.CSP=\"script-src 'self' 'unsafe-inline'\" \
+                  -Duser.timezone=Asia/Taipei
+                 "
 
 
 volumes:
