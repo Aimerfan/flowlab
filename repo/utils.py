@@ -55,6 +55,7 @@ def get_repo_verbose(user, project):
     project_verbose = {
         'name': project.name,
         'branch_sum': len(branches),
+        'branches': branches,
         'branch': project.default_branch,
     }
 

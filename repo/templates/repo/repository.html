@@ -129,11 +129,14 @@ git push -u origin --tags</code>
                 <div class="align_both_sides">
                     <div class="ver_mid">
                         <div style="padding: 15px;">
-                            <button class="btn-sm ver_mid">
+                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownBranch" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span style="width: 100px;">{{ info.branch }}</span>
-                                <img src="{% static 'core/images/arrow-down.png' %}"
-                                     style="width: 10px; float: right" alt="drop_down">
                             </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownBranch">
+                                {% for branch in info.branches %}
+                                    <li><a class="dropdown-item">{{ branch.name }}</a></li>
+                                {% endfor %}
+                            </ul>
                         </div>
                         <div>
                             <h5>{{ root_path }}</h5>
