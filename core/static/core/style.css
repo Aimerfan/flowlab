@@ -557,3 +557,8 @@ button {
 #gray {
     color: #313335;
 }
+
+/* pipeline console highlight 字體顏色 */
+span.pipeline_new_node {
+    color: #0060C1;
+}

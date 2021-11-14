@@ -174,6 +174,6 @@ def repo_build_view(request, user, project):
     # 取得 console output
     multibr_default_job = jenkins_inst.get_job_info(job_name)
     last_build_number = multibr_default_job['lastCompletedBuild']['number']
-    build_info = jenkins_inst.get_build_console_output(job_name, last_build_number)
+    build_info = jenkins_inst.get_build_console_output(job_name, last_build_number).split('\n')
 
     return render(request, 'build.html', {'info': project_info, 'build_info': build_info})
