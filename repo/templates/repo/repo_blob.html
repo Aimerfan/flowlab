@@ -3,10 +3,13 @@
 {% load nav_tag %}
 {% load range %}
 {% block title %}
-    儲存庫檔案預覽
+    {{ info.name }}/{% if blob_path == '.' %}{{ file.name }}
+    {% else %}{{ blob_path }}/{{ file.name }}{% endif %}
+    at {{ info.branch }}
 {% endblock %}
 {% block body %}
-{% get_name request as username %}
+    {% get_name request as username %}
+    {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="repo_content">
             <div>
@@ -23,7 +26,7 @@
                         </button>
                     </div>
                     <div>
-                        {% if blob_path == '' %}
+                        {% if blob_path == '.' %}
                         <h5>{{ file.name }}</h5>
                         {% else %}
                         <h5>{{ blob_path }}/{{ file.name }}</h5>
