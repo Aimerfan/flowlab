@@ -15,7 +15,8 @@
             <div>
                 <button>{{ branch }}</button>
             </div>
-            <div class="align_both_sides ver_mid">
+            {% if build_results %}
+            <div class="ver_mid">
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -41,6 +42,9 @@
                     </tbody>
                 </table>
             </div>
+            {% else %}
+                <h2 class="text-center">該分支上目前無建置結果</h2>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
