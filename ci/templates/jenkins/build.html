@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load nav_tag %}
+{% load url %}
+{% block title %}
+    {% get_name request as username %}
+    {{ branch }} [{{ username }}_{{ info.name }}] [Jenkins]
+{% endblock %}
+{% block body %}
+    {% get_name request as username %}
+    {% include 'cicd_nav.html' with project=info.name %}
+    <div class="container container_close">
+        <div class="repo_content">
+            <h1 style="text-align: center">Jenkins Pipeline {{ branch }}</h1>
+            <div>
+                <button>{{ branch }}</button>
+            </div>
+            <div class="align_both_sides ver_mid">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="text-center">建置結果</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for num, result in build_results.items %}
+                        <tr>
+                            <td class="text-center"><a href="{% url 'repo_build' user info.name  %}">第 {{ num }} 次</a></td>
+                            <td class="text-center">
+                                {% if result == 'success' %}
+                                    <img src="{% static 'jenkins/images/success.png' %}" alt="success" style="height: 35px;">
+                                {% elif result == 'failure' %}
+                                    <img src="{% static 'jenkins/images/failure.png' %}" alt="failure" style="height: 35px;">
+                                {% elif result == 'stop' %}
+                                    <img src="{% static 'jenkins/images/stop.png' %}" alt="stop" style="height: 35px;">
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

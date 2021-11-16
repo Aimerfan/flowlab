@@ -4,7 +4,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 
-from repo.utils import get_repo_verbose
+from repo.utils import get_job_name, get_repo_verbose
+from .jenkins import jenkins_inst
 from .pipeparser import PipeParser
 
 
@@ -13,6 +14,35 @@ def jenkins_file_view(request, user, project):
     project_info = get_repo_verbose(user, project)
 
     return render(request, 'jenkins/jenkins_file.html', {'info': project_info})
+
+
+def build_view(request, user, project, branch):
+    project_info = get_repo_verbose(user, project)
+    job_name = get_job_name(user, project, branch)
+
+    # 取得該 branch 的最新 5 個建置結果 (由新至舊)
+    build_results = {}
+    multibr_default_job = jenkins_inst.get_job_info(job_name)
+    last_build_number = multibr_default_job['lastCompletedBuild']['number']
+    for number in range(last_build_number, last_build_number - 5, -1):
+        if number > 0:
+            build_info = jenkins_inst.get_build_console_output(job_name, number).split('\n')
+            last_line = build_info[-2]
+            # 擷取 console 的結果
+            if 'SUCCESS' in last_line:
+                build_results[number] = 'success'
+            elif 'FAILURE' in last_line:
+                build_results[number] = 'failure'
+            elif 'ABORTED' in last_line:
+                build_results[number] = 'stop'
+            else:
+                build_results[number] = ''
+
+    return render(request, 'jenkins/build.html', {
+        'info': project_info,
+        'branch': branch,
+        'build_results': build_results
+    })
 
 
 @csrf_exempt
