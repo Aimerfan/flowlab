@@ -73,22 +73,23 @@ def repo_view(request, user, project):
     return render(request, 'repo/repository.html', content)
 
 
-def repo_tree_view(request, user, project, path):
+def repo_tree_view(request, user, project, branch, path=''):
     """儲存庫專案資料夾"""
     project_info = get_repo_verbose(user, project)
-    folders, files = get_tree(user, project, path)
-    tree_path = request.path.split('tree/')[1]
+    folders, files = get_tree(user, project, path, branch)
+    tree_path = request.path.split('tree/' + branch + '/')[1]
 
     content = {
         'info': project_info,
         'tree_path': tree_path,
         'folders': folders,
-        'files': files
+        'files': files,
+        'branch': branch
     }
     return render(request, 'repo/repo_tree.html', content)
 
 
-def repo_blob_view(request, user, project, path):
+def repo_blob_view(request, user, project, branch, path):
     """儲存庫專案檔案"""
     url_as_path = PurePosixPath(path)
     blob_path = str(url_as_path.parent)
@@ -96,7 +97,7 @@ def repo_blob_view(request, user, project, path):
 
     project_inst = gitlab_inst.projects.get(f'{user}/{project}')
     project_info = get_repo_verbose(user, project)
-    trees = project_inst.repository_tree(path=blob_path)
+    trees = project_inst.repository_tree(path=blob_path, ref=branch)
 
     for tree in trees:
         if tree['type'] == 'blob' and tree['name'] == file:
@@ -117,7 +118,8 @@ def repo_blob_view(request, user, project, path):
         'info': project_info,
         'blob_path': blob_path,
         'file': file,
-        'line': line
+        'line': line,
+        'branch': branch
     })
 
 
