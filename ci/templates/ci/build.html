@@ -26,14 +26,14 @@
                     <tbody>
                     {% for num, result in build_results.items %}
                         <tr>
-                            <td class="text-center"><a href="{% url 'repo_build' user info.name  %}">第 {{ num }} 次</a></td>
+                            <td class="text-center"><a href="{% url 'build_console' user info.name  %}">第 {{ num }} 次</a></td>
                             <td class="text-center">
                                 {% if result == 'success' %}
-                                    <img src="{% static 'jenkins/images/success.png' %}" alt="success" style="height: 35px;">
+                                    <img src="{% static 'ci/images/success.png' %}" alt="success" style="height: 35px;">
                                 {% elif result == 'failure' %}
-                                    <img src="{% static 'jenkins/images/failure.png' %}" alt="failure" style="height: 35px;">
+                                    <img src="{% static 'ci/images/failure.png' %}" alt="failure" style="height: 35px;">
                                 {% elif result == 'stop' %}
-                                    <img src="{% static 'jenkins/images/stop.png' %}" alt="stop" style="height: 35px;">
+                                    <img src="{% static 'ci/images/stop.png' %}" alt="stop" style="height: 35px;">
                                 {% endif %}
                             </td>
                         </tr>

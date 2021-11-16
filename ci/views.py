@@ -13,7 +13,7 @@ def jenkins_file_view(request, user, project):
     """顯示 Jenkins File"""
     project_info = get_repo_verbose(user, project)
 
-    return render(request, 'jenkins/jenkins_file.html', {'info': project_info})
+    return render(request, 'ci/jenkins_file.html', {'info': project_info})
 
 
 def build_view(request, user, project, branch):
@@ -38,11 +38,24 @@ def build_view(request, user, project, branch):
             else:
                 build_results[number] = ''
 
-    return render(request, 'jenkins/build.html', {
+    return render(request, 'ci/build.html', {
         'info': project_info,
         'branch': branch,
         'build_results': build_results
     })
+
+
+def build_console_view(request, user, project):
+    project_info = get_repo_verbose(user, project)
+    branch_name = project_info['branch']
+    job_name = get_job_name(user, project, branch_name)
+
+    # 取得 console output
+    multibr_default_job = jenkins_inst.get_job_info(job_name)
+    last_build_number = multibr_default_job['lastCompletedBuild']['number']
+    build_info = jenkins_inst.get_build_console_output(job_name, last_build_number).split('\n')
+
+    return render(request, 'ci/build_console.html', {'info': project_info, 'build_info': build_info})
 
 
 @csrf_exempt
