@@ -20,10 +20,11 @@ def build_view(request, user, project, branch):
     project_info = get_repo_verbose(user, project)
     job_name = get_job_name(user, project, branch)
 
-    # 取得該 branch 的最新 5 個建置結果 (由新至舊)
     build_results = {}
     multibr_default_job = jenkins_inst.get_job_info(job_name)
+    # 取得該 branch 最新的建置編號
     last_build_number = multibr_default_job['lastCompletedBuild']['number']
+    # 取得該 branch 的最新 5 個建置結果 (由新至舊)
     for number in range(last_build_number, last_build_number - 5, -1):
         if number > 0:
             build_info = jenkins_inst.get_build_console_output(job_name, number).split('\n')
@@ -45,15 +46,12 @@ def build_view(request, user, project, branch):
     })
 
 
-def build_console_view(request, user, project):
+def build_console_view(request, user, project, branch, number):
     project_info = get_repo_verbose(user, project)
-    branch_name = project_info['branch']
-    job_name = get_job_name(user, project, branch_name)
+    job_name = get_job_name(user, project, branch)
 
     # 取得 console output
-    multibr_default_job = jenkins_inst.get_job_info(job_name)
-    last_build_number = multibr_default_job['lastCompletedBuild']['number']
-    build_info = jenkins_inst.get_build_console_output(job_name, last_build_number).split('\n')
+    build_info = jenkins_inst.get_build_console_output(job_name, number).split('\n')
 
     return render(request, 'ci/build_console.html', {'info': project_info, 'build_info': build_info})
 
