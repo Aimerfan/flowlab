@@ -143,7 +143,7 @@ def repo_new_view(request):
 
         # 建置 Jenkins Job (Multibranch Pipeline)
         job_name = get_job_name(username, repo_meta['name'])
-        if not jenkins_inst.job_exists(job_name):
+        if jenkins_inst.job_exists(job_name):
             raise Exception('job already exists.')
         gitlab_webhook_url = f"{gitlab_url}/{username}/{repo_meta['name']}"
         config_xml = CONFIG_XML.replace('set_remote', gitlab_webhook_url)
