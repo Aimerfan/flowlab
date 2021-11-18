@@ -12,8 +12,15 @@
     <div class="container container_close">
         <div class="repo_content">
             <h1 style="text-align: center">Jenkins Pipeline {{ branch }}</h1>
-            <div>
-                <button>{{ branch }}</button>
+            <div style="padding: 15px;">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownBranch" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span style="width: 100px;">{{ branch }}</span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownBranch">
+                    {% for branch in info.branches %}
+                        <li><a class="dropdown-item" href="{% url 'build' username info.name branch.name %}">{{ branch.name }}</a></li>
+                    {% endfor %}
+                </ul>
             </div>
             {% if build_results %}
             <div class="ver_mid">

@@ -211,6 +211,16 @@ button {
     border-radius: .2rem
 }
 
+.btn-primary {
+    background-color: #3278ff;
+    border-color: #3278ff;
+}
+
+.btn-primary:hover {
+    background-color: #285fcc;
+    border-color: #285fcc;
+}
+
 .btn_ci_flow {
     color: #33577E;
     background-color: #BCDCFF;

@@ -128,13 +128,7 @@ git push -u origin --tags</code>
                 <hr style="height: 3px; background: #aaaaaa; margin: 0">
                 <div class="align_both_sides">
                     <div class="ver_mid">
-                        <div style="padding: 15px;">
-                            <button class="btn-sm ver_mid">
-                                <span style="width: 100px;">{{ info.branch }}</span>
-                                <img src="{% static 'core/images/arrow-down.png' %}"
-                                     style="width: 10px; float: right" alt="drop_down">
-                            </button>
-                        </div>
+                        {% include 'repo/switch_branch.html' with project=info curr_branch=branch %}
                         <div>
                             <h5>{{ root_path }}</h5>
                         </div>
@@ -192,7 +186,7 @@ git push -u origin --tags</code>
                         <div style="display: flex;">
                             {% with root_path|add:key as tree_path %}
                             <img src="{% static 'core/images/folder.png' %}" alt="folder" class="repo_icon">
-                            <h6><a href="{% url 'repo_tree' username info.name key %}">{{ key }}</a></h6>
+                            <h6><a href="{% url 'repo_tree' username info.name info.branch key %}">{{ key }}</a></h6>
                             {% endwith %}
                         </div>
                     </div>
@@ -210,7 +204,7 @@ git push -u origin --tags</code>
                     <div style="width: 300px;" class="col-md-auto text_left">
                         <div style="display: flex;">
                             <img src="{% static 'core/images/file.png' %}" alt="file" class="repo_icon">
-                            <h6><a href="{% url 'repo_blob' username info.name key %}">{{ key }}</a></h6>
+                            <h6><a href="{% url 'repo_blob' username info.name info.branch key %}">{{ key }}</a></h6>
                         </div>
                     </div>
                     <div style="width: calc(100% - 500px);" class="col-md-auto text_left">
