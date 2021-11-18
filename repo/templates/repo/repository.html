@@ -51,20 +51,7 @@
                     <h6>你可以藉由 clone 儲存庫開始 或 使用下方選項添加一些文件。</h6>
                 </div>
                 <div style="padding: 20px; display: flex;">
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownClone"
-                                data-bs-toggle="dropdown" aria-expanded="false">Clone</button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownClone">
-                            <li style="padding-left: 10px;">使用 SSH clone</li>
-                            <li><a class="dropdown-item" href="#" onclick="copyEvent('ssh_clone')">
-                                <span id="ssh_clone">{{ gitlab_ssh }}</span></a>
-                            </li>
-                            <li style="padding-left: 10px;">使用 HTTP clone</li>
-                            <li><a class="dropdown-item" href="#" onclick="copyEvent('http_clone')">
-                                <span id="http_clone">{{ gitlab_url }}</span></a>
-                            </li>
-                        </ul>
-                    </div>
+                    {% include 'repo/btn_clone_repo.html' %}
                     <button style="border-style: dashed; margin-left: 20px;">Add Jenkins File</button>
                 </div>
                 <hr style="height: 3px; background: #aaaaaa; margin: 0">
@@ -143,7 +130,7 @@ git push -u origin --tags</code>
                             </button>
                         </div>
                         <div style="padding: 15px;">
-                            <button class="btn-sm"><span style="width: 60px;">clone</span></button>
+                            {% include 'repo/btn_clone_repo.html' %}
                         </div>
                     </div>
                 </div>

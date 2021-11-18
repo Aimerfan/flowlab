@@ -1,0 +1,12 @@
+<button type="button" class="btn btn-primary dropdown-toggle" id="dropdownClone"
+        data-bs-toggle="dropdown" aria-expanded="false">Clone</button>
+<ul class="dropdown-menu" aria-labelledby="dropdownClone">
+    <li style="padding-left: 10px;">使用 HTTP clone</li>
+    <li><a class="dropdown-item" onclick="copyEvent('http_clone')" data-bs-toggle="tooltip" data-bs-placement="top" title="複製">
+        <span id="http_clone">{{ gitlab_url }}</span></a>
+    </li>
+    <li style="padding-left: 10px;">使用 SSH clone</li>
+    <li><a class="dropdown-item" onclick="copyEvent('ssh_clone')" data-bs-toggle="tooltip" data-bs-placement="top" title="複製">
+        <span id="ssh_clone">{{ gitlab_ssh }}</span></a>
+    </li>
+</ul>
