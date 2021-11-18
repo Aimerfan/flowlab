@@ -13,7 +13,7 @@
             <a href="{% url 'repo_project' username project %}">
                 <button class="btn_ci_flow btn-md" type="button">code</button>
             </a>
-            <a href="{% url 'repo_build' username project %}">
+            <a href="{% url 'build' username project info.branch %}">
                 <button class="btn_ci_flow btn-md" type="button">build</button>
             </a>
             <a href="{% url 'analysis' %}">

@@ -164,16 +164,3 @@ def repo_new_view(request):
         return redirect('repo_project', user=username, project=repo_meta['name'])
 
     return render(request, 'repo/repo_new.html', {'form': form})
-
-
-def repo_build_view(request, user, project):
-    project_info = get_repo_verbose(user, project)
-    branch_name = project_info['branch']
-    job_name = get_job_name(user, project, branch_name)
-
-    # 取得 console output
-    multibr_default_job = jenkins_inst.get_job_info(job_name)
-    last_build_number = multibr_default_job['lastCompletedBuild']['number']
-    build_info = jenkins_inst.get_build_console_output(job_name, last_build_number).split('\n')
-
-    return render(request, 'build.html', {'info': project_info, 'build_info': build_info})
