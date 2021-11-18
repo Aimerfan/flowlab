@@ -3,13 +3,14 @@
 {% load nav_tag %}
 {% load url %}
 {% block title %}
-    儲存庫預覽
+    {% get_name request as username %}
+    {{ username }}/{{ info.name }}
 {% endblock %}
 {% block body %}
-{% get_name request as username %}
-{% get_gitlab_url username info.name as gitlab_url %}
-{% get_gitlab_ssh username info.name as gitlab_ssh %}
-{% include 'cicd_nav.html' with project=info.name %}
+    {% get_name request as username %}
+    {% get_gitlab_url username info.name as gitlab_url %}
+    {% get_gitlab_ssh username info.name as gitlab_ssh %}
+    {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="repo_content">
             <h1 style="text-align: center">儲存庫預覽區塊</h1>

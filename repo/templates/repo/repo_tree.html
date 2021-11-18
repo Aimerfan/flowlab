@@ -3,10 +3,11 @@
 {% load nav_tag %}
 {% load range %}
 {% block title %}
-    儲存庫資料夾預覽
+    {{ info.name }}/{{ tree_path }} at {{ info.branch }}
 {% endblock %}
 {% block body %}
-{% get_name request as username %}
+    {% get_name request as username %}
+    {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="repo_content">
             <div>

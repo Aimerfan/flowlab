@@ -12,7 +12,9 @@
         <div class="repo_content">
             <h1 style="text-align: center">Jenkins Pipeline Console</h1>
             <div class="align_both_sides ver_mid">
-                <pre>{{ build_info }}</pre>
+                <pre>{% for line in build_info %}
+{% if '[Pipeline]' in line %}<span class="pipeline_new_node">{{ line }}</span>{% else %}{{ line }}{% endif %}{% endfor %}
+</pre>
             </div>
         </div>
     </div>

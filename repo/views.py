@@ -1,5 +1,3 @@
-import requests
-
 from datetime import datetime
 from pathlib import PurePosixPath
 from base64 import b64decode
@@ -8,9 +6,9 @@ from django.shortcuts import render, redirect
 from django.utils import timezone
 
 from core.utils import CONFIG_XML
-from ci.jenkins import jenkins_inst, jenkins_url, root
+from ci.jenkins import jenkins_inst, jenkins_url
 from .gitlab import gitlab_inst, gitlab_url
-from .utils import timedelta_str, get_repo_verbose, get_tree
+from .utils import get_job_name, timedelta_str, get_repo_verbose, get_tree
 from .forms import RepoForm, DelRepoForm
 
 
@@ -47,7 +45,7 @@ def repo_view(request, user, project):
             gitlab_inst.projects.get(full_project_name).delete()
 
             # 刪除 Jenkins Job
-            job_name = f'{user}_{project}'
+            job_name = get_job_name(user, project)
             if jenkins_inst.get_job_name(job_name):
                 jenkins_inst.delete_job(job_name)
             return redirect('repo_list', user=user)
@@ -144,8 +142,8 @@ def repo_new_view(request):
             raise Exception('repo create error.')
 
         # 建置 Jenkins Job (Multibranch Pipeline)
-        job_name = f"{username}_{repo_meta['name']}"
-        if job_name == jenkins_inst.get_job_name(job_name):
+        job_name = get_job_name(username, repo_meta['name'])
+        if jenkins_inst.job_exists(job_name):
             raise Exception('job already exists.')
         gitlab_webhook_url = f"{gitlab_url}/{username}/{repo_meta['name']}"
         config_xml = CONFIG_XML.replace('set_remote', gitlab_webhook_url)
@@ -170,9 +168,12 @@ def repo_new_view(request):
 
 def repo_build_view(request, user, project):
     project_info = get_repo_verbose(user, project)
-    branch_name = 'master'
-    job_name = f'{user}_{project}'
-    console_url = f'{jenkins_url}/job/{job_name}/job/{branch_name}/lastBuild/consoleText'
-    build_info = requests.get(console_url, auth=root).content.decode()
+    branch_name = project_info['branch']
+    job_name = get_job_name(user, project, branch_name)
+
+    # 取得 console output
+    multibr_default_job = jenkins_inst.get_job_info(job_name)
+    last_build_number = multibr_default_job['lastCompletedBuild']['number']
+    build_info = jenkins_inst.get_build_console_output(job_name, last_build_number).split('\n')
 
     return render(request, 'build.html', {'info': project_info, 'build_info': build_info})
