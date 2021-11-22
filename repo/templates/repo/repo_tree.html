@@ -1,17 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load nav_tag %}
 {% load range %}
 {% block title %}
     {{ info.name }}/{{ tree_path }} at {{ info.branch }}
 {% endblock %}
 {% block body %}
-    {% get_name request as username %}
     {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="repo_content">
             <div>
-                <h2>{{ username }} / {{ info.name }}</h2>
+                <h2>{{ user.username }} / {{ info.name }}</h2>
             </div>
             <hr style="height: 3px; background: #aaaaaa; margin: 0">
             <div class="align_both_sides">
@@ -45,7 +43,7 @@
                         {% with tree_path|add:key as tree_path %}
                         <div style="display: flex;">
                             <img src="{% static 'core/images/folder.png' %}" alt="folder" class="repo_icon">
-                            <h6><a href="{% url 'repo_tree' username info.name branch tree_path %}">{{ key }}</a></h6>
+                            <h6><a href="{% url 'repo_tree' user.username info.name branch tree_path %}">{{ key }}</a></h6>
                         </div>
                         {% endwith %}
                     </div>
@@ -63,7 +61,7 @@
                         {% with tree_path|add:key as tree_path %}
                         <div style="display: flex;">
                             <img src="{% static 'core/images/file.png' %}" alt="folder" class="repo_icon">
-                            <h6><a href="{% url 'repo_blob' username info.name branch tree_path %}">{{ key }}</a></h6>
+                            <h6><a href="{% url 'repo_blob' user.username info.name branch tree_path %}">{{ key }}</a></h6>
                         </div>
                         {% endwith %}
                     </div>

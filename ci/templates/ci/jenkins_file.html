@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load nav_tag %}
 {% block title %}
     Jenkins File
 {% endblock %}
 {% block body %}
 <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
 <script src="{% static 'js/jquery.cookie-1.4.1.min.js' %}"></script>
-{% get_name request as username %}
 {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="align_both_sides">

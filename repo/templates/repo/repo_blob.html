@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load nav_tag %}
 {% load range %}
 {% block title %}
     {{ info.name }}/{% if blob_path == '.' %}{{ file.name }}
@@ -8,12 +7,11 @@
     at {{ info.branch }}
 {% endblock %}
 {% block body %}
-    {% get_name request as username %}
     {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="repo_content">
             <div>
-                <h2>{{ username }} / {{ info.name }}</h2>
+                <h2>{{ user.username }} / {{ info.name }}</h2>
             </div>
             <hr style="height: 3px; background: #aaaaaa; margin: 0">
             <div class="align_both_sides">
@@ -53,7 +51,7 @@
                 </div>
                 <div class="frame_files_context">
                     <div class="co-md-1">
-                        {% with line|add:"1" as line%}
+                        {% with line|add:"1" as line %}
                         {% for i in 1|range:line %}
                         <div class="line_numbers">
                             {{ i }}

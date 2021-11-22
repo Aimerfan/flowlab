@@ -1,21 +1,18 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load nav_tag %}
 {% load url %}
 {% block title %}
-    {% get_name request as username %}
-    {{ username }}/{{ info.name }}
+    {{ user.username }}/{{ info.name }}
 {% endblock %}
 {% block body %}
-    {% get_name request as username %}
-    {% get_gitlab_url username info.name as gitlab_url %}
-    {% get_gitlab_ssh username info.name as gitlab_ssh %}
+    {% get_gitlab_http_url user.username info.name as gitlab_http_url %}
+    {% get_gitlab_ssh_url user.username info.name as gitlab_ssh_url %}
     {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="repo_content">
             <h1 style="text-align: center">儲存庫預覽區塊</h1>
             <div class="align_both_sides ver_mid">
-                <h2>{{ username }} / {{ info.name }}</h2>
+                <h2>{{ user.username }} / {{ info.name }}</h2>
                 <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#delModal"
                         style="height: fit-content;">
                     Delete Project
@@ -32,7 +29,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <h6>此動作無法撤銷，將永久刪除此儲存庫。</h6><br>
-                                    <h6>請輸入 <span style="background: #B2B7BC">{{ username }}/{{ info.name }}</span> 並再次確認</h6>
+                                    <h6>請輸入 <span style="background: #B2B7BC">{{ user.username }}/{{ info.name }}</span> 並再次確認</h6>
                                     {{ form.project_info }}
                                 </div>
                                 <div class="modal-footer">
@@ -63,7 +60,7 @@
                 <div class="command_context" style="background-color: #A3C3E0;">
                     <pre>
                         <code>
-git config --global user.name "{{ username }}"
+git config --global user.name "{{ user.username }}"
 git config --global user.email "{{ request.user.email }}"</code>
                     </pre>
                 </div>
@@ -71,7 +68,7 @@ git config --global user.email "{{ request.user.email }}"</code>
                 <div class="command_context" style="background-color: #A3C3E0;">
                     <pre>
                         <code>
-git clone {{ gitlab_url }}
+git clone {{ gitlab_http_url }}
 cd {{ info.name }}
 git switch -c main
 touch README.md
@@ -86,7 +83,7 @@ git push -u origin main</code>
                         <code>
 cd existing_folder
 git init --initial-branch=main
-git remote add origin {{ gitlab_url }}
+git remote add origin {{ gitlab_http_url }}
 git add .
 git commit -m "Initial commit"
 git push -u origin main</code>
@@ -98,7 +95,7 @@ git push -u origin main</code>
                         <code>
 cd existing_repo
 git remote rename origin old-origin
-git remote add origin {{ gitlab_url }}
+git remote add origin {{ gitlab_http_url }}
 git push -u origin --all
 git push -u origin --tags</code>
                     </pre>
@@ -122,11 +119,9 @@ git push -u origin --tags</code>
                     </div>
                     <div class="ver_mid">
                         <div>
-                            <button class="btn-sm ver_mid" style="padding: 7px;">
+                            <button type="button" class="btn btn-secondary">
                                 <img src="{% static 'core/images/download.png' %}"
-                                     style="width: 15px; margin: auto 5px;" alt="download">
-                                <img src="{% static 'core/images/arrow-down.png' %}"
-                                     style="width: 10px; margin: auto 5px;" alt="drop_down">
+                                     style="width: 18px;" alt="download">
                             </button>
                         </div>
                         <div style="padding: 15px;">
@@ -173,7 +168,7 @@ git push -u origin --tags</code>
                         <div style="display: flex;">
                             {% with root_path|add:key as tree_path %}
                             <img src="{% static 'core/images/folder.png' %}" alt="folder" class="repo_icon">
-                            <h6><a href="{% url 'repo_tree' username info.name info.branch key %}">{{ key }}</a></h6>
+                            <h6><a href="{% url 'repo_tree' user.username info.name info.branch key %}">{{ key }}</a></h6>
                             {% endwith %}
                         </div>
                     </div>
@@ -191,7 +186,7 @@ git push -u origin --tags</code>
                     <div style="width: 300px;" class="col-md-auto text_left">
                         <div style="display: flex;">
                             <img src="{% static 'core/images/file.png' %}" alt="file" class="repo_icon">
-                            <h6><a href="{% url 'repo_blob' username info.name info.branch key %}">{{ key }}</a></h6>
+                            <h6><a href="{% url 'repo_blob' user.username info.name info.branch key %}">{{ key }}</a></h6>
                         </div>
                     </div>
                     <div style="width: calc(100% - 500px);" class="col-md-auto text_left">

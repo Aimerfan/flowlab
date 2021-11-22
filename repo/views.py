@@ -13,7 +13,7 @@ from .forms import RepoForm, DelRepoForm
 
 
 def repo_list_view(request, user):
-    """儲存庫列表"""
+    """檢視儲存庫列表"""
     gitlab_user = gitlab_inst.users.list(username=user)[0]
     project_list = gitlab_user.projects.list()
 
@@ -36,7 +36,7 @@ def repo_list_view(request, user):
 
 
 def repo_view(request, user, project):
-    """檢視儲存庫"""
+    """檢視儲存庫內容"""
     form = DelRepoForm(request.POST or None)
 
     full_project_name = f'{user}/{project}'
@@ -74,7 +74,7 @@ def repo_view(request, user, project):
 
 
 def repo_tree_view(request, user, project, branch, path=''):
-    """儲存庫專案資料夾"""
+    """檢視儲存庫資料夾"""
     project_info = get_repo_verbose(user, project)
     folders, files = get_tree(user, project, path, branch)
     tree_path = request.path.split('tree/' + branch + '/')[1]
@@ -90,7 +90,7 @@ def repo_tree_view(request, user, project, branch, path=''):
 
 
 def repo_blob_view(request, user, project, branch, path):
-    """儲存庫專案檔案"""
+    """檢視儲存庫檔案"""
     url_as_path = PurePosixPath(path)
     blob_path = str(url_as_path.parent)
     file = url_as_path.name
