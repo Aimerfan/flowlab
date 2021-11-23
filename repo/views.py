@@ -4,6 +4,8 @@ from base64 import b64decode
 
 from django.shortcuts import render, redirect
 from django.utils import timezone
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 from core.utils import CONFIG_XML
 from ci.jenkins import jenkins_inst, jenkins_url
@@ -35,30 +37,26 @@ def repo_list_view(request, user):
     return render(request, 'repo/repo_list.html', {'projects': projects})
 
 
+@require_http_methods(['GET', 'HEAD', 'DELETE'])
 def repo_view(request, user, project):
     """檢視儲存庫內容"""
-    form = DelRepoForm(request.POST or None)
 
-    full_project_name = f'{user}/{project}'
-    if request.method == 'POST':
-        if request.POST['project_info'] == full_project_name:
-            gitlab_inst.projects.get(full_project_name).delete()
+    if request.method == 'DELETE':
+        full_project_name = f'{user}/{project}'
+        # 刪除 gitlab project
+        gitlab_inst.projects.get(full_project_name).delete()
 
-            # 刪除 Jenkins Job
-            job_name = get_job_name(user, project)
-            if jenkins_inst.get_job_name(job_name):
-                jenkins_inst.delete_job(job_name)
-            return redirect('repo_list', user=user)
-        else:
-            # todo: 輸入錯誤的提示
-            pass
+        # 刪除 Jenkins Job
+        job_name = get_job_name(user, project)
+        if jenkins_inst.get_job_name(job_name):
+            jenkins_inst.delete_job(job_name)
+        return JsonResponse({'status': 200})
 
+    # 通過 utils 取得 project(repo) 詳細訊息
+    # 判斷如果是空儲存庫，給空的預設值
     project_info = get_repo_verbose(user, project)
-
     if project_info['branch_sum'] == 0:
-        folders = ''
-        files = ''
-        root_path = ''
+        folders = files = root_path = ''
     else:
         folders, files = get_tree(user, project)
         root_path = f'{project}/'
@@ -68,7 +66,7 @@ def repo_view(request, user, project):
         'root_path': root_path,
         'folders': folders,
         'files': files,
-        'form': form
+        'form': DelRepoForm(),
     }
     return render(request, 'repo/repository.html', content)
 
