@@ -29,7 +29,7 @@ def timedelta_str(seconds):
     prev_max = 1
     for unit, max_sec in unit_dict.items():
         if unit == 'year' or seconds < max_sec:
-            redundant = seconds // prev_max
+            redundant = int(seconds // prev_max)
             plural = 's' if redundant > 1 else ''
             return f'Updated {redundant} {unit}{plural} ago'
         else:

@@ -31,7 +31,7 @@ def repo_list_view(request, user):
 
         # 放進 projects 清單
         projects[project_meta.name] = {
-            'last_activity_at': timedelta_str(now_last_delta.seconds),
+            'last_activity_at': timedelta_str(now_last_delta.total_seconds()),
             'branch_sum': len(branch_list),
         }
     return render(request, 'repo/repo_list.html', {'projects': projects})
