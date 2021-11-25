@@ -87,35 +87,37 @@ def repo_tree_view(request, user, project, branch, path=''):
 
 def repo_blob_view(request, user, project, branch, path):
     """檢視儲存庫檔案"""
-    url_as_path = PurePosixPath(path)
-    blob_path = str(url_as_path.parent)
-    file = url_as_path.name
+    full_path = PurePosixPath(path)
+    blob = {
+        'path': str(full_path.parent),
+    }
 
     project_inst = gitlab_inst.projects.get(f'{user}/{project}')
     project_info = get_repo_verbose(user, project)
-    trees = project_inst.repository_tree(path=blob_path, ref=branch)
 
+    trees = project_inst.repository_tree(path=blob['path'], ref=branch)
+    # 列出 path_tree 下的 subtree, 搜尋 request 的 blob
     for tree in trees:
-        if tree['type'] == 'blob' and tree['name'] == file:
-            blob = project_inst.repository_blob(tree['id'])
-            file = {
-                'name': tree['name'],
-                'content': b64decode(blob['content']).decode('utf-8'),
-            }
+        if tree['name'] == full_path.name and tree['type'] == 'blob':
+            gl_blob = project_inst.repository_blob(tree['id'])
+            content = b64decode(gl_blob['content']).decode('utf-8')
 
-    if file['content'] == '':
-        line = 0
-    elif file['content'][-1] == '\n':
-        line = file['content'].count('\n')
-    else:
-        line = file['content'].count('\n') + 1
+            # account 'Lines Of Code'
+            loc = content.count('\n')
+            if content != '' and content[-1] != '\n':
+                loc += 1
+
+            blob.update({
+                'name': full_path.name,
+                'loc': loc,
+                'content': content,
+            })
+            break
 
     return render(request, 'repo/repo_blob.html', {
         'info': project_info,
-        'blob_path': blob_path,
-        'file': file,
-        'line': line,
-        'branch': branch
+        'branch': branch,
+        'blob': blob,
     })
 
 
