@@ -127,26 +127,28 @@ def repo_new_view(request):
 
     if request.method == 'POST':
         username = request.user.username
+        repo_name = request.POST['name']
+        
+        # 建立 gitlab project
         repo_meta = {
-            'name': request.POST['name'],
+            'name': repo_name,
             'description': request.POST['description'],
             'visibility': request.POST['visibility'],
         }
-        # TODO: add file when create repo
-        add_file = request.POST.getlist('add_file')
-
         gitlab_user = gitlab_inst.users.list(username=username)[0]
         user_project = gitlab_user.projects.create(repo_meta)
+        # TODO: add file when create repo
+        add_file = request.POST.getlist('add_file')
         # TODO: error message tips
         if user_project is None:
             raise Exception('repo create error.')
 
-        # 建置 Jenkins Job (Multibranch Pipeline)
-        job_name = get_job_name(username, repo_meta['name'])
+        # 建立 Jenkins Job (Multibranch Pipeline 模板)
+        job_name = get_job_name(username, repo_name)
         if jenkins_inst.job_exists(job_name):
             raise Exception('job already exists.')
-        gitlab_webhook_url = f"{gitlab_url}/{username}/{repo_meta['name']}"
-        config_xml = CONFIG_XML.replace('set_remote', gitlab_webhook_url)
+        gitlab_repo_url = f"{gitlab_url}/{username}/{repo_name}"
+        config_xml = CONFIG_XML.replace('set_remote', gitlab_repo_url)
         jenkins_inst.create_job(job_name, config_xml)
 
         # 建立 GitLab webhook
@@ -161,6 +163,6 @@ def repo_new_view(request):
             raise Exception('webhook in github already exists.')
         project.hooks.create(gitlab_webhook)
 
-        return redirect('repo_project', user=username, project=repo_meta['name'])
+        return redirect('repo_project', user=username, project=repo_name)
 
     return render(request, 'repo/repo_new.html', {'form': form})
