@@ -26,7 +26,7 @@ class RepoForm(forms.Form):
     )
     visibility = forms.ChoiceField(
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        choices=REPO_VISIBILITY,
+        choices=REPO_VISIBILITY, initial=REPO_VISIBILITY[0],
     )
     add_file = forms.MultipleChoiceField(
         required=False,
