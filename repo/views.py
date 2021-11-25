@@ -74,14 +74,13 @@ def repo_tree_view(request, user, project, branch, path=''):
     """檢視儲存庫資料夾"""
     project_info = get_repo_verbose(user, project)
     folders, files = get_tree(user, project, path, branch)
-    tree_path = request.path.split('tree/' + branch + '/')[1]
 
     content = {
         'info': project_info,
-        'tree_path': tree_path,
+        'tree_path': f'{path}/' if path else '',
         'folders': folders,
         'files': files,
-        'branch': branch
+        'branch': branch,
     }
     return render(request, 'repo/repo_tree.html', content)
 
