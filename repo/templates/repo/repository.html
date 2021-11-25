@@ -21,22 +21,21 @@
                 <div class="modal fade" id="delModal" tabindex="-1" aria-labelledby="delModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
-                            <form id="delRepoForm">
-                                {% csrf_token %}
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="delModalLabel">你確定要刪除該儲存庫嗎?</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <h6>此動作無法撤銷，將永久刪除此儲存庫。</h6><br>
-                                    <h6>請輸入 <span style="background: #B2B7BC">{{ user.username }}/{{ info.name }}</span> 並再次確認</h6>
-                                    {{ form.project_info }}
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                                    <button type="button" class="btn btn-primary" id="delRepoConfirm">確定刪除</button>
-                                </div>
-                            </form>
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="delModalLabel">你確定要刪除該儲存庫嗎?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <h6>此動作無法撤銷，將永久刪除此儲存庫。</h6><br>
+                                <h6>請輸入 <span style="background: #B2B7BC">{{ user.username }}/{{ info.name }}</span> 並再次確認</h6>
+                                {# 複製 django form 產生的 html 標籤 #}
+                                <label for="id_project_info" style="display:inline;"></label>
+                                <input type="text" name="project_info" class="form-control" required="" id="id_project_info">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-primary" id="delRepoConfirm">確定刪除</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -207,15 +206,15 @@ git push -u origin --tags</code>
     <script>
     {
         let delBtn = $('#delRepoConfirm');
+        {# 刪除儲存庫時，確認按鈕的行為 #}
         delBtn.click(function () {
-            let form = $('#delRepoForm');
             let confirmInput = $('#id_project_info').val();
 
             if(confirmInput === "{{ user.username }}/{{ info.name }}"){
                 delBtn.attr('disabled', true);
                 $.ajax({
                     type: 'DELETE',
-                    url: form.attr('action'),
+                    url: window.location.href,
                     {# 補上 csrf token #}
                     beforeSend: function(xhr) {
                         xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
@@ -228,6 +227,17 @@ git push -u origin --tags</code>
             }
             else{
                 alert('輸入錯誤，請再次確認!');
+            }
+        });
+
+        {# 刪除儲存庫時，input 欄位按下 enter 的行為 #}
+        $('#id_project_info').on("keyup", function (event){
+            // 設定按下 enter 鍵時的行為
+            if(event.keyCode === 13){
+                // 取消預設的行為
+                event.preventDefault();
+                // 點擊 確認 按鈕
+                delBtn.click();
             }
         });
     }

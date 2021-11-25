@@ -11,7 +11,7 @@ from core.utils import CONFIG_XML
 from ci.jenkins import jenkins_inst, jenkins_url
 from .gitlab import gitlab_inst, gitlab_url
 from .utils import get_job_name, timedelta_str, get_repo_verbose, get_tree
-from .forms import RepoForm, DelRepoForm
+from .forms import RepoForm
 
 
 def repo_list_view(request, user):
@@ -66,7 +66,6 @@ def repo_view(request, user, project):
         'root_path': root_path,
         'folders': folders,
         'files': files,
-        'form': DelRepoForm(),
     }
     return render(request, 'repo/repository.html', content)
 

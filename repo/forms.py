@@ -33,9 +33,3 @@ class RepoForm(forms.Form):
         widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
         choices=REPO_ADD_FILE,
     )
-
-
-class DelRepoForm(forms.Form):
-    project_info = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
