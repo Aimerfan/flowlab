@@ -13,7 +13,27 @@ def jenkins_file_view(request, user, project):
     """顯示 Jenkins File"""
     project_info = get_repo_verbose(user, project)
 
-    return render(request, 'ci/jenkins_file.html', {'info': project_info})
+    # 表單內容 (專案類型, 需要檢測的項目)
+    project_type = {
+        'java': 'java',
+        'gradle': 'gradle',
+        'maven': 'maven',
+    }
+    project_test = {
+        'junit': '單元測試',
+        'jacoco': '覆蓋率檢測',
+        'sonarqube': 'Sonar Qube 檢測',
+    }
+    form = {
+        'type': project_type,
+        'test': project_test,
+    }
+
+    if request.method == 'POST':
+        project_type = request.POST['type']
+        project_test = request.POST.getlist('test')
+
+    return render(request, 'ci/jenkins_file.html', {'info': project_info, 'form': form})
 
 
 def build_view(request, user, project, branch):
@@ -44,7 +64,7 @@ def build_view(request, user, project, branch):
     return render(request, 'ci/build.html', {
         'info': project_info,
         'branch': branch,
-        'build_results': build_results
+        'build_results': build_results,
     })
 
 
