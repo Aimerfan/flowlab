@@ -15,8 +15,18 @@ with open('.env', 'r', encoding='utf-8') as envfile:
         if len(tokens) == 2:
             ENVIRON[tokens[0]] = tokens[1]
 
-# read {project_root}/ci/static/ci/multibranch_config.xml as python string
-CONFIG_XML = ElementTree.parse('ci/static/ci/multibranch_config.xml').getroot()
-CONFIG_XML = ElementTree.tostring(CONFIG_XML).decode()
-CONFIG_XML = CONFIG_XML.replace('set_username', ENVIRON['GITLAB_ROOT_USERNAME'])
-CONFIG_XML = CONFIG_XML.replace('set_password', ENVIRON['GITLAB_ROOT_PASSWORD'])
+
+def load_multibranch_xml():
+    """
+    載入 {project_root}/ci/static/ci/multibranch_config.xml
+    並轉換為 python String
+    """
+    xml = ElementTree.parse('ci/static/ci/multibranch_config.xml').getroot()
+    xml = ElementTree.tostring(xml).decode()
+    xml = xml.replace('set_username', ENVIRON['GITLAB_ROOT_USERNAME'])
+    xml = xml.replace('set_password', ENVIRON['GITLAB_ROOT_PASSWORD'])
+    return xml
+
+
+# Jenkins Multibranch Jobs 預設模板設定
+CONFIG_XML = load_multibranch_xml()

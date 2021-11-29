@@ -1,6 +1,4 @@
 {% load static %}
-{% load nav_tag %}
-{% get_name request as username %}
 <div style="padding: 15px;">
     <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownBranch" data-bs-toggle="dropdown" aria-expanded="false">
         <span style="width: 100px;">
@@ -13,7 +11,7 @@
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownBranch">
         {% for branch in project.branches %}
-            <li><a class="dropdown-item" href="{% url 'repo_tree_root' username project.name branch.name %}">{{ branch.name }}</a></li>
+            <li><a class="dropdown-item" href="{% url 'repo_tree_root' user.username project.name branch.name %}">{{ branch.name }}</a></li>
         {% endfor %}
     </ul>
 </div>

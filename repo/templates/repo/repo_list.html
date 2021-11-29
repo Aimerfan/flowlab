@@ -1,11 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load nav_tag %}
 {% block title %}
     儲存庫列表
 {% endblock %}
 {% block body %}
-{% get_name request as username %}
     <div class="container_close">
         <div class="content">
             <h1 style="padding: 20px 0 0 0; text-align: center;">projects</h1>
@@ -21,7 +19,7 @@
                     {% for project, info in projects.items %}
                     <li class="d-flex border-bottom">
                         <div class="col-md-8">
-                            <h6><a href="{% url 'repo_project' username project %}">{{ project }}</a></h6>
+                            <h6><a href="{% url 'repo_project' user.username project %}">{{ project }}</a></h6>
                         </div>
                         <div class="col-md-2">
                             {% if info.branch_sum == 1 %}

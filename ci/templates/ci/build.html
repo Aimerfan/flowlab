@@ -1,13 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load nav_tag %}
 {% load url %}
 {% block title %}
-    {% get_name request as username %}
-    {{ branch }} [{{ username }}_{{ info.name }}] [Jenkins]
+    {{ branch }} [{{ user.username }}_{{ info.name }}] [Jenkins]
 {% endblock %}
 {% block body %}
-    {% get_name request as username %}
     {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="repo_content">
@@ -18,7 +15,7 @@
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownBranch">
                     {% for branch in info.branches %}
-                        <li><a class="dropdown-item" href="{% url 'build' username info.name branch.name %}">{{ branch.name }}</a></li>
+                        <li><a class="dropdown-item" href="{% url 'build' user.username info.name branch.name %}">{{ branch.name }}</a></li>
                     {% endfor %}
                 </ul>
             </div>

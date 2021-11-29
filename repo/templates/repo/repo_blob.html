@@ -1,29 +1,27 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load nav_tag %}
 {% load range %}
 {% block title %}
-    {{ info.name }}/{% if blob_path == '.' %}{{ file.name }}
-    {% else %}{{ blob_path }}/{{ file.name }}{% endif %}
+    {{ info.name }}/{% if blob.path == '.' %}{{ blob.name }}
+    {% else %}{{ blob.path }}/{{ blob.name }}{% endif %}
     at {{ info.branch }}
 {% endblock %}
 {% block body %}
-    {% get_name request as username %}
     {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="repo_content">
             <div>
-                <h2>{{ username }} / {{ info.name }}</h2>
+                <h2>{{ user.username }} / {{ info.name }}</h2>
             </div>
             <hr style="height: 3px; background: #aaaaaa; margin: 0">
             <div class="align_both_sides">
                 <div class="ver_mid">
                     {% include 'repo/switch_branch.html' with project=info curr_branch=branch %}
                     <div>
-                        {% if blob_path == '.' %}
-                        <h5>{{ file.name }}</h5>
+                        {% if blob.path == '.' %}
+                        <h5>{{ blob.name }}</h5>
                         {% else %}
-                        <h5>{{ blob_path }}/{{ file.name }}</h5>
+                        <h5>{{ blob.path }}/{{ blob.name }}</h5>
                         {% endif %}
                     </div>
                 </div>
@@ -48,12 +46,12 @@
             <div class="frame_files">
                 <div class="frame_files_header">
                     <div class="col-md-auto text_left">
-                        <h5>{{ file.name }}</h5>
+                        <h5>{{ blob.name }}</h5>
                     </div>
                 </div>
                 <div class="frame_files_context">
                     <div class="co-md-1">
-                        {% with line|add:"1" as line%}
+                        {% with blob.loc|add:"1" as line %}
                         {% for i in 1|range:line %}
                         <div class="line_numbers">
                             {{ i }}
@@ -62,10 +60,10 @@
                         {% endwith %}
                     </div>
                     <div class="co-md-11">
-                        {% if line == 0 %}
-                        <pre>Empty file</pre>
+                        {% if blob.loc == 0 %}
+                        <pre>Empty File</pre>
                         {% else %}
-                        <pre>{{ file.content }}</pre>
+                        <pre>{{ blob.content }}</pre>
                         {% endif %}
                     </div>
                 </div>

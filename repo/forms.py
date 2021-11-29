@@ -26,16 +26,10 @@ class RepoForm(forms.Form):
     )
     visibility = forms.ChoiceField(
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        choices=REPO_VISIBILITY,
+        choices=REPO_VISIBILITY, initial=REPO_VISIBILITY[0],
     )
     add_file = forms.MultipleChoiceField(
         required=False,
         widget=forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
         choices=REPO_ADD_FILE,
-    )
-
-
-class DelRepoForm(forms.Form):
-    project_info = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'})
     )

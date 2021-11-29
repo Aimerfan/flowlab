@@ -1,12 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load nav_tag %}
 {% load url %}
 {% block title %}
     Jenkins Pipeline Console
 {% endblock %}
 {% block body %}
-{% get_name request as username %}
 {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="repo_content">
