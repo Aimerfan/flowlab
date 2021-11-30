@@ -10,8 +10,8 @@
     <div class="container container_close">
         <div class="align_both_sides">
             <div class="col-md-5">
-                <button type="button" class="btn btn-info" style="float: right;" id="switch_mode" value="simpleMode">切換模式</button>
-                <div id="simpleMode" style="display: none;">
+                <button type="button" class="btn btn-info" style="float: right;" id="switch_mode" value="simpleMode">進階模式</button>
+                <div id="simpleMode" style="display: block;">
                     <h5>Simple Setting</h5>
                     <form id="config_form" method="post" action="">
                         {% csrf_token %}
@@ -29,7 +29,7 @@
                         <button id="submit_config" class="btn btn-primary">確認修改</button>
                     </form>
                 </div>
-                <div id="puzzleMode" >
+                <div id="puzzleMode" style="display: none;">
                     <h5>Jenkins File Puzzle</h5>
                     <form method="post" action="" name="pipeline" id="pipe_form">
                         {% csrf_token %}
@@ -70,14 +70,16 @@
     $('#switch_mode').click(function (){
         let mode = $(this);
         if(mode.val() === 'simpleMode') {
-            $('#simpleMode').css('display', 'block');
-            $('#puzzleMode').css('display', 'none');
-            mode.val('puzzleMode');
-        }
-        else if(mode.val() === 'puzzleMode'){
             $('#simpleMode').css('display', 'none');
             $('#puzzleMode').css('display', 'block');
+            mode.val('puzzleMode');
+            mode.text('簡單模式')
+        }
+        else if(mode.val() === 'puzzleMode'){
+            $('#simpleMode').css('display', 'block');
+            $('#puzzleMode').css('display', 'none');
             mode.val('simpleMode');
+            mode.text('進階模式')
         }
     });
 </script>
