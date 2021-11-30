@@ -1,6 +1,8 @@
+from time import sleep
 from datetime import datetime
 from pathlib import PurePosixPath
 from base64 import b64decode
+from io import BytesIO
 
 from django.shortcuts import render, redirect
 from django.utils import timezone
@@ -9,7 +11,7 @@ from django.views.decorators.http import require_http_methods
 
 from core.utils import CONFIG_XML
 from ci.jenkins import jenkins_inst, jenkins_url
-from .gitlab import gitlab_inst, gitlab_url
+from .gitlab import gitlab_inst, gitlab_url, public_gitlab
 from .utils import get_job_name, timedelta_str, get_repo_verbose, get_tree
 from .forms import BlankRepoForm, TemplateRepoForm
 
@@ -137,11 +139,11 @@ def repo_new_blank(request):
         }
         gitlab_user = gitlab_inst.users.list(username=username)[0]
         user_project = gitlab_user.projects.create(repo_meta)
-        # TODO: add file when create repo
-        add_file = request.POST.getlist('add_file')
         # TODO: error message tips
         if user_project is None:
             raise Exception('repo create error.')
+        # TODO: add file when create repo
+        add_file = request.POST.getlist('add_file')
 
         # 建立 Jenkins Job (Multibranch Pipeline 模板)
         job_name = get_job_name(username, repo_name)
@@ -173,9 +175,39 @@ def repo_new_template(request):
     form = TemplateRepoForm(request.POST or None)
 
     if request.method == 'POST':
-        if form.is_valid():
-            template = form.cleaned_data['template']
-            # print(template)
-            # TODO: 匯入選擇的模板
+        # 先驗證表單資訊
+        if not form.is_valid():
+            return redirect('repo_new_template')
+
+        selected_template = form.cleaned_data['template']
+        repo_meta = {
+            'name': form.cleaned_data['name'],
+            'description': form.cleaned_data['description'],
+            'visibility': form.cleaned_data['visibility'],
+        }
+
+        # 從 public gitlab 匯出模板專案
+        public_template = public_gitlab.projects.get(selected_template)
+        project_export = public_template.exports.create()
+        project_export.refresh()
+        while project_export.export_status != 'finished':
+            sleep(1)
+            project_export.refresh()
+
+        # 下載匯出結果 並 匯入 gitlab
+        with BytesIO() as buffer:
+            project_export.download(streamed=True, action=buffer.write)
+            buffer.seek(0)
+
+            output = gitlab_inst.projects.import_project(
+                file=buffer,
+                path=form.cleaned_data['name'],
+                namespace=request.user.username,
+                overwrite=False,
+            )
+            project_import = gitlab_inst.projects.get(output['id'], lazy=True).imports.get()
+            while project_import.import_status != 'finished':
+                sleep(1)
+                project_import.refresh()
 
     return render(request, 'repo/repo_new_template.html', {'form': form})
