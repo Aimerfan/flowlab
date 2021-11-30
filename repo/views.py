@@ -121,7 +121,7 @@ def repo_blob_view(request, user, project, branch, path):
     })
 
 
-def repo_new_view(request):
+def repo_new_blank(request):
     """新增儲存庫"""
     form = BlankRepoForm(request.POST or None)
 
@@ -165,10 +165,10 @@ def repo_new_view(request):
 
         return redirect('repo_project', user=username, project=repo_name)
 
-    return render(request, 'repo/repo_new.html', {'form': form})
+    return render(request, 'repo/repo_new_blank.html', {'form': form})
 
 
-def repo_new_template_view(request):
+def repo_new_template(request):
     """新增模板儲存庫"""
     form = TemplateRepoForm(request.POST or None)
 
