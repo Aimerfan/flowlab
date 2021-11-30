@@ -16,27 +16,20 @@
                     <form id="config_form" method="post" action="">
                         {% csrf_token %}
                         <div style="background: aliceblue; padding: 5px;">
-                            <h6>專案類型：</h6>
-                            <div class="d-flex justify-content-evenly">
-                                {% for value, label in form.type.items %}
-                                    <input class="btn-check" type="radio" name="type" value="{{ value }}" id="{{ value }}" autocomplete="off" required>
-                                    <label class="btn btn-outline-success" for="{{ value }}">{{ label }}</label>
-                                {% endfor %}
-                            </div>
                             <h6>需要檢測的項目：</h6>
                             <div class="ms-3">
-                                {% for value, label in form.test.items %}
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" role="switch" name="test" value="{{ value }}" id="{{ value }}" checked>
-                                    <label class="form-check-label" for="{{ value }}">{{ label }}</label>
-                                </div>
+                                {% for test in test_select_form.selected_tests %}
+                                    <div class="form-check form-switch">
+                                        {{ test.tag }}
+                                        <label class="form-check-label" for="{{ test.id_for_label }}">{{ test.choice_label }}</label>
+                                    </div>
                                 {% endfor %}
                             </div>
                         </div>
                         <button id="submit_config" class="btn btn-primary">確認修改</button>
                     </form>
                 </div>
-                <div id="puzzleMode">
+                <div id="puzzleMode" >
                     <h5>Jenkins File Puzzle</h5>
                     <form method="post" action="" name="pipeline" id="pipe_form">
                         {% csrf_token %}

@@ -7,33 +7,21 @@ from django.views.decorators.csrf import csrf_exempt
 from repo.utils import get_job_name, get_repo_verbose
 from .jenkins import jenkins_inst
 from .pipeparser import PipeParser
+from .forms import TestSelectForm
 
 
 def jenkins_file_view(request, user, project):
     """顯示 Jenkins File"""
-    project_info = get_repo_verbose(user, project)
-
-    # 表單內容 (專案類型, 需要檢測的項目)
-    project_type = {
-        'java': 'java',
-        'gradle': 'gradle',
-        'maven': 'maven',
-    }
-    project_test = {
-        'junit': '單元測試',
-        'jacoco': '覆蓋率檢測',
-        'sonarqube': 'Sonar Qube 檢測',
-    }
-    form = {
-        'type': project_type,
-        'test': project_test,
-    }
+    form = TestSelectForm(request.POST or None)
 
     if request.method == 'POST':
-        project_type = request.POST['type']
-        project_test = request.POST.getlist('test')
+        selected_tests = request.POST.getlist('selected_tests')
+        # print(selected_tests)
+        # TODO: 處理選擇的測試
 
-    return render(request, 'ci/jenkins_file.html', {'info': project_info, 'form': form})
+    project_info = get_repo_verbose(user, project)
+
+    return render(request, 'ci/jenkins_file.html', {'info': project_info, 'test_select_form': form})
 
 
 def build_view(request, user, project, branch):
