@@ -166,3 +166,10 @@ def repo_new_view(request):
         return redirect('repo_project', user=username, project=repo_name)
 
     return render(request, 'repo/repo_new.html', {'form': form})
+
+
+def repo_new_template_view(request):
+    """新增模板儲存庫"""
+    form = RepoForm(request.POST or None)
+
+    return render(request, 'repo/repo_new_template.html', {'form': form})

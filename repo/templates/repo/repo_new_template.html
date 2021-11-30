@@ -1,13 +1,22 @@
 {% extends 'base.html' %}
 {% block title %}
-    新增空白專案
+    新增模板專案
 {% endblock %}
 {% block body %}
-    <h1 style="padding: 20px 0 0 0; text-align: center;">新增空白專案</h1>
+    <h1 style="padding: 20px 0 0 0; text-align: center;">新增模板專案</h1>
     <div class="container_close">
         <div class="new_repo_context">
             <form method="post" action="">
                 {% csrf_token %}
+                <div class="mb-3">
+                    <div style="margin: 10px 0;">模板選擇</div>
+                    <label for="template_select" style="display:inline;"></label>
+                    <select class="form-select" id="template_select">
+                        <option value="" selected></option>
+                        <option value="gradle">gradle</option>
+                    </select>
+                </div>
+                <hr style="height: 3px; background: #0000A6;">
                 <div class="mb-3">
                     <label for="{{ form.name.id_for_label }}" style="margin: 10px 0;">專案名稱</label>
                     {{ form.name }}
@@ -24,13 +33,6 @@
                         {{ visible.choice_label.name }}<br>
                         <span style="color: #5A5A5A;">{{ visible.choice_label.info }}</span>
                     </label>
-                </div>
-                {% endfor %}
-                <hr style="height: 3px; background: #0000A6;">
-                {% for file in form.add_file %}
-                <div class="form-check">
-                    {{ file.tag }}
-                    <label class="form-check-label" for="{{ file.id_for_label }}">{{ file.choice_label }}</label>
                 </div>
                 {% endfor %}
                 <div class="high_content">
