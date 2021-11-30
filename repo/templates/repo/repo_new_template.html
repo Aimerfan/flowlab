@@ -10,10 +10,11 @@
                 {% csrf_token %}
                 <div class="mb-3">
                     <div style="margin: 10px 0;">模板選擇</div>
-                    <label for="template_select" style="display:inline;"></label>
-                    <select class="form-select" id="template_select">
-                        <option value="" selected></option>
-                        <option value="gradle">gradle</option>
+                    <label for="{{ form.template.id_for_label }}" style="display:inline;"></label>
+                    <select class="form-select" id="{{ form.template.id_for_label }}" name="{{ form.template.html_name }}" required="">
+                        {% for template in form.template %}
+                            {{ template.tag }}
+                        {% endfor %}
                     </select>
                 </div>
                 <hr style="height: 3px; background: #0000A6;">

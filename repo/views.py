@@ -11,7 +11,7 @@ from core.utils import CONFIG_XML
 from ci.jenkins import jenkins_inst, jenkins_url
 from .gitlab import gitlab_inst, gitlab_url
 from .utils import get_job_name, timedelta_str, get_repo_verbose, get_tree
-from .forms import RepoForm
+from .forms import BlankRepoForm, TemplateRepoForm
 
 
 def repo_list_view(request, user):
@@ -123,7 +123,7 @@ def repo_blob_view(request, user, project, branch, path):
 
 def repo_new_view(request):
     """新增儲存庫"""
-    form = RepoForm(request.POST or None)
+    form = BlankRepoForm(request.POST or None)
 
     if request.method == 'POST':
         username = request.user.username
@@ -170,6 +170,12 @@ def repo_new_view(request):
 
 def repo_new_template_view(request):
     """新增模板儲存庫"""
-    form = RepoForm(request.POST or None)
+    form = TemplateRepoForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            template = form.cleaned_data['template']
+            # print(template)
+            # TODO: 匯入選擇的模板
 
     return render(request, 'repo/repo_new_template.html', {'form': form})
