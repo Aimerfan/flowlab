@@ -15,10 +15,14 @@ class BaseRepoForm(forms.Form):
     ]
 
     name = forms.CharField(
+        max_length=50,
+        strip=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     description = forms.CharField(
         required=False,
+        max_length=256,
+        strip=True,
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': '3'}),
     )
     visibility = forms.ChoiceField(
@@ -41,5 +45,5 @@ class BlankRepoForm(BaseRepoForm):
 class TemplateRepoForm(BaseRepoForm):
     template = forms.ChoiceField(
         initial='',
-        choices=[('', '(選擇一個模板)')] + REPO_TEMPLATES_SRC['gitlab']['templates'],
+        choices=[('', '(選擇一個模板)')] + REPO_TEMPLATES_SRC['local']['templates'],
     )
