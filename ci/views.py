@@ -15,9 +15,10 @@ def jenkins_file_view(request, user, project):
     form = TestSelectForm(request.POST or None)
 
     if request.method == 'POST':
-        selected_tests = request.POST.getlist('selected_tests')
-        # print(selected_tests)
-        # TODO: 處理選擇的測試
+        if form.is_valid():
+            selected_tests = form.cleaned_data['selected_tests']
+            # print(selected_tests)
+            # TODO: 處理選擇的測試
 
     project_info = get_repo_verbose(user, project)
 

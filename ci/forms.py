@@ -6,7 +6,7 @@ class TestSelectForm(forms.Form):
     COVERAGE = 'coverage'
     SONARQUBE = 'sonarqube'
 
-    selected_tests = forms.ChoiceField(
+    selected_tests = forms.MultipleChoiceField(
         required=False,
         widget=forms.CheckboxSelectMultiple(attrs={
             'class': 'form-check-input',
