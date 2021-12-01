@@ -8,6 +8,7 @@ from repo.utils import get_job_name, get_repo_verbose
 from .jenkins import jenkins_inst
 from .pipeparser import PipeParser
 from .forms import TestSelectForm
+from .utils import update_jenkinsfile
 
 
 def jenkins_file_view(request, user, project):
@@ -16,9 +17,10 @@ def jenkins_file_view(request, user, project):
 
     if request.method == 'POST':
         if form.is_valid():
+            # 讀取選擇的分支與測試
+            selected_branch = request.POST.get('selected_branch')
             selected_tests = form.cleaned_data['selected_tests']
-            # print(selected_tests)
-            # TODO: 處理選擇的測試
+            update_jenkinsfile(user, project, selected_branch, selected_tests)
 
     project_info = get_repo_verbose(user, project)
 
@@ -68,11 +70,11 @@ def build_console_view(request, user, project, branch, number):
 
 
 @csrf_exempt
-def post_jenkinsfile_api(request):
+def create_jenkinsfile(request):
     # valid ajax request
     if not request.is_ajax() or request.method != 'POST':
         return HttpResponseBadRequest('error request type, must be ajax by POST method.')
-    
+
     pipe_tree = PipeParser.parse(json.loads(request.body))
     return HttpResponse(pipe_tree.__str__(), headers={
         'Content-Type': 'text/plain',

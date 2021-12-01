@@ -16,6 +16,15 @@
                     <form id="config_form" method="post" action="">
                         {% csrf_token %}
                         <div style="background: aliceblue; padding: 5px;">
+                            <h6>需要修改的分支名稱：</h6>
+                            <div class="ms-3" style="width: fit-content;">
+                                <label for="selected_branch" style="display:inline;"></label>
+                                <select class="form-select" id="selected_branch" name="selected_branch" required="">
+                                    {% for branch in info.branches %}
+                                        <option>{{ branch.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                             <h6>需要檢測的項目：</h6>
                             <div class="ms-3">
                                 {% for test in test_select_form.selected_tests %}
