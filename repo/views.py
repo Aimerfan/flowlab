@@ -1,5 +1,7 @@
+from time import sleep
 from datetime import datetime
 from pathlib import PurePosixPath
+from pkgutil import get_data
 from base64 import b64decode
 
 from django.shortcuts import render, redirect
@@ -11,7 +13,7 @@ from core.utils import CONFIG_XML
 from ci.jenkins import jenkins_inst, jenkins_url
 from .gitlab import gitlab_inst, gitlab_url
 from .utils import get_job_name, timedelta_str, get_repo_verbose, get_tree
-from .forms import RepoForm
+from .forms import BlankRepoForm, TemplateRepoForm
 
 
 def repo_list_view(request, user):
@@ -121,9 +123,9 @@ def repo_blob_view(request, user, project, branch, path):
     })
 
 
-def repo_new_view(request):
+def repo_new_blank(request):
     """新增儲存庫"""
-    form = RepoForm(request.POST or None)
+    form = BlankRepoForm(request.POST or None)
 
     if request.method == 'POST':
         username = request.user.username
@@ -165,4 +167,45 @@ def repo_new_view(request):
 
         return redirect('repo_project', user=username, project=repo_name)
 
-    return render(request, 'repo/repo_new.html', {'form': form})
+    return render(request, 'repo/repo_new_blank.html', {'form': form})
+
+
+def repo_new_template(request):
+    """新增模板儲存庫"""
+    form = TemplateRepoForm(request.POST or None)
+
+    if request.method == 'POST':
+        # 先驗證表單資訊
+        if not form.is_valid():
+            return redirect('repo_new_template')
+
+        # 擷取常用變數
+        selected_template = form.cleaned_data['template']
+        username = request.user.username
+        repo_name = form.cleaned_data['name']
+
+        # 從 local repo_templates 匯入專案模板
+        template_path = f'resources/repo_templates/{selected_template}'
+        template = get_data(__name__, template_path)
+        # 匯入到 gitlab
+        output = gitlab_inst.projects.import_project(
+            file=template,
+            path=repo_name,
+            namespace=username,
+            overwrite=False,
+        )
+        project_import = gitlab_inst.projects.get(output['id'], lazy=True).imports.get()
+        # 等待直到匯入完成
+        while project_import.import_status != 'finished':
+            sleep(1)
+            project_import.refresh()
+
+        # 匯入後根據表單更新專案設定值
+        created_project = gitlab_inst.projects.get(f'{username}/{repo_name}')
+        created_project.description = form.cleaned_data['description']
+        created_project.visibility = form.cleaned_data['visibility']
+        created_project.save()
+
+        return redirect('repo_project', user=username, project=repo_name)
+
+    return render(request, 'repo/repo_new_template.html', {'form': form})

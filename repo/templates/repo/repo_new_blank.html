@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
-{% load static %}
 {% block title %}
-    新增儲存庫
+    新增空白專案
 {% endblock %}
 {% block body %}
-    <h1 style="padding: 20px 0 0 0; text-align: center;">新增儲存庫</h1>
+    <h1 style="padding: 20px 0 0 0; text-align: center;">新增空白專案</h1>
     <div class="container_close">
         <div class="new_repo_context">
             <form method="post" action="">
@@ -35,7 +34,7 @@
                 </div>
                 {% endfor %}
                 <div class="high_content">
-                    <button type="submit">Create Project</button>
+                    <button class="btn btn-primary" type="submit">建立專案</button>
                 </div>
             </form>
         </div>
