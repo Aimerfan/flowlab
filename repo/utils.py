@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.utils import timezone
 
-from .gitlab import gitlab_inst
+from core.gitlab import inner_gitlab
 
 
 def get_job_name(user, project, branch=''):
@@ -49,7 +49,7 @@ def get_repo_verbose(user, project):
         'last_activity_at': commit time of default branch last commit
     }
     """
-    project = gitlab_inst.projects.get(f'{user}/{project}')
+    project = inner_gitlab.projects.get(f'{user}/{project}')
     branches = project.branches.list()
 
     project_verbose = {
@@ -80,7 +80,7 @@ def get_repo_verbose(user, project):
 
 
 def get_tree(user, project, path='', ref=''):
-    project = gitlab_inst.projects.get(f'{user}/{project}')
+    project = inner_gitlab.projects.get(f'{user}/{project}')
     trees = project.repository_tree(path=path, ref=ref)
 
     folders = {}

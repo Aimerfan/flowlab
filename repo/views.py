@@ -9,16 +9,15 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 
-from core.utils import CONFIG_XML
-from ci.jenkins import jenkins_inst, jenkins_url
-from .gitlab import gitlab_inst, gitlab_url
+from core.gitlab import inner_gitlab, inner_gitlab_url
+from core.jenkins import inner_jenkins, inner_jenkins_url, CONFIG_XML
 from .utils import get_job_name, timedelta_str, get_repo_verbose, get_tree
 from .forms import BlankRepoForm, TemplateRepoForm
 
 
 def repo_list_view(request, user):
     """檢視儲存庫列表"""
-    gitlab_user = gitlab_inst.users.list(username=user)[0]
+    gitlab_user = inner_gitlab.users.list(username=user)[0]
     project_list = gitlab_user.projects.list()
 
     projects = {}
@@ -28,7 +27,7 @@ def repo_list_view(request, user):
         now_last_delta = timezone.now() - datetime.fromisoformat(last_updated)
 
         # 根據 project meta 資訊獲得更詳細的的 project obj, 以計算 branches 數
-        project = gitlab_inst.projects.get(f'{user}/{project_meta.name}')
+        project = inner_gitlab.projects.get(f'{user}/{project_meta.name}')
         branch_list = project.branches.list()
 
         # 放進 projects 清單
@@ -46,12 +45,12 @@ def repo_view(request, user, project):
     if request.method == 'DELETE':
         full_project_name = f'{user}/{project}'
         # 刪除 gitlab project
-        gitlab_inst.projects.get(full_project_name).delete()
+        inner_gitlab.projects.get(full_project_name).delete()
 
         # 刪除 Jenkins Job
         job_name = get_job_name(user, project)
-        if jenkins_inst.get_job_name(job_name):
-            jenkins_inst.delete_job(job_name)
+        if inner_jenkins.get_job_name(job_name):
+            inner_jenkins.delete_job(job_name)
         return JsonResponse({'status': 200})
 
     # 通過 utils 取得 project(repo) 詳細訊息
@@ -94,7 +93,7 @@ def repo_blob_view(request, user, project, branch, path):
         'path': str(full_path.parent),
     }
 
-    project_inst = gitlab_inst.projects.get(f'{user}/{project}')
+    project_inst = inner_gitlab.projects.get(f'{user}/{project}')
     project_info = get_repo_verbose(user, project)
 
     trees = project_inst.repository_tree(path=blob['path'], ref=branch)
@@ -137,7 +136,7 @@ def repo_new_blank(request):
             'description': request.POST['description'],
             'visibility': request.POST['visibility'],
         }
-        gitlab_user = gitlab_inst.users.list(username=username)[0]
+        gitlab_user = inner_gitlab.users.list(username=username)[0]
         user_project = gitlab_user.projects.create(repo_meta)
         # TODO: add file when create repo
         add_file = request.POST.getlist('add_file')
@@ -147,20 +146,20 @@ def repo_new_blank(request):
 
         # 建立 Jenkins Job (Multibranch Pipeline 模板)
         job_name = get_job_name(username, repo_name)
-        if jenkins_inst.job_exists(job_name):
+        if inner_jenkins.job_exists(job_name):
             raise Exception('job already exists.')
-        gitlab_repo_url = f"{gitlab_url}/{username}/{repo_name}"
+        gitlab_repo_url = f"{inner_gitlab_url}/{username}/{repo_name}"
         config_xml = CONFIG_XML.replace('set_remote', gitlab_repo_url)
-        jenkins_inst.create_job(job_name, config_xml)
+        inner_jenkins.create_job(job_name, config_xml)
 
         # 建立 GitLab webhook
-        jenkins_webhook_url = f'{jenkins_url}/project/{job_name}'
+        jenkins_webhook_url = f'{inner_jenkins_url}/project/{job_name}'
         gitlab_webhook = {
             'url': jenkins_webhook_url,
             'push_events': 1,
             'merge_requests_events': 1,
         }
-        project = gitlab_inst.projects.get(user_project.id)
+        project = inner_gitlab.projects.get(user_project.id)
         if project.hooks.list():
             raise Exception('webhook in github already exists.')
         project.hooks.create(gitlab_webhook)
@@ -188,20 +187,20 @@ def repo_new_template(request):
         template_path = f'resources/repo_templates/{selected_template}'
         template = get_data(__name__, template_path)
         # 匯入到 gitlab
-        output = gitlab_inst.projects.import_project(
+        output = inner_gitlab.projects.import_project(
             file=template,
             path=repo_name,
             namespace=username,
             overwrite=False,
         )
-        project_import = gitlab_inst.projects.get(output['id'], lazy=True).imports.get()
+        project_import = inner_gitlab.projects.get(output['id'], lazy=True).imports.get()
         # 等待直到匯入完成
         while project_import.import_status != 'finished':
             sleep(1)
             project_import.refresh()
 
         # 匯入後根據表單更新專案設定值
-        created_project = gitlab_inst.projects.get(f'{username}/{repo_name}')
+        created_project = inner_gitlab.projects.get(f'{username}/{repo_name}')
         created_project.description = form.cleaned_data['description']
         created_project.visibility = form.cleaned_data['visibility']
         created_project.save()

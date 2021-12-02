@@ -1,6 +1,6 @@
 from django import template
 
-from core.utils import ENVIRON
+from ..config import ENVIRON
 
 register = template.Library()
 
