@@ -6,7 +6,7 @@ venv/
 # web source
 /static/
 /media/
-/log/
+/logs/
 
 # secret
 local_settings.py

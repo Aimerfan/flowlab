@@ -140,5 +140,6 @@ LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
 
 try:
     from .secrets import *
-except ImportError:
-    raise Exception("A secrets.py file is required to run this project")
+    from .log import LOGGING
+except Exception as e:
+    raise e
