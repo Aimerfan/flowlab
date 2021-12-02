@@ -13,7 +13,6 @@ def update_jenkinsfile(user, project, selected_branch, selected_tests):
     # 修改 Jenkinsfile 需要的變數
     modify = False
     is_used = False
-    jenkinsfile = ''
     used_stage = f"when {{ branch '{selected_branch}' }}"
     unused_stage = f"when {{ not {{ branch '{selected_branch}' }} }}"
 
@@ -50,5 +49,6 @@ def update_jenkinsfile(user, project, selected_branch, selected_tests):
                 lines[index] = blank + unused_stage
             modify = False
 
-    # 組合 Jenkinsfile 內容, list to string
-    jenkinsfile = '\n'.join(lines)
+    # 組合檔案內容 (list to string), 並更新至 Jenkinsfile 上
+    file.content = '\n'.join(lines)
+    file.save(branch=selected_branch, commit_message='改變檢測項目')
