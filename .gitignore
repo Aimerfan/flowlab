@@ -10,4 +10,5 @@ venv/
 
 # secret
 local_settings.py
+flowlab/secrets.py
 .env

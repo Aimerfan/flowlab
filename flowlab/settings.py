@@ -139,6 +139,6 @@ LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
 ]
 
 try:
-    from .local_settings import *
+    from .secrets import *
 except ImportError:
-    raise Exception("A local_settings.py file is required to run this project")
+    raise Exception("A secrets.py file is required to run this project")
