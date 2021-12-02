@@ -572,3 +572,28 @@ button {
 span.pipeline_new_node {
     color: #0060C1;
 }
+
+/* boostrap toast & django message tag */
+.top-200px {
+    top: 200px!important;
+}
+
+.info {
+    background: #c9dbe6;
+    color: #313335;
+}
+
+.success {
+    background: #9cffaf;
+    color: #313335;
+}
+
+.warning {
+    background: lightgoldenrodyellow;
+    color: #313335;
+}
+
+.error {
+    background: #d7686d;
+    color: white;
+}

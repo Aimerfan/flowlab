@@ -20,5 +20,32 @@
     {% include 'nav.html' %}
     {% block body %}{% endblock %}
     {% block custom_javascript %}{% endblock %}
+
+    {% if messages %}
+    <div class="toast-container position-absolute p-3 top-200px start-50 translate-middle" id="toastPlacement" data-original-class="toast-container position-absolute p-3">
+        {% for message in messages %}
+        <div class="toast fade show{% if message.tags %} {{ message.tags }}{% endif %}" data-name="messageToast">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <div{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</div>
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script>
+        {# message 停留 3 秒後自動消失 #}
+        let toast_div = $('div[data-name="messageToast"]');
+        setTimeout(display_toast, 3000)
+        function display_toast() {
+            {#toast_div.fadeOut('hide');#}
+            toast_div.removeClass('show');
+            toast_div.addClass('hide');
+        }
+    </script>
+    {% endif %}
 </body>
 </html>
