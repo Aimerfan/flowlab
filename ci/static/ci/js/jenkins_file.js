@@ -89,11 +89,11 @@
     // 抓取頁面元素，準備 json 資料(使 pipeline_data 可用)
     combinePipeline();
     // jquery ajax
-    let code_sector = document.querySelector(".info");
+    let code_sector = document.querySelector(".pipeline_content");
     const pipeparser_url = "/ci/pipeparser/";
     $.ajax({
       type: "POST",
-      url:pipeparser_url,
+      url: pipeparser_url,
       contentType: "application/json",
       data: pipeline_data,
       datatype: "text/plain",
@@ -111,7 +111,7 @@
   let btnDownload = document.querySelector('#btn_download')
   btnDownload.onclick = function () {
     let aTag = document.createElement('a');
-    let pipelineText = document.querySelector('.info').innerHTML;
+    let pipelineText = document.querySelector('.pipeline_content').innerHTML;
     let blob = new Blob([pipelineText], {
       type: "application/octet-stream",
     })

@@ -35,7 +35,7 @@
                                 {% endfor %}
                             </div>
                         </div>
-                        <button id="submit_config" class="btn btn-primary">確認修改</button>
+                        <button class="btn btn-primary float-end" name="action" value="update">確認修改</button>
                     </form>
                 </div>
                 <div id="puzzleMode" style="display: none;">
@@ -57,7 +57,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-primary btn_pipe">確認修改</button>
+                        <button type="button" class="btn btn-primary float-end btn_pipe">確認修改</button>
                     </form>
                 </div>
             </div>
@@ -67,8 +67,18 @@
                     <button id="btn_download" class="btn btn-secondary">Download</button>
                 </div>
                 <div class="jenkins_code_content">
-                    <pre><code style="font-size: 16px;" class="info"></code></pre>
+                    <pre><code style="font-size: 16px;" class="pipeline_content">{{ pipe_content }}</code></pre>
                 </div>
+                {% if pipe_content %}
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <label>
+                        <input type="hidden" name="pipe_content" value="{{ pipe_content }}">
+                        <input type="hidden" name="selected_branch" value="{{ selected_branch }}">
+                    </label>
+                    <button id="push_pipeline" class="btn btn-primary float-end" style="display: block;" name="action" value="push">推送到儲存庫</button>
+                </form>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -81,14 +91,15 @@
         if(mode.val() === 'simpleMode') {
             $('#simpleMode').css('display', 'none');
             $('#puzzleMode').css('display', 'block');
+            $('#push_pipeline').css('display', 'none');
             mode.val('puzzleMode');
-            mode.text('簡單模式')
+            mode.text('簡單模式');
         }
         else if(mode.val() === 'puzzleMode'){
             $('#simpleMode').css('display', 'block');
             $('#puzzleMode').css('display', 'none');
             mode.val('simpleMode');
-            mode.text('進階模式')
+            mode.text('進階模式');
         }
     });
 </script>

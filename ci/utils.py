@@ -6,7 +6,7 @@ from core.gitlab import inner_gitlab
 
 
 @csrf_exempt
-def update_jenkinsfile(user, project, selected_branch, selected_tests):
+def update_jenkinsfile(repo_name, selected_branch, selected_tests):
     # Gradle 模板提供的測試
     all_tests = ['unit_test', 'coverage', 'sonarqube']
 
@@ -17,7 +17,7 @@ def update_jenkinsfile(user, project, selected_branch, selected_tests):
     unused_stage = f"when {{ not {{ branch '{selected_branch}' }} }}"
 
     # 取得專案根目錄下的 Jenkinsfile
-    project_inst = inner_gitlab.projects.get(f'{user}/{project}')
+    project_inst = inner_gitlab.projects.get(repo_name)
     # TODO: 處理根目錄無 Jenkisfile 的狀況
     file = project_inst.files.get(file_path='Jenkinsfile', ref=selected_branch)
     content = b64decode(file.content).decode('utf-8')
@@ -49,6 +49,16 @@ def update_jenkinsfile(user, project, selected_branch, selected_tests):
                 lines[index] = blank + unused_stage
             modify = False
 
-    # 組合檔案內容 (list to string), 並更新至 Jenkinsfile 上
-    file.content = '\n'.join(lines)
+    # 組合 Jenkinsfile 內容 (list to string)
+    return '\n'.join(lines)
+
+
+@csrf_exempt
+def push_jenkinsfile(repo_name, selected_branch, pipe_content):
+    # 取得專案根目錄下的 Jenkinsfile
+    project_inst = inner_gitlab.projects.get(repo_name)
+    file = project_inst.files.get(file_path='Jenkinsfile', ref=selected_branch)
+
+    # push 更新後的 Jenkinsfile 至 GitLab
+    file.content = pipe_content
     file.save(branch=selected_branch, commit_message='改變檢測項目')

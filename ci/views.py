@@ -3,28 +3,43 @@ import json
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 
 from core.jenkins import inner_jenkins
 from repo.utils import get_job_name, get_repo_verbose
 from .pipeparser import PipeParser
 from .forms import TestSelectForm
-from .utils import update_jenkinsfile
+from .utils import update_jenkinsfile, push_jenkinsfile
 
 
 def jenkins_file_view(request, user, project):
     """顯示 Jenkins File"""
     form = TestSelectForm(request.POST or None)
+    project_info = get_repo_verbose(user, project)
+    repo_name = f'{user}/{project}'
+    pipe_content = ''
+    selected_branch = ''
 
     if request.method == 'POST':
-        if form.is_valid():
+        # 修改並顯示 Jenkinsfile
+        if request.POST['action'] == 'update' and form.is_valid():
             # 讀取選擇的分支與測試
             selected_branch = request.POST.get('selected_branch')
             selected_tests = form.cleaned_data['selected_tests']
-            update_jenkinsfile(user, project, selected_branch, selected_tests)
+            pipe_content = update_jenkinsfile(repo_name, selected_branch, selected_tests)
+        # 將前端顯示的 Jenkisfile 推至儲存庫
+        elif request.POST['action'] == 'push':
+            selected_branch = request.POST.get('selected_branch')
+            pipe_content = request.POST.get('pipe_content')
+            push_jenkinsfile(repo_name, selected_branch, pipe_content)
+            messages.success(request, 'push 成功, 可以到 build 頁面查看建置結果')
 
-    project_info = get_repo_verbose(user, project)
-
-    return render(request, 'ci/jenkins_file.html', {'info': project_info, 'test_select_form': form})
+    return render(request, 'ci/jenkins_file.html', {
+        'info': project_info,
+        'test_select_form': form,
+        'pipe_content': pipe_content,
+        'selected_branch': selected_branch,
+    })
 
 
 def build_view(request, user, project, branch):
