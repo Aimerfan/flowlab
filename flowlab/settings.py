@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'repo.apps.RepoConfig',
     'ci.apps.CiConfig',
+    'course.apps.CourseConfig',
     'behave_django',
 ]
 
