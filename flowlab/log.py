@@ -63,7 +63,7 @@ LOGGING = {
         },
         'access': {
             'level': 'INFO',
-            'filters': ['require_debug_false'],
+            # 'filters': ['require_debug_false'],
             'formatter': 'simple',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': LOGGING_DIR / 'access.log',

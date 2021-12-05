@@ -4,9 +4,11 @@ from pathlib import PurePosixPath
 from pkgutil import get_data
 from base64 import b64decode
 
+from gitlab.exceptions import GitlabGetError
+
 from django.shortcuts import render, redirect
 from django.utils import timezone
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_http_methods
 
 from core.gitlab import GITLAB_, GITLAB_URL
@@ -96,24 +98,24 @@ def repo_blob_view(request, user, project, branch, path):
     project_inst = GITLAB_.projects.get(f'{user}/{project}')
     project_info = get_repo_verbose(user, project)
 
-    trees = project_inst.repository_tree(path=blob['path'], ref=branch)
-    # 列出 path_tree 下的 subtree, 搜尋 request 的 blob
-    for tree in trees:
-        if tree['name'] == full_path.name and tree['type'] == 'blob':
-            gl_blob = project_inst.repository_blob(tree['id'])
-            content = b64decode(gl_blob['content']).decode('utf-8')
+    try:
+        file = project_inst.files.get(file_path=str(full_path), ref=branch)
+    except GitlabGetError:
+        raise Http404(f'"{user}/{project}/{branch}/{path}" does not exist!')
+    else:
+        # 先解 base64, 然後要再進行一次 utf-8 decode
+        content = file.decode().decode('utf-8')
 
-            # account 'Lines Of Code'
-            loc = content.count('\n')
-            if content != '' and content[-1] != '\n':
-                loc += 1
+    # 計算 'Lines Of Code'
+    loc = content.count('\n')
+    if content != '' and content[-1] != '\n':
+        loc += 1
 
-            blob.update({
-                'name': full_path.name,
-                'loc': loc,
-                'content': content,
-            })
-            break
+    blob.update({
+        'name': full_path.name,
+        'loc': loc,
+        'content': content,
+    })
 
     return render(request, 'repo/repo_blob.html', {
         'info': project_info,
