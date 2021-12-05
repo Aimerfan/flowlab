@@ -2,7 +2,7 @@ from base64 import b64decode
 
 from django.views.decorators.csrf import csrf_exempt
 
-from core.gitlab import inner_gitlab
+from core.gitlab import GITLAB_
 
 
 @csrf_exempt
@@ -17,7 +17,7 @@ def update_jenkinsfile(repo_name, selected_branch, selected_tests):
     unused_stage = f"when {{ not {{ branch '{selected_branch}' }} }}"
 
     # 取得專案根目錄下的 Jenkinsfile
-    project_inst = inner_gitlab.projects.get(repo_name)
+    project_inst = GITLAB_.projects.get(repo_name)
     # TODO: 處理根目錄無 Jenkisfile 的狀況
     file = project_inst.files.get(file_path='Jenkinsfile', ref=selected_branch)
     content = b64decode(file.content).decode('utf-8')
@@ -56,7 +56,7 @@ def update_jenkinsfile(repo_name, selected_branch, selected_tests):
 @csrf_exempt
 def push_jenkinsfile(repo_name, selected_branch, pipe_content):
     # 取得專案根目錄下的 Jenkinsfile
-    project_inst = inner_gitlab.projects.get(repo_name)
+    project_inst = GITLAB_.projects.get(repo_name)
     file = project_inst.files.get(file_path='Jenkinsfile', ref=selected_branch)
 
     # push 更新後的 Jenkinsfile 至 GitLab

@@ -5,9 +5,9 @@ from core.config import ENVIRON
 
 
 """新增一個共用的 Jenkins Instance"""
-inner_jenkins_url = f'http://{ENVIRON["JENKINS_HOST"]}:{ENVIRON["JENKINS_PORT"]}'
+JENKINS_URL = f'http://{ENVIRON["JENKINS_HOST"]}:{ENVIRON["JENKINS_PORT"]}'
 _root_secret = (ENVIRON['JENKINS_ROOT_USERNAME'], ENVIRON['JENKINS_ROOT_PASSWORD'])
-inner_jenkins = Jenkins(inner_jenkins_url, username=_root_secret[0], password=_root_secret[1])
+JENKINS_ = Jenkins(JENKINS_URL, username=_root_secret[0], password=_root_secret[1])
 del _root_secret
 
 

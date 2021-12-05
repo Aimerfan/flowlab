@@ -1,17 +1,10 @@
 from datetime import datetime
 
+from gitlab import Gitlab
+
 from django.utils import timezone
 
-from core.gitlab import inner_gitlab
-
-
-def get_job_name(user, project, branch=''):
-    # multibranch pipline 專案實際上比較像 "每個分支一個 job 的 folder"
-    # 因此如果給定 branch name, job_name 要把原本 job_name 當成 folder, 再加上分支名稱
-    if branch:
-        return f'{user}_{project}/{branch}'
-    else:
-        return f'{user}_{project}'
+from . import GITLAB_
 
 
 def timedelta_str(seconds):
@@ -36,7 +29,7 @@ def timedelta_str(seconds):
             prev_max = max_sec
 
 
-def get_repo_verbose(user, project):
+def get_repo_verbose(user, project, gitlab: Gitlab = GITLAB_):
     """
     合併 project meta info 與 default branch 的部分訊息
     :return: {
@@ -49,7 +42,7 @@ def get_repo_verbose(user, project):
         'last_activity_at': commit time of default branch last commit
     }
     """
-    project = inner_gitlab.projects.get(f'{user}/{project}')
+    project = gitlab.projects.get(f'{user}/{project}')
     branches = project.branches.list()
 
     project_verbose = {
@@ -79,8 +72,8 @@ def get_repo_verbose(user, project):
     return project_verbose
 
 
-def get_tree(user, project, path='', ref=''):
-    project = inner_gitlab.projects.get(f'{user}/{project}')
+def get_tree(user, project, path='', ref='', gitlab: Gitlab = GITLAB_):
+    project = gitlab.projects.get(f'{user}/{project}')
     trees = project.repository_tree(path=path, ref=ref)
 
     folders = {}

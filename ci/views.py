@@ -5,8 +5,9 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 
-from core.jenkins import inner_jenkins
-from repo.utils import get_job_name, get_repo_verbose
+from core.jenkins import JENKINS_
+from core.jenkins.functools import get_job_name
+from core.gitlab.functools import get_repo_verbose
 from .pipeparser import PipeParser
 from .forms import TestSelectForm
 from .utils import update_jenkinsfile, push_jenkinsfile
@@ -48,14 +49,14 @@ def build_view(request, user, project, branch):
 
     build_results = {}
 
-    if inner_jenkins.job_exists(job_name):
-        multibr_default_job = inner_jenkins.get_job_info(job_name)
+    if JENKINS_.job_exists(job_name):
+        multibr_default_job = JENKINS_.get_job_info(job_name)
         # 取得該 branch 最新的建置編號
         last_build_number = multibr_default_job['lastCompletedBuild']['number']
         # 取得該 branch 的最新 5 個建置結果 (由新至舊)
         for number in range(last_build_number, last_build_number - 5, -1):
             if number > 0:
-                build_info = inner_jenkins.get_build_console_output(job_name, number).split('\n')
+                build_info = JENKINS_.get_build_console_output(job_name, number).split('\n')
                 last_line = build_info[-2]
                 # 擷取 console 的結果
                 if 'SUCCESS' in last_line:
@@ -79,7 +80,7 @@ def build_console_view(request, user, project, branch, number):
     job_name = get_job_name(user, project, branch)
 
     # 取得 console output
-    build_info = inner_jenkins.get_build_console_output(job_name, number).split('\n')
+    build_info = JENKINS_.get_build_console_output(job_name, number).split('\n')
 
     return render(request, 'ci/build_console.html', {'info': project_info, 'build_info': build_info})
 
