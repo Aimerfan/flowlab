@@ -1,7 +1,7 @@
 from django.db import models
 
 from core.models import Semester
-from accounts.models import Teacher
+from accounts.models import Teacher, Student
 
 
 class Course(models.Model):
@@ -19,6 +19,7 @@ class Course(models.Model):
         null=True,
         verbose_name='指導老師',
     )
+    students = models.ManyToManyField(Student, blank=True, verbose_name='學生')
 
     class Meta:
         unique_together = ['semester', 'name']
