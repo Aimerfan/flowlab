@@ -13,6 +13,7 @@ class Project(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        verbose_name='關聯課程',
     )
     # TODO: 分組功能
     # group = models.BooleanField
