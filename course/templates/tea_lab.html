@@ -11,9 +11,10 @@
         </tr>
     </thead>
     <tbody>
+    {% with lab_id=1 %}
         <tr>
             <td>40/50</td>
-            <td>Lab1: DevOps</td>
+            <td><a href="{% url 'lab_detail' course_id lab_id %}">Lab1: DevOps</a></td>
             <td>2021/11/30 23:59</td>
             <td><input class="form-check-input" type="checkbox" aria-label="" checked></td>
         </tr>
@@ -23,5 +24,6 @@
             <td>2021/12/07 23:59</td>
             <td><input class="form-check-input" type="checkbox" aria-label=""></td>
         </tr>
+    {% endwith %}
     </tbody>
 </table>

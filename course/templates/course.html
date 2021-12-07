@@ -15,9 +15,10 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% with course_id=1 %}
                     <tr>
                         <td>110-1</td>
-                        <td>軟體品質保證測試</td>
+                        <td><a href="{% url 'labs' course_id %}">軟體品質保證測試</a></td>
                         <td>Teacher</td>
                     </tr>
                     <tr>
@@ -25,6 +26,7 @@
                         <td>軟體工程理論與實務</td>
                         <td>Teacher</td>
                     </tr>
+                    {% endwith %}
                 </tbody>
             </table>
         </div>

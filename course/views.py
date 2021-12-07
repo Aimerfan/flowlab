@@ -7,8 +7,8 @@ def course_view(request):
 
 
 def lab_view(request, course_id):
-    context = {}
-    return render(request, 'lab.html', context)
+
+    return render(request, 'lab.html', {'course_id': course_id})
 
 
 def lab_detail_view(request, course_id, lab_id):
