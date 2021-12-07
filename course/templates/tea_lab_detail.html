@@ -1,28 +1,35 @@
-<form>
-    <div class="mb-3 row">
-        <label class="form-label text-start"  for="lab_info">實驗說明</label>
-        <textarea class="form-control" rows="3" id="lab_info"></textarea>
-    </div>
-    <div class="mb-3 row">
-        <label class="col-sm-2 col-form-label text-start" for="lab_br">實驗繳交分支</label>
+<form method="post">
+    {% csrf_token %}
+    <div class="my-3 row">
+        <label class="col-sm-2 col-form-label text-start" for="{{ form.name.id_for_label }}">實驗名稱</label>
         <div class="px-0 col-sm-10">
-            <input class="form-control" type="text" id="lab_br">
+            {{ form.name }}
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-2 col-form-label text-start" for="lab_template">套用模板</label>
+        <label class="form-label text-start" for="{{ form.description.id_for_label }}">實驗說明</label>
+        {{ form.description }}
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label text-start" for="{{ form.branch.id_for_label }}">實驗繳交分支</label>
         <div class="px-0 col-sm-10">
-            <select class="form-select" aria-label="" id="lab_template">
-                <option selected>無</option>
-                <option value="flowlab">flowlab</option>
-                <option value="swimming-pool">swimming-pool</option>
+            {{ form.branch }}
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label text-start" for="{{ form.template.id_for_label }}">套用模板</label>
+        <div class="px-0 col-sm-10">
+            <select class="form-select" id="{{ form.template.id_for_label }}" name="{{ form.template.html_name }} required">
+                {% for template in form.template %}
+                    {{ template.tag }}
+                {% endfor %}
             </select>
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-2 col-form-label text-start" for="lab_dateline">繳交期限</label>
+        <label class="col-sm-2 col-form-label text-start" for="{{ form.dateline.id_for_label }}">繳交期限</label>
         <div class="px-0 col-sm-10">
-            <input class="form-control" type="datetime-local" id="lab_dateline">
+            {{ form.dateline }}
         </div>
     </div>
     <button class="btn btn-primary" type="button">儲存</button>
