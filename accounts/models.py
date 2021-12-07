@@ -22,7 +22,13 @@ class Student(RoleBase):
     class Meta:
         verbose_name = verbose_name_plural = '學生'
 
+    def __str__(self):
+        return self.full_name
+
 
 class Teacher(RoleBase):
     class Meta:
         verbose_name = verbose_name_plural = '教師'
+
+    def __str__(self):
+        return self.full_name

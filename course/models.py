@@ -24,6 +24,9 @@ class Course(models.Model):
         unique_together = ['semester', 'name']
         verbose_name = verbose_name_plural = '課程'
 
+    def __str__(self):
+        return f'{self.semester}/{self.name}'
+
 
 class Lab(models.Model):
     name = models.CharField('實驗名稱', max_length=50)
@@ -40,3 +43,6 @@ class Lab(models.Model):
     class Meta:
         unique_together = ['course', 'name']
         verbose_name = verbose_name_plural = '實驗'
+
+    def __str__(self):
+        return f'{self.course.name}/{self.name}'

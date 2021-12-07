@@ -21,3 +21,6 @@ class Project(models.Model):
     class Meta:
         unique_together = ['user', 'name']
         verbose_name = verbose_name_plural = '專案'
+
+    def __str__(self):
+        return f'{self.user}/{self.name}'
