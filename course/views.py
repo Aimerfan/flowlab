@@ -14,3 +14,8 @@ def lab_view(request, course_id):
 def lab_detail_view(request, course_id, lab_id):
     context = {}
     return render(request, 'lab_detail.html', context)
+
+
+def lab_new_view(request, course_id):
+
+    return render(request, 'lab_new.html', {})
