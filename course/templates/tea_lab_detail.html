@@ -1,0 +1,29 @@
+<form>
+    <div class="mb-3 row">
+        <label class="form-label text-start"  for="lab_info">實驗說明</label>
+        <textarea class="form-control" rows="3" id="lab_info"></textarea>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label text-start" for="lab_br">實驗繳交分支</label>
+        <div class="px-0 col-sm-10">
+            <input class="form-control" type="text" id="lab_br">
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label text-start" for="lab_template">套用模板</label>
+        <div class="px-0 col-sm-10">
+            <select class="form-select" aria-label="" id="lab_template">
+                <option selected>無</option>
+                <option value="flowlab">flowlab</option>
+                <option value="swimming-pool">swimming-pool</option>
+            </select>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label text-start" for="lab_dateline">繳交期限</label>
+        <div class="px-0 col-sm-10">
+            <input class="form-control" type="datetime-local" id="lab_dateline">
+        </div>
+    </div>
+    <button class="btn btn-primary" type="button">儲存</button>
+</form>
