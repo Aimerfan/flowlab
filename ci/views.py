@@ -8,6 +8,7 @@ from django.contrib import messages
 from core.jenkins import JENKINS_
 from core.jenkins.functools import get_job_name
 from core.gitlab.functools import get_repo_verbose
+from core.dicts import MESSAGE_DICT
 from .pipeparser import PipeParser
 from .forms import TestSelectForm
 from .utils import update_jenkinsfile, push_jenkinsfile
@@ -33,7 +34,7 @@ def jenkins_file_view(request, user, project):
             selected_branch = request.POST.get('selected_branch')
             pipe_content = request.POST.get('pipe_content')
             push_jenkinsfile(repo_name, selected_branch, pipe_content)
-            messages.success(request, 'push 成功, 可以到 build 頁面查看建置結果')
+            messages.success(request, MESSAGE_DICT.get('push_jenkinsfile_success'))
 
     return render(request, 'ci/jenkins_file.html', {
         'info': project_info,
