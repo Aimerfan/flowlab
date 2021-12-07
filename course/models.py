@@ -23,3 +23,20 @@ class Course(models.Model):
     class Meta:
         unique_together = ['semester', 'name']
         verbose_name = verbose_name_plural = '課程'
+
+
+class Lab(models.Model):
+    name = models.CharField('實驗名稱', max_length=50)
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        verbose_name='關聯課程',
+    )
+    branch = models.CharField('繳交分支', max_length=72)
+    description = models.TextField('實驗描述', blank=True)
+    deadline = models.DateTimeField('繳交期限', blank=True, null=True)
+    # template = models.ForeignKey()
+
+    class Meta:
+        unique_together = ['course', 'name']
+        verbose_name = verbose_name_plural = '實驗'
