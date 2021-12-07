@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}
+    課程瀏覽
+{% endblock %}
+{% block body %}
+    <div class="container container_close">
+        <div class="content">
+            <h1>課程</h1>
+            <table class="table table-light table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th scope="col">學期</th>
+                        <th scope="col">課程名稱</th>
+                        <th scope="col">教師</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% with course_id=1 %}
+                    <tr>
+                        <td>110-1</td>
+                        <td><a href="{% url 'labs' course_id %}">軟體品質保證測試</a></td>
+                        <td>Teacher</td>
+                    </tr>
+                    <tr>
+                        <td>110-1</td>
+                        <td>軟體工程理論與實務</td>
+                        <td>Teacher</td>
+                    </tr>
+                    {% endwith %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

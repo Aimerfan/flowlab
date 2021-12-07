@@ -597,3 +597,8 @@ span.pipeline_new_node {
     background: #d7686d;
     color: white;
 }
+
+/* 上下間距較窄的 card */
+.card-body-close {
+    padding: 0.5rem 1rem;
+}
