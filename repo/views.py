@@ -1,27 +1,37 @@
+import logging
 from time import sleep
 from datetime import datetime
 from pathlib import PurePosixPath
 from pkgutil import get_data
-from base64 import b64decode
 
 from gitlab.exceptions import GitlabGetError
 
 from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_http_methods
 
+from core.dicts import MESSAGE_DICT
 from core.gitlab import GITLAB_, GITLAB_URL
 from core.gitlab.functools import timedelta_str, get_repo_verbose, get_tree
 from core.jenkins import JENKINS_, JENKINS_URL, CONFIG_XML
 from core.jenkins.functools import get_job_name
 from .forms import BlankRepoForm, TemplateRepoForm
 
+logger = logging.getLogger(f'flowlab.{__name__}')
+
 
 def repo_list_view(request, user):
     """檢視儲存庫列表"""
-    gitlab_user = GITLAB_.users.list(username=user)[0]
-    project_list = gitlab_user.projects.list()
+    try:
+        gitlab_user = GITLAB_.users.list(username=user)[0]
+    except IndexError:
+        logger.error(f"gitlab user '{user}' does not exist")
+        messages.error(request, MESSAGE_DICT.get('gitlab_user_not_found'))
+        raise Http404
+    else:
+        project_list = gitlab_user.projects.list()
 
     projects = {}
     for project_meta in project_list:
@@ -30,14 +40,20 @@ def repo_list_view(request, user):
         now_last_delta = timezone.now() - datetime.fromisoformat(last_updated)
 
         # 根據 project meta 資訊獲得更詳細的的 project obj, 以計算 branches 數
-        project = GITLAB_.projects.get(f'{user}/{project_meta.name}')
-        branch_list = project.branches.list()
+        try:
+            project = GITLAB_.projects.get(f'{user}/{project_meta.name}')
+        except GitlabGetError:
+            logger.warning(f"gitlab project {user}/{project_meta.name} does not exist")
+            messages.warning(request, MESSAGE_DICT.get('gitlab_project_not_found').format(project_meta.name))
+        else:
+            branch_list = project.branches.list()
 
-        # 放進 projects 清單
-        projects[project_meta.name] = {
-            'last_activity_at': timedelta_str(now_last_delta.total_seconds()),
-            'branch_sum': len(branch_list),
-        }
+            # 放進 projects 清單
+            projects[project_meta.name] = {
+                'last_activity_at': timedelta_str(now_last_delta.total_seconds()),
+                'branch_sum': len(branch_list),
+            }
+
     return render(request, 'repo/repo_list.html', {'projects': projects})
 
 
