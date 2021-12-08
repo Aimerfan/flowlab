@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}
-    Labs
+    {{ course_name }}
 {% endblock %}
 {% block body %}
     <div class="container container_close">
         <div class="content">
-            <h1 class="float-none">Labs</h1>
+            <h1>{{ course_name }}</h1>
+            <h2>Labs</h2>
             <table class="table table-light table-hover">
                 <thead class="table-secondary">
                     <tr>
@@ -15,18 +16,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% with lab_id=1 %}
+                {% for lab in labs %}
                     <tr>
                         <td><input class="form-check-input" type="checkbox" aria-label="" checked></td>
-                        <td><a href="{% url 'lab_detail' course_id lab_id %}">Lab1: DevOps</a></td>
-                        <td>2021/11/30 23:59</td>
+                        <td><a href="{% url 'lab_detail' course_id lab.id %}">{{ lab.name }}</a></td>
+                        <td>{{ lab.deadline }}</td>
                     </tr>
-                    <tr>
-                        <td><input class="form-check-input" type="checkbox" aria-label=""></td>
-                        <td>Lab2: SonarQube</td>
-                        <td>2021/12/07 23:59</td>
-                    </tr>
-                {% endwith %}
+                {% endfor %}
                 </tbody>
             </table>
         </div>
