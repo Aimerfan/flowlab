@@ -131,7 +131,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # https://pypi.org/project/django-login-required-middleware/
 # regex path 白名單
 LOGIN_REQUIRED_IGNORE_PATHS = [
-    r'/admin*',
+    r'/admin/*',
 ]
 # url names 白名單
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
