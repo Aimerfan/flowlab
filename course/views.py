@@ -34,11 +34,21 @@ def course_view(request, course_id):
 
 
 def lab_view(request, course_id, lab_id):
-    form = LabForm
-    return render(request, 'lab_tch.html', {'form': form})
-    # return render(request, 'lab_stu.html', {'form': form})
+    lab = Lab.objects.filter(id=lab_id).get()
+    form = LabForm(instance=lab)
+
+    if Role.STUDENT in get_roles(request.user):
+        return render(request, 'lab_stu.html', {
+            'course_id': course_id,
+            'lab': lab,
+        })
+    elif Role.TEACHER in get_roles(request.user):
+        return render(request, 'lab_tch.html', {
+            'course_id': course_id,
+            'form': form,
+        })
 
 
 def lab_new_view(request, course_id):
-    form = LabForm
+    form = LabForm(request.POST or None)
     return render(request, 'lab_new.html', {'form': form})

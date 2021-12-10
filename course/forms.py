@@ -24,8 +24,7 @@ class LabForm(forms.ModelForm):
             # 'template': forms.Select(),
             'deadline': forms.DateTimeInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'yyyy/mm/dd 下午 hh:mm',
-                # 'type': 'datetime-local',
+                'type': 'datetime-local',
             }),
         }
 
