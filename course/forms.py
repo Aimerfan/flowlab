@@ -31,4 +31,6 @@ class LabForm(forms.ModelForm):
     template = forms.ChoiceField(
         initial='none',
         choices=[('none', '無')],
+        # TODO: 暫時設定為非必填, 否則無法通過表單驗證
+        required=False,
     )
