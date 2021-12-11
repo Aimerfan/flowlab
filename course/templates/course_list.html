@@ -18,7 +18,7 @@
                 {% for course in courses %}
                     <tr>
                         <td>{{ course.semester }}</td>
-                        <td><a href="{% url 'labs' course.id %}">{{ course.name }}</a></td>
+                        <td><a href="{% url 'course' course.id %}">{{ course.name }}</a></td>
                         <td>{{ course.teacher }}</td>
                     </tr>
                 {% endfor %}

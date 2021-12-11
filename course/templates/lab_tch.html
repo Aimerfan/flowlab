@@ -52,7 +52,7 @@
                 },
             })
                 .done(function(response) {
-                    window.location.href = "{% url 'labs' course_id %}";
+                    window.location.href = "{% url 'course' course_id %}";
                 })
                 .fail(() => delBtn.attr('disabled', false));
         });
