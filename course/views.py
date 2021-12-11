@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib import messages
+from django.http import JsonResponse
 
 from core.dicts import MESSAGE_DICT
 from .forms import LabForm
@@ -50,9 +51,15 @@ def lab_view(request, course_id, lab_id):
             form.save()
             # TODO: 若 "繳交期限" 未重新選擇, 會被更新成空值
             messages.success(request, MESSAGE_DICT.get('update_lab_success'))
+        # 刪除 lab
+        elif request.method == 'DELETE':
+            lab.delete()
+            messages.success(request, MESSAGE_DICT.get('delete_lab_success'))
+            return JsonResponse({'status': 200})
 
         return render(request, 'lab_tch.html', {
             'course_id': course_id,
+            'lab_id': lab_id,
             'form': form,
         })
 
