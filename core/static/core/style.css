@@ -414,11 +414,10 @@ button {
 
 /* 儲存庫檔案檢視 (blob) */
 .line_numbers {
-    /*background-color: lightgray;*/
     color: #1b1b1b;
-    padding: 1px 10px;
     text-align: right;
     font-size: 13px;
+    user-select: none;  /* 無法被選擇 */
 }
 
 .frame_files_context {
