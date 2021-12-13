@@ -28,6 +28,7 @@ def course_view(request, course_id):
         'labs': Lab.objects.filter(course=course_id),
         'course': Course.objects.filter(id=course_id).get(),
     }
+    context.update({'students': context['course'].students.all()})
 
     if Role.STUDENT in get_roles(request.user):
         return render(request, 'course_stu.html', context)

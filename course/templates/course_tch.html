@@ -25,10 +25,28 @@
                 <tbody>
                 {% for lab in labs %}
                     <tr>
-                        <td>40/50</td>
+                        <td>0/{{ students.count }}</td>
                         <td><a href="{% url 'lab' course.id lab.id %}">{{ lab.name }}</a></td>
                         <td>{% if lab.deadline %}{{ lab.deadline }}{% else %}無{% endif %}</td>
                         <td><input class="form-check-input" type="checkbox" aria-label="" checked></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="content">
+            <h2>Students</h2>
+            <table class="table table-light table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>名稱</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for stu in students %}
+                    <tr>
+                        <td>{{ stu }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
