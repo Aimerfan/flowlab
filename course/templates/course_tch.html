@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{ course.name }}
+{% endblock %}
+{% block body %}
+    <div class="container container_close">
+        <div class="content">
+            <h1>{{ course.name }}</h1>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-8"><h2 class="float-none">Labs</h2></div>
+                <div class="col-sm-2">
+                    <button class="btn btn-primary" onclick="location.href='{% url 'lab_new' course.id %}'">新增 Lab</button>
+                </div>
+            </div>
+            <table class="table table-light table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th scope="col">繳交人數</th>
+                        <th scope="col">實驗名稱</th>
+                        <th scope="col">繳交期限</th>
+                        <th scope="col">顯示作業</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for lab in labs %}
+                    <tr>
+                        <td>0/{{ students.count }}</td>
+                        <td><a href="{% url 'lab' course.id lab.id %}">{{ lab.name }}</a></td>
+                        <td>{% if lab.deadline %}{{ lab.deadline }}{% else %}無{% endif %}</td>
+                        <td><input class="form-check-input" type="checkbox" aria-label="" checked></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div class="content">
+            <h2>Students</h2>
+            <table class="table table-light table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>名稱</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for stu in students %}
+                    <tr>
+                        <td>{{ stu }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

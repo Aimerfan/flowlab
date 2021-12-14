@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 
-class CoreConfig(AppConfig):
+class CourseConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'core'
-    verbose_name = 'flowlab'
+    name = 'course'
+    verbose_name = '課程'

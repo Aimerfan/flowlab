@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{ lab.name }}
+{% endblock %}
+{% block body %}
+    <div class="container container_close">
+        <div class="content">
+            <h1>{{ lab.name }}</h1>
+            <div>
+                <div class="mb-3 row">
+                    <label class="form-label text-start">實驗說明</label>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text text-start" id="id_description">{% if lab.description %}{{ lab.description }}{% else %}無{% endif %}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row align-items-center">
+                    <label class="col-sm-2 col-form-label text-start">實驗繳交分支</label>
+                    <div class="px-0 col-sm-10">
+                        <div class="card">
+                            <div class="card-body-close">
+                                <p class="card-text text-start" id="id_branch">{{ lab.branch }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label text-start">套用模板</label>
+                    <div class="px-0 col-sm-8">
+                        <div class="card">
+                            <div class="card-body-close">
+                                <p class="card-text text-start" id="id_template">模板名稱</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-secondary">下載</button>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-sm-2 col-form-label text-start">繳交期限</label>
+                    <div class="px-0 col-sm-10">
+                        <div class="card">
+                            <div class="card-body-close">
+                                <p class="card-text text-start" id="id_dateline">{% if lab.deadline %}{{ lab.deadline }}{% else %}無{% endif %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

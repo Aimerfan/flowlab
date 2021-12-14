@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'repo.apps.RepoConfig',
     'ci.apps.CiConfig',
+    'course.apps.CourseConfig',
     'behave_django',
 ]
 
@@ -119,6 +120,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -130,7 +132,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # https://pypi.org/project/django-login-required-middleware/
 # regex path 白名單
 LOGIN_REQUIRED_IGNORE_PATHS = [
-    r'/admin*',
+    r'/admin/*',
+    r'/static/*',
 ]
 # url names 白名單
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
