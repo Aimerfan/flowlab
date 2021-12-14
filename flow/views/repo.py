@@ -12,12 +12,13 @@ from django.utils import timezone
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_http_methods
 
+from core.infra import GITLAB_, GITLAB_URL
+from core.infra.gitlab_func import timedelta_str, get_repo_verbose, get_tree
+from core.infra import JENKINS_, JENKINS_URL
+from core.infra.jenkins_func import get_job_name
 from core.dicts import MESSAGE_DICT
-from core.gitlab import GITLAB_, GITLAB_URL
-from core.gitlab.functools import timedelta_str, get_repo_verbose, get_tree
-from core.jenkins import JENKINS_, JENKINS_URL, CONFIG_XML
-from core.jenkins.functools import get_job_name
 from ..forms import BlankRepoForm, TemplateRepoForm
+from ..utils import CONFIG_XML
 
 logger = logging.getLogger(f'flowlab.{__name__}')
 
@@ -198,8 +199,9 @@ def repo_new_template(request):
         repo_name = form.cleaned_data['name']
 
         # 從 local repo_templates 匯入專案模板
+        parent_package = str(__name__).rsplit('.', 2)[0]
         template_path = f'resources/repo_templates/{selected_template}'
-        template = get_data(__name__, template_path)
+        template = get_data(parent_package, template_path)
         # 匯入到 gitlab
         output = GITLAB_.projects.import_project(
             file=template,

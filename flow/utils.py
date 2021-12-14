@@ -1,8 +1,28 @@
+from pkgutil import get_data
+from xml.etree import ElementTree
 from base64 import b64decode
 
 from django.views.decorators.csrf import csrf_exempt
 
-from core.gitlab import GITLAB_
+from core.infra import ENVIRON
+from core.infra import GITLAB_
+
+
+def load_multibranch_xml():
+    """
+    載入 {project_root}/ci/static/ci/multibranch_config.xml
+    並轉換為 python String
+    """
+    config_file = get_data(__name__, 'resources/multibranch_config.xml').decode('utf-8')
+    xml = ElementTree.fromstring(config_file)
+    xml = ElementTree.tostring(xml).decode()
+    xml = xml.replace('set_username', ENVIRON['GITLAB_ROOT_USERNAME'])
+    xml = xml.replace('set_password', ENVIRON['GITLAB_ROOT_PASSWORD'])
+    return xml
+
+
+"""Jenkins Multibranch Jobs 預設模板設定"""
+CONFIG_XML = load_multibranch_xml()
 
 
 @csrf_exempt
