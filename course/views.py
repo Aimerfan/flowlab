@@ -79,6 +79,31 @@ def lab_view(request, course_id, lab_id):
             'project_list': project_list,
         }
         context.update(get_nav_side_dict(request.user.username, 'student'))
+
+        # 按下更新按鈕, 更新關聯專案
+        if request.method == 'POST':
+            origin_repo = request.POST['origin_repo']
+            selected_repo = request.POST['select_repo']
+
+            # 專案有關聯 lab (lab 有關聯到專案)
+            if origin_repo:
+                repo_obj = Project.objects.filter(user=request.user, name=origin_repo)
+                # 刪除關聯的 lab
+                repo_obj.get().labs.remove(lab)
+
+            # 檢查需更新的 Project 有無存在
+            new_repo_obj = Project.objects.filter(user=request.user, name=selected_repo)
+            # Project 存在, 加入關聯的 lab
+            if new_repo_obj.count():
+                new_repo_obj.get().labs.add(lab)
+            # Project 不存在, 建立新的 Project, 並加入關聯的 lab
+            else:
+                instance = Project.objects.create(user=request.user, name=selected_repo)
+                instance.labs.add(lab)
+
+            context.update({'project': Project.objects.filter(user=request.user.id, labs=lab.id).get()})
+            messages.success(request, MESSAGE_DICT.get('update_related_project'))
+
         return render(request, 'lab_stu.html', context)
 
     elif Role.TEACHER in get_roles(request.user):

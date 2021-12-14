@@ -46,6 +46,9 @@
                                     <option>目前儲存庫上沒有任何專案，請先建立專案</option>
                                 {% endfor %}
                                 </select>
+                                <label style="display: none;">
+                                    <input name="origin_repo" value="{{ project.name }}">
+                                </label>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
