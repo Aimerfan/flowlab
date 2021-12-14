@@ -4,13 +4,23 @@
     儲存庫列表
 {% endblock %}
 {% block body %}
-    <div class="container_close">
+    <div class="container container_close">
         <div class="content">
-            <h1 style="padding: 20px 0 0 0; text-align: center;">projects</h1>
-            <div class="right_content">
-                <button class="btn btn-primary mx-1" type="button" onclick="location.href='{% url 'repo_new_template' %}'">新增模板專案</button>
-                <button class="btn btn-primary mx-1" type="button" onclick="location.href='{% url 'repo_new_blank' %}'">新增空白專案</button>
+            <h1 style="padding-top: 20px;">projects</h1>
+        </div>
+        <div class="high_content">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-start">
+                    <div class="mx-1">搜尋<img src="{% static 'repo/images/search.png' %}" alt="search" style="height: 25px; padding-left: 5px;"></div>
+                    <div style="border-right: 1px solid navy; padding-left: 5px; margin-right: 5px;"></div>
+                    <div class="mx-1">篩選<img src="{% static 'repo/images/filter.png' %}" alt="filter" style="height: 25px; padding-left: 5px;"></div>
+                </div>
+                <div>
+                    <button class="btn btn-primary mx-1" type="button" onclick="location.href='{% url 'repo_new_template' %}'">新增模板專案</button>
+                    <button class="btn btn-primary mx-1" type="button" onclick="location.href='{% url 'repo_new_blank' %}'">新增空白專案</button>
+                </div>
             </div>
+            
         </div>
         <div class="content projects_content">
             <ul style="padding: 5px;">

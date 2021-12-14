@@ -333,7 +333,6 @@ button {
 
 /* repo_projects 列表 */
 .projects_content {
-    width: 80%;
     text-align: left;
     background-color: whitesmoke;
     border-radius: 10px;
