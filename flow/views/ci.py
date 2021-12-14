@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.contrib import messages
 
-from core.jenkins import JENKINS_
-from core.jenkins.functools import get_job_name
-from core.gitlab.functools import get_repo_verbose
+from core.infra import JENKINS_
+from core.infra.jenkins_func import get_job_name
+from core.infra.gitlab_func import get_repo_verbose
 from core.dicts import MESSAGE_DICT
 from ..forms import TestSelectForm
 from ..utils import update_jenkinsfile, push_jenkinsfile
