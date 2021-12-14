@@ -21,6 +21,5 @@ urlpatterns = [
     path('', include('core.urls')),
     path('accounts/', include('accounts.urls')),
     path('course/', include('course.urls')),
-    path('repo/', include('repo.urls')),
-    path('ci/', include('ci.urls'))
+    path('flow/', include('flow.urls')),
 ]

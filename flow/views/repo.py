@@ -17,7 +17,7 @@ from core.gitlab import GITLAB_, GITLAB_URL
 from core.gitlab.functools import timedelta_str, get_repo_verbose, get_tree
 from core.jenkins import JENKINS_, JENKINS_URL, CONFIG_XML
 from core.jenkins.functools import get_job_name
-from .forms import BlankRepoForm, TemplateRepoForm
+from ..forms import BlankRepoForm, TemplateRepoForm
 
 logger = logging.getLogger(f'flowlab.{__name__}')
 

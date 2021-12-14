@@ -90,7 +90,7 @@
     combinePipeline();
     // jquery ajax
     let code_sector = document.querySelector(".pipeline_content");
-    const pipeparser_url = "/ci/pipeparser/";
+    const pipeparser_url = "/flow/pipeparser/";
     $.ajax({
       type: "POST",
       url: pipeparser_url,

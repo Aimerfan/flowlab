@@ -1,17 +1,12 @@
-import json
-
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 
 from core.jenkins import JENKINS_
 from core.jenkins.functools import get_job_name
 from core.gitlab.functools import get_repo_verbose
 from core.dicts import MESSAGE_DICT
-from .pipeparser import PipeParser
-from .forms import TestSelectForm
-from .utils import update_jenkinsfile, push_jenkinsfile
+from ..forms import TestSelectForm
+from ..utils import update_jenkinsfile, push_jenkinsfile
 
 
 def jenkins_file_view(request, user, project):
@@ -84,15 +79,3 @@ def build_console_view(request, user, project, branch, number):
     build_info = JENKINS_.get_build_console_output(job_name, number).split('\n')
 
     return render(request, 'ci/build_console.html', {'info': project_info, 'build_info': build_info})
-
-
-@csrf_exempt
-def create_jenkinsfile(request):
-    # valid ajax request
-    if not request.is_ajax() or request.method != 'POST':
-        return HttpResponseBadRequest('error request type, must be ajax by POST method.')
-
-    pipe_tree = PipeParser.parse(json.loads(request.body))
-    return HttpResponse(pipe_tree.__str__(), headers={
-        'Content-Type': 'text/plain',
-    })
