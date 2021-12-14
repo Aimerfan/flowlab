@@ -22,6 +22,4 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('course/', include('course.urls')),
     path('flow/', include('flow.urls')),
-    path('repo/', include('repo.urls')),
-    path('ci/', include('ci.urls'))
 ]

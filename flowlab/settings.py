@@ -34,8 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core.apps.CoreConfig',
     'accounts.apps.AccountsConfig',
-    'repo.apps.RepoConfig',
-    'ci.apps.CiConfig',
+    'flow.apps.FlowConfig',
     'course.apps.CourseConfig',
     'behave_django',
 ]
