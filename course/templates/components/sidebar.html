@@ -1,0 +1,20 @@
+{% load static %}
+<button type="button" class="btn" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+    <img src="{% static 'core/images/favicon.ico' %}" alt="sidebar" style="height: 40px;">
+</button>
+
+<div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+    <a href="{% url 'courses' %}">
+        <img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab" style="display:block; margin:9px; height: 50px;">
+    </a>
+    <div class="">
+        {% for c in courses %}
+            <h5><a href="{% url 'course' c.id %}" style="text-decoration: none;">{{ c.name }}</a></h5>
+            {% for l in all_labs %}
+                {% if l.course == c %}
+                <h6 style="padding-left: 20px;"><a href="{% url 'lab' c.id l.id %}">{{ l.name }}</a></h6>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
