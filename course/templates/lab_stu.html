@@ -14,7 +14,11 @@
                     <div class="card">
                         <div class="card-body-close">
                             <p class="card-text text-start" id="id_repo">
-                                <a href="">專案名稱 or 目前無設定關聯專案(filled)</a>
+                                {% if project.name %}
+                                    <a href="{% url 'repo_project' user.username project.name %}">{{ project.name }}</a>
+                                {% else %}
+                                    無
+                                {% endif %}
                             </p>
                         </div>
                     </div>
@@ -36,8 +40,8 @@
                             <div class="modal-body">
                                 <label for="select_repo" style="display:inline;"></label>
                                 <select class="form-select" id="select_repo" name="select_repo">
-                                {% for project in projects %}
-                                    <option>{{ project.name }}</option>
+                                {% for repo in project_list %}
+                                    <option>{{ repo.name }}</option>
                                 {% empty %}
                                     <option>目前儲存庫上沒有任何專案，請先建立專案</option>
                                 {% endfor %}

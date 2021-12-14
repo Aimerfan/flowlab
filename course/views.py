@@ -63,9 +63,20 @@ def lab_view(request, course_id, lab_id):
     form = LabForm(instance=lab)
 
     if Role.STUDENT in get_roles(request.user):
+        # 找出與 lab 關聯的專案
+        project = Project.objects.filter(user=request.user.id, labs=lab.id)
+        if project:
+            project = project.get()
+
+        # 列出有關 user 的所有 gitlab 專案
+        gitlab_user = GITLAB_.users.list(username=request.user.username)[0]
+        project_list = gitlab_user.projects.list()
+
         context = {
             'course_id': course_id,
             'lab': lab,
+            'project': project,
+            'project_list': project_list,
         }
         context.update(get_nav_side_dict(request.user.username, 'student'))
         return render(request, 'lab_stu.html', context)
