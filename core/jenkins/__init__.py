@@ -16,7 +16,8 @@ def load_multibranch_xml():
     載入 {project_root}/ci/static/ci/multibranch_config.xml
     並轉換為 python String
     """
-    xml = ElementTree.parse('ci/static/ci/multibranch_config.xml').getroot()
+    # FIXME: use pkgutils, rather than hard code.
+    xml = ElementTree.parse('flow/static/ci/multibranch_config.xml').getroot()
     xml = ElementTree.tostring(xml).decode()
     xml = xml.replace('set_username', ENVIRON['GITLAB_ROOT_USERNAME'])
     xml = xml.replace('set_password', ENVIRON['GITLAB_ROOT_PASSWORD'])
