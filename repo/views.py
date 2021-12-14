@@ -121,16 +121,12 @@ def repo_blob_view(request, user, project, branch, path):
     else:
         # 先解 base64, 然後要再進行一次 utf-8 decode
         content = file.decode().decode('utf-8')
-
-    # 計算 'Lines Of Code'
-    loc = content.count('\n')
-    if content != '' and content[-1] != '\n':
-        loc += 1
+        content = content.split('\n')
 
     blob.update({
         'name': full_path.name,
-        'loc': loc,
         'content': content,
+        'format': full_path.name.rsplit('.')[-1]
     })
 
     return render(request, 'repo/repo_blob.html', {
