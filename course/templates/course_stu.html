@@ -13,6 +13,8 @@
                     <tr>
                         <th scope="col">是否繳交</th>
                         <th scope="col">實驗名稱</th>
+                        <th scope="col">關聯專案</th>
+                        <th scope="col">繳交分支</th>
                         <th scope="col">繳交期限</th>
                     </tr>
                 </thead>
@@ -21,6 +23,8 @@
                     <tr>
                         <td><input class="form-check-input" type="checkbox" aria-label="" checked></td>
                         <td><a href="{% url 'lab' course.id lab.id %}">{{ lab.name }}</a></td>
+                        <td><a href="">專案名稱(filled)</a></td>
+                        <td>{{ lab.branch }}</td>
                         <td>{% if lab.deadline %}{{ lab.deadline }}{% else %}無{% endif %}</td>
                     </tr>
                 {% endfor %}
