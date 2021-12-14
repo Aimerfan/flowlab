@@ -1,0 +1,53 @@
+<div>
+    <h5 style="font-weight: bold; padding-top: 20px; margin: 0;">該專案的儲存庫目前沒有內容</h5>
+    <h6>你可以藉由 clone 儲存庫開始 或 使用下方選項添加一些文件。</h6>
+</div>
+<div style="padding: 20px; display: flex;">
+    {% include 'repo/btn_clone_repo.html' %}
+    <button style="border-style: dashed; margin-left: 20px;">Add Jenkins File</button>
+</div>
+<hr style="height: 3px; background: #aaaaaa; margin: 0">
+<div>
+    <h5 style="font-weight: bold; padding-top: 20px; margin: 0;">Command line 說明</h5>
+    <h6>你可以使用以下指令，從你的電腦上傳現有的文件。</h6>
+</div>
+<h6 style="font-weight: bold; padding: 10px 0; margin: 0;">Git 全局設置</h6>
+<div class="command_context" style="background-color: #A3C3E0;">
+    <pre><code>
+git config --global user.name "{{ user.username }}"
+git config --global user.email "{{ request.user.email }}"</code>
+    </pre>
+</div>
+<h6 style="font-weight: bold; padding: 10px 0; margin: 0;">建立一個新的儲存庫</h6>
+<div class="command_context" style="background-color: #A3C3E0;">
+    <pre><code>
+git clone {{ gitlab_http_url }}
+cd {{ info.name }}
+git switch -c main
+touch README.md
+git add README.md
+git commit -m "add README"
+git push -u origin main</code>
+    </pre>
+</div>
+<h6 style="font-weight: bold; padding: 10px 0; margin: 0;">Push 一個已存在的資料夾</h6>
+<div class="command_context" style="background-color: #A3C3E0;">
+    <pre><code>
+cd existing_folder
+git init --initial-branch=main
+git remote add origin {{ gitlab_http_url }}
+git add .
+git commit -m "Initial commit"
+git push -u origin main</code>
+    </pre>
+</div>
+<h6 style="font-weight: bold; padding: 10px 0; margin: 0;">Push 一個已存在的 Git 儲存庫</h6>
+<div class="command_context" style="background-color: #A3C3E0;">
+    <pre><code>
+cd existing_repo
+git remote rename origin old-origin
+git remote add origin {{ gitlab_http_url }}
+git push -u origin --all
+git push -u origin --tags</code>
+    </pre>
+</div>
