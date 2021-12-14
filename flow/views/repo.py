@@ -199,8 +199,9 @@ def repo_new_template(request):
         repo_name = form.cleaned_data['name']
 
         # 從 local repo_templates 匯入專案模板
+        parent_package = str(__name__).rsplit('.', 2)[0]
         template_path = f'resources/repo_templates/{selected_template}'
-        template = get_data(__name__, template_path)
+        template = get_data(parent_package, template_path)
         # 匯入到 gitlab
         output = GITLAB_.projects.import_project(
             file=template,
