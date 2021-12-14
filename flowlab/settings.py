@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'flow.apps.FlowConfig',
     'course.apps.CourseConfig',
-    'behave_django',
 ]
 
 MIDDLEWARE = [
