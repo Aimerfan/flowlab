@@ -3,23 +3,28 @@ from django.contrib import messages
 from django.http import JsonResponse
 
 from core.dicts import MESSAGE_DICT
+from core.infra import GITLAB_
 from .forms import LabForm
 from .models import Course, Lab
+from .utils import get_nav_side_dict
+from flow.models import Project
 from accounts.models import Role, Teacher, Student
 from accounts.utils.check_role import get_roles
 
 
 def course_list_view(request):
-    courses = {}
+    context = {}
 
     if Role.STUDENT in get_roles(request.user):
         stu_id = Student.objects.filter(full_name=request.user.username).get().id
-        courses = Course.objects.filter(students=stu_id)
+        context.update({'courses': Course.objects.filter(students=stu_id)})
+        context.update(get_nav_side_dict(request.user.username, 'student'))
     elif Role.TEACHER in get_roles(request.user):
         tch_id = Teacher.objects.filter(full_name=request.user.username).get().id
-        courses = Course.objects.filter(teacher=tch_id)
+        context.update({'courses': Course.objects.filter(teacher=tch_id)})
+        context.update(get_nav_side_dict(request.user.username, 'teacher'))
 
-    return render(request, 'course_list.html', {'courses': courses})
+    return render(request, 'course_list.html', context)
 
 
 def course_view(request, course_id):
@@ -27,12 +32,29 @@ def course_view(request, course_id):
     context = {
         'labs': Lab.objects.filter(course=course_id),
         'course': Course.objects.filter(id=course_id).get(),
+        'project': {},
     }
     context.update({'students': context['course'].students.all()})
 
     if Role.STUDENT in get_roles(request.user):
+
+        for lab in context['labs']:
+            # 找出與 lab 關聯的專案
+            project = Project.objects.filter(user=request.user.id, labs=lab)
+            if project.count() == 1:
+                project_dict = {
+                    lab: project.get().name
+                }
+                context['project'].update(project_dict)
+            else:
+                # FIXME: 理論上不該出現這種情況 (一個 lab 對應到多個 projects)
+                pass
+
+        context.update(get_nav_side_dict(request.user.username, 'student'))
         return render(request, 'course_stu.html', context)
+
     elif Role.TEACHER in get_roles(request.user):
+        context.update(get_nav_side_dict(request.user.username, 'teacher'))
         return render(request, 'course_tch.html', context)
 
 
@@ -41,10 +63,49 @@ def lab_view(request, course_id, lab_id):
     form = LabForm(instance=lab)
 
     if Role.STUDENT in get_roles(request.user):
-        return render(request, 'lab_stu.html', {
+        # 找出與 lab 關聯的專案
+        project = Project.objects.filter(user=request.user.id, labs=lab.id)
+        if project:
+            project = project.get()
+
+        # 列出有關 user 的所有 gitlab 專案
+        gitlab_user = GITLAB_.users.list(username=request.user.username)[0]
+        project_list = gitlab_user.projects.list()
+
+        context = {
             'course_id': course_id,
             'lab': lab,
-        })
+            'project': project,
+            'project_list': project_list,
+        }
+        context.update(get_nav_side_dict(request.user.username, 'student'))
+
+        # 按下更新按鈕, 更新關聯專案
+        if request.method == 'POST':
+            origin_repo = request.POST['origin_repo']
+            selected_repo = request.POST['select_repo']
+
+            # 專案有關聯 lab (lab 有關聯到專案)
+            if origin_repo:
+                repo_obj = Project.objects.filter(user=request.user, name=origin_repo)
+                # 刪除關聯的 lab
+                repo_obj.get().labs.remove(lab)
+
+            # 檢查需更新的 Project 有無存在
+            new_repo_obj = Project.objects.filter(user=request.user, name=selected_repo)
+            # Project 存在, 加入關聯的 lab
+            if new_repo_obj.count():
+                new_repo_obj.get().labs.add(lab)
+            # Project 不存在, 建立新的 Project, 並加入關聯的 lab
+            else:
+                instance = Project.objects.create(user=request.user, name=selected_repo)
+                instance.labs.add(lab)
+
+            context.update({'project': Project.objects.filter(user=request.user.id, labs=lab.id).get()})
+            messages.success(request, MESSAGE_DICT.get('update_related_project'))
+
+        return render(request, 'lab_stu.html', context)
+
     elif Role.TEACHER in get_roles(request.user):
         # 更新 lab 資訊
         if request.method == 'POST':
@@ -58,11 +119,13 @@ def lab_view(request, course_id, lab_id):
             messages.success(request, MESSAGE_DICT.get('delete_lab_success'))
             return JsonResponse({'status': 200})
 
-        return render(request, 'lab_tch.html', {
+        context = {
             'course_id': course_id,
             'lab_id': lab_id,
             'form': form,
-        })
+        }
+        context.update(get_nav_side_dict(request.user.username, 'teacher'))
+        return render(request, 'lab_tch.html', context)
 
 
 def lab_new_view(request, course_id):

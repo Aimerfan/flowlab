@@ -3,9 +3,62 @@
     {{ lab.name }}
 {% endblock %}
 {% block body %}
+    {% include 'components/sidebar.html' %}
     <div class="container container_close">
         <div class="content">
             <h1>{{ lab.name }}</h1>
+
+            <div class="mb-3 row">
+                <label class="col-sm-2 col-form-label text-start">關聯的專案</label>
+                <div class="px-0 col-sm-8">
+                    <div class="card">
+                        <div class="card-body-close">
+                            <p class="card-text text-start" id="id_repo">
+                                {% if project.name %}
+                                    <a href="{% url 'repo_project' user.username project.name %}">{{ project.name }}</a>
+                                {% else %}
+                                    無
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#updateRepo">更新</button>
+                </div>
+            </div>
+            {# 更新 關聯專案 的互動視窗 #}
+            <div class="modal fade" id="updateRepo" tabindex="-1" aria-labelledby="updateRepoLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="delModalLabel">請選擇想要更新的專案</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <label for="select_repo" style="display:inline;"></label>
+                                <select class="form-select" id="select_repo" name="select_repo">
+                                {% for repo in project_list %}
+                                    <option>{{ repo.name }}</option>
+                                {% empty %}
+                                    <option>目前儲存庫上沒有任何專案，請先建立專案</option>
+                                {% endfor %}
+                                </select>
+                                <label style="display: none;">
+                                    <input name="origin_repo" value="{{ project.name }}">
+                                </label>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                <button type="submit" class="btn btn-primary">確定</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <div class="mb-3 row">
                     <label class="form-label text-start">實驗說明</label>
@@ -25,7 +78,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="mb-3 row align-items-center">
                     <label class="col-sm-2 col-form-label text-start">套用模板</label>
                     <div class="px-0 col-sm-8">
                         <div class="card">
@@ -38,7 +91,7 @@
                         <button type="button" class="btn btn-secondary">下載</button>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div class="mb-3 row align-items-center">
                     <label class="col-sm-2 col-form-label text-start">繳交期限</label>
                     <div class="px-0 col-sm-10">
                         <div class="card">

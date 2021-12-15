@@ -4,6 +4,7 @@ MESSAGE_DICT = {
     'create_lab_success': 'Lab 建立成功',
     'update_lab_success': '更新 Lab 資訊成功',
     'delete_lab_success': 'Lab 刪除成功',
+    'update_related_project': '更新 project 成功',
     # warning
     'gitlab_project_not_found': 'Gitlab 找不到專案 {}',
     # error

@@ -584,3 +584,13 @@ span.pipeline_new_node {
 .card-body-close {
     padding: 0.5rem 1rem;
 }
+
+/* course app 側邊欄 */
+.offcanvas-start {
+    width: 250px;
+}
+
+.offcanvas {
+    /*z-index: ;*/
+    background: #e6f1ff;
+}
