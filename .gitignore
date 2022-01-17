@@ -7,6 +7,7 @@ venv/
 /static/
 /media/
 /logs/
+/uploads/
 
 # secret
 local_settings.py

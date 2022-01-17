@@ -1,7 +1,14 @@
+from datetime import date
+
 from django.db import models
 from django.contrib.auth.models import User
 
+from accounts.models import Teacher
 from course.models import Lab
+
+
+def upload_to_path(instance, filename):
+    return f'templates/{instance}'
 
 
 class Project(models.Model):
@@ -18,3 +25,23 @@ class Project(models.Model):
 
     def __str__(self):
         return f'{self.user}/{self.name}'
+
+
+class Template(models.Model):
+    teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        verbose_name='擁有者',
+    )
+    name = models.CharField('模板名稱', max_length=50)
+    template = models.FileField('模板檔案', upload_to=upload_to_path)
+    date = models.DateField('建立日期', default=date.today)
+
+    class Meta:
+        unique_together = ['teacher', 'name']
+        verbose_name = verbose_name_plural = '模板'
+
+    def __str__(self):
+        return f'{self.teacher}/{self.name}'
