@@ -12,6 +12,8 @@ from django.utils import timezone
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_http_methods
 
+from accounts.models import Role
+from accounts.utils.check_role import get_roles
 from core.infra import GITLAB_, GITLAB_URL
 from core.infra.gitlab_func import timedelta_str, get_repo_verbose, get_tree
 from core.infra import JENKINS_, JENKINS_URL
@@ -25,6 +27,11 @@ logger = logging.getLogger(f'flowlab.{__name__}')
 
 def repo_list_view(request, user):
     """檢視儲存庫列表"""
+    # 判斷 user 身分, 只有 teacher 可以匯出模板
+    identity = ''
+    if Role.TEACHER in get_roles(request.user):
+        identity = 'teacher'
+
     try:
         gitlab_user = GITLAB_.users.list(username=user)[0]
     except IndexError:
@@ -55,7 +62,12 @@ def repo_list_view(request, user):
                 'branch_sum': len(branch_list),
             }
 
-    return render(request, 'repo/repo_list.html', {'projects': projects})
+    content = {
+        'identity': identity,
+        'projects': projects,
+    }
+
+    return render(request, 'repo/repo_list.html', content)
 
 
 @require_http_methods(['GET', 'HEAD', 'DELETE'])
@@ -224,3 +236,9 @@ def repo_new_template(request):
         return redirect('repo_project', user=username, project=repo_name)
 
     return render(request, 'repo/repo_new_template.html', {'form': form})
+
+
+def template_list(request):
+    """模板列表"""
+
+    return render(request, 'repo/template_list.html', {})

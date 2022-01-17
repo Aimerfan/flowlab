@@ -19,7 +19,7 @@
                 {% else %}
                     {% for project, info in projects.items %}
                     <li class="d-flex border-bottom">
-                        <div class="col-md-8">
+                        <div class="col-md-6 me-auto">
                             <h6><a href="{% url 'repo_project' user.username project %}">{{ project }}</a></h6>
                         </div>
                         <div class="col-md-2">
@@ -29,9 +29,42 @@
                             <h6>{{ info.branch_sum }} branches</h6>
                             {% endif %}
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <h6>{{ info.last_activity_at }}</h6>
                         </div>
+                        {# 老師才有資格匯出模板 #}
+                        {% if identity == 'teacher' %}
+                            {# more... 下拉式選單 #}
+                            <div class="col-md-1 d-flex align-items-center dropdown">
+                                <button class="btn dropdownMore" type="button" id="dropdownMore" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="{% static 'ci/images/more.png' %}" width="20px" alt="more">
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMore">
+                                    <li class="dropdown-item" data-bs-toggle="modal" data-bs-target="#exportModal">匯出模板</li>
+                                </ul>
+                                {#  匯出模板的互動視窗  #}
+                                <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <form method="post" action="">
+                                                {% csrf_token %}
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exportModalLabel">模板資訊</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    模板名稱:
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                                    <button type="submit" class="btn btn-primary">匯出</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                     </li>
                     {% endfor %}
                 {% endif %}
