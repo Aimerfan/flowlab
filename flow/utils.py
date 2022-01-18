@@ -1,11 +1,14 @@
+import os
 from pkgutil import get_data
 from xml.etree import ElementTree
 from base64 import b64decode
+from time import sleep
 
 from django.views.decorators.csrf import csrf_exempt
 
 from core.infra import ENVIRON
 from core.infra import GITLAB_
+from flowlab.settings import MEDIA_ROOT
 
 
 def load_multibranch_xml():
@@ -82,3 +85,32 @@ def push_jenkinsfile(repo_name, selected_branch, pipe_content):
     # push 更新後的 Jenkinsfile 至 GitLab
     file.content = pipe_content
     file.save(branch=selected_branch, commit_message='改變檢測項目')
+
+
+def export_template(user, project, template_name):
+    """匯出 project 作為模板"""
+    # 建立匯出模板
+    exp_project = GITLAB_.projects.get(f'{user}/{project}')
+    export = exp_project.exports.create()
+
+    # 等待 'finished' 狀態
+    export.refresh()
+    while export.export_status != 'finished':
+        sleep(1)
+        export.refresh()
+
+    # 指定存放路徑, 檢查是否有資料夾
+    template_path = f'{MEDIA_ROOT}/templates/{user}'
+    if not os.path.exists(MEDIA_ROOT):
+        os.mkdir(MEDIA_ROOT)
+    if not os.path.exists(f'{MEDIA_ROOT}/templates'):
+        os.mkdir(f'{MEDIA_ROOT}/templates')
+    if not os.path.exists(template_path):
+        os.mkdir(template_path)
+
+    # 下載結果
+    with open(f'{template_path}/{template_name}.tar.gz', 'wb') as f:
+        export.download(streamed=True, action=f.write)
+
+    # FIX: 路徑可能有些問題
+    return f'{template_path}/{template_name}'

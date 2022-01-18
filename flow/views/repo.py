@@ -12,26 +12,20 @@ from django.utils import timezone
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_http_methods
 
-from accounts.models import Role
-from accounts.utils.check_role import get_roles
 from core.infra import GITLAB_, GITLAB_URL
 from core.infra.gitlab_func import timedelta_str, get_repo_verbose, get_tree
 from core.infra import JENKINS_, JENKINS_URL
 from core.infra.jenkins_func import get_job_name
 from core.dicts import MESSAGE_DICT
-from ..forms import BlankRepoForm, TemplateRepoForm
-from ..utils import CONFIG_XML
+from ..forms import BlankRepoForm, TemplateRepoForm, ExportTemplateForm
+from ..models import Teacher, Template
+from ..utils import CONFIG_XML, export_template
 
 logger = logging.getLogger(f'flowlab.{__name__}')
 
 
 def repo_list_view(request, user):
     """檢視儲存庫列表"""
-    # 判斷 user 身分, 只有 teacher 可以匯出模板
-    identity = ''
-    if Role.TEACHER in get_roles(request.user):
-        identity = 'teacher'
-
     try:
         gitlab_user = GITLAB_.users.list(username=user)[0]
     except IndexError:
@@ -62,8 +56,28 @@ def repo_list_view(request, user):
                 'branch_sum': len(branch_list),
             }
 
+    # 模板 form
+    form = ExportTemplateForm(request.POST or None)
+    # 按下匯出模板按鈕
+    if request.method == 'POST':
+        project_name = request.POST['project']
+        template_name = request.POST['name']
+        teacher = Teacher.objects.get(user=request.user)
+
+        if Template.objects.filter(teacher=teacher, name=template_name):
+            # 模板名稱重複
+            messages.warning(request, MESSAGE_DICT.get('template_name_exist').format(template_name))
+        else:
+            # 匯出模板
+            form.instance.template = export_template(user, project_name, template_name)
+            form.instance.teacher = teacher
+            form.save()
+            messages.success(request, MESSAGE_DICT.get('export_template').format(template_name))
+
+            return redirect('template')
+
     content = {
-        'identity': identity,
+        'form': form,
         'projects': projects,
     }
 
@@ -240,5 +254,30 @@ def repo_new_template(request):
 
 def template_list(request):
     """模板列表"""
+    teacher = Teacher.objects.get(user=request.user)
+    templates = Template.objects.filter(teacher=teacher)
 
-    return render(request, 'repo/template_list.html', {})
+    form = ExportTemplateForm(request.POST or None)
+    if request.method == 'POST' and request.POST['action'] == 'Rename':
+        # 修改模板名稱
+        # TODO: 修改實際檔案名稱
+        origin_name = request.POST['origin_name']
+        new_name = request.POST['name']
+        template = Template.objects.get(teacher=teacher, name=origin_name)
+        template.name = new_name
+        template.save()
+        messages.success(request, MESSAGE_DICT.get('rename_template').format(new_name))
+
+    elif request.method == 'POST' and request.POST['action'] == 'Delete':
+        # 刪除模板
+        # TODO: 刪除實際檔案
+        name = request.POST['name']
+        Template.objects.get(teacher=teacher, name=name).delete()
+        messages.success(request, MESSAGE_DICT.get('delete_template').format(name))
+
+    content = {
+        'templates': templates,
+        'form': form,
+    }
+
+    return render(request, 'repo/template_list.html', content)
