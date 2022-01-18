@@ -52,7 +52,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                                <button type="submit" class="btn btn-primary">確定</button>
+                                <button type="submit" class="btn btn-primary" name="action" value="UpdateRepo">確定</button>
                             </div>
                         </form>
                     </div>
@@ -79,19 +79,6 @@
                     </div>
                 </div>
                 <div class="mb-3 row align-items-center">
-                    <label class="col-sm-2 col-form-label text-start">套用模板</label>
-                    <div class="px-0 col-sm-8">
-                        <div class="card">
-                            <div class="card-body-close">
-                                <p class="card-text text-start" id="id_template">模板名稱</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-2">
-                        <button type="button" class="btn btn-secondary">下載</button>
-                    </div>
-                </div>
-                <div class="mb-3 row align-items-center">
                     <label class="col-sm-2 col-form-label text-start">繳交期限</label>
                     <div class="px-0 col-sm-10">
                         <div class="card">
@@ -101,6 +88,47 @@
                         </div>
                     </div>
                 </div>
+                {% if lab.template %}
+                    <div class="mb-3 row align-items-center">
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#newModal">使用模板建立新專案</button>
+                    </div>
+                    {# 建立 套用模板的專案 的互動視窗 #}
+                    <div class="modal fade" id="newModal" tabindex="-1" aria-labelledby="newModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="newModalLabel">專案資訊</h5>
+                                        <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                    <div class="mb-3 text-start">
+                                        <label class="form-label text-start" for="{{ form.name.id_for_label }}">專案名稱</label>
+                                        {{ form.name }}
+                                    </div>
+                                    <div class="mb-3 text-start">
+                                        <label class="form-label text-start" for="{{ form.description.id_for_label }}">專案敘述 (選填)</label>
+                                        {{ form.description }}
+                                    </div>
+                                    {% for visible in form.visibility %}
+                                    <div class="mb-3 form-check text-start">
+                                        {{ visible.tag }}
+                                        <label class="form-check-label" for="{{ visible.id_for_label }}">
+                                            {{ visible.choice_label.name }}<br>
+                                            <span style="color: #5A5A5A;">{{ visible.choice_label.info }}</span>
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                        <button type="submit" class="btn btn-primary" name="action" value="CreateRepo">建立專案</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

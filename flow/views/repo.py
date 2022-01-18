@@ -97,6 +97,9 @@ def repo_view(request, user, project):
         job_name = get_job_name(user, project)
         if JENKINS_.get_job_name(job_name):
             JENKINS_.delete_job(job_name)
+
+        # 刪除 Project model
+        Project.objects.get(user=request.user, name=project).delete()
         return JsonResponse({'status': 200})
 
     # 判斷如果是空儲存庫，給空的預設值

@@ -112,5 +112,5 @@ def export_template(user, project, template_name):
     with open(f'{template_path}/{template_name}.tar.gz', 'wb') as f:
         export.download(streamed=True, action=f.write)
 
-    # FIX: 路徑可能有些問題
-    return f'{template_path}/{template_name}'
+    # FIXME: 路徑可能有些問題
+    return f'{template_path}/{template_name}.tar.gz'

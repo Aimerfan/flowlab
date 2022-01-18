@@ -8,6 +8,7 @@ MESSAGE_DICT = {
     'export_template': '成功匯出 {} 模板',
     'rename_template': '{} 模板名稱修改成功',
     'delete_template': '{} 模板刪除成功',
+    'create_template_related_project': '成功建立 {} 專案, 且已關聯至 Lab',
     # warning
     'gitlab_project_not_found': 'Gitlab 找不到專案 {}',
     'template_name_exist': '{} 模板已存在, 請修改模板名稱',
