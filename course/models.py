@@ -2,6 +2,7 @@ from django.db import models
 
 from core.models import Semester
 from accounts.models import Teacher, Student
+from flow.models import Project, Template
 
 
 class Course(models.Model):
@@ -36,10 +37,17 @@ class Lab(models.Model):
         on_delete=models.CASCADE,
         verbose_name='關聯課程',
     )
+    project = models.ManyToManyField(Project, blank=True)
+    template = models.ForeignKey(
+        Template,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        verbose_name='套用模板',
+    )
     branch = models.CharField('繳交分支', max_length=72)
     description = models.TextField('實驗描述', blank=True)
     deadline = models.DateTimeField('繳交期限', blank=True, null=True)
-    # template = models.ForeignKey()
 
     class Meta:
         unique_together = ['course', 'name']

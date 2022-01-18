@@ -6,7 +6,7 @@ from .models import Project, Template
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ['user', 'name']
-    filter_horizontal = ('labs',)
+    # filter_horizontal = ('labs',)
     ordering = ['user']
 
 

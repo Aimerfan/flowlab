@@ -13,6 +13,7 @@ from accounts.utils.check_role import get_roles
 
 
 def course_list_view(request):
+    """課程總覽"""
     context = {}
 
     if Role.STUDENT in get_roles(request.user):
@@ -28,7 +29,7 @@ def course_list_view(request):
 
 
 def course_view(request, course_id):
-
+    """課程內容"""
     context = {
         'labs': Lab.objects.filter(course=course_id),
         'course': Course.objects.filter(id=course_id).get(),
@@ -37,18 +38,20 @@ def course_view(request, course_id):
     context.update({'students': context['course'].students.all()})
 
     if Role.STUDENT in get_roles(request.user):
-
         for lab in context['labs']:
             # 找出與 lab 關聯的專案
-            project = Project.objects.filter(user=request.user.id, labs=lab)
-            if project.count() == 1:
+            project = lab.project.filter(user=request.user)
+            # 若找的到, lab 對應到'專案名稱'
+            if project:
                 project_dict = {
                     lab: project.get().name
                 }
-                context['project'].update(project_dict)
+            # 若找不到, lab 對應到'空值', 前端會顯示'無'
             else:
-                # FIXME: 理論上不該出現這種情況 (一個 lab 對應到多個 projects)
-                pass
+                project_dict = {
+                    lab: ''
+                }
+            context['project'].update(project_dict)
 
         context.update(get_nav_side_dict(request.user.username, 'student'))
         return render(request, 'course_stu.html', context)
@@ -59,12 +62,13 @@ def course_view(request, course_id):
 
 
 def lab_view(request, course_id, lab_id):
+    """實驗內容"""
     lab = Lab.objects.filter(id=lab_id).get()
     form = LabForm(instance=lab)
 
     if Role.STUDENT in get_roles(request.user):
         # 找出與 lab 關聯的專案
-        project = Project.objects.filter(user=request.user.id, labs=lab.id)
+        project = lab.project.filter(user=request.user)
         if project:
             project = project.get()
 
@@ -85,23 +89,17 @@ def lab_view(request, course_id, lab_id):
             origin_repo = request.POST['origin_repo']
             selected_repo = request.POST['select_repo']
 
-            # 專案有關聯 lab (lab 有關聯到專案)
+            # lab 有關聯到專案, 需要先刪除關聯的專案, 再建立新的關聯專案
             if origin_repo:
-                repo_obj = Project.objects.filter(user=request.user, name=origin_repo)
-                # 刪除關聯的 lab
-                repo_obj.get().labs.remove(lab)
+                repo_obj = Project.objects.get(user=request.user, name=origin_repo)
+                # 刪除關聯的專案
+                lab.project.remove(repo_obj)
 
-            # 檢查需更新的 Project 有無存在
-            new_repo_obj = Project.objects.filter(user=request.user, name=selected_repo)
-            # Project 存在, 加入關聯的 lab
-            if new_repo_obj.count():
-                new_repo_obj.get().labs.add(lab)
-            # Project 不存在, 建立新的 Project, 並加入關聯的 lab
-            else:
-                instance = Project.objects.create(user=request.user, name=selected_repo)
-                instance.labs.add(lab)
+            # 建立關聯專案
+            new_repo_obj = Project.objects.get(user=request.user, name=selected_repo)
+            lab.project.add(new_repo_obj)
 
-            context.update({'project': Project.objects.filter(user=request.user.id, labs=lab.id).get()})
+            context.update({'project': new_repo_obj})
             messages.success(request, MESSAGE_DICT.get('update_related_project'))
 
         return render(request, 'lab_stu.html', context)
@@ -129,6 +127,7 @@ def lab_view(request, course_id, lab_id):
 
 
 def lab_new_view(request, course_id):
+    """新增實驗 (lab)"""
     form = LabForm(request.POST or None)
 
     if request.method == 'POST' and form.is_valid():
