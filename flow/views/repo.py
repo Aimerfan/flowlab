@@ -1,5 +1,4 @@
 import logging
-from time import sleep
 from datetime import datetime
 from pathlib import PurePosixPath
 from pkgutil import get_data
@@ -12,14 +11,14 @@ from django.utils import timezone
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_http_methods
 
-from core.infra import GITLAB_, GITLAB_URL
+from core.infra import GITLAB_
 from core.infra.gitlab_func import timedelta_str, get_repo_verbose, get_tree
-from core.infra import JENKINS_, JENKINS_URL
+from core.infra import JENKINS_
 from core.infra.jenkins_func import get_job_name
 from core.dicts import MESSAGE_DICT
 from ..forms import BlankRepoForm, TemplateRepoForm, ExportTemplateForm
 from ..models import Teacher, Template
-from ..utils import CONFIG_XML, export_template
+from ..utils import export_template, import_template, create_jenkins_job, create_gitlab_webhook
 
 logger = logging.getLogger(f'flowlab.{__name__}')
 
@@ -189,24 +188,9 @@ def repo_new_blank(request):
             raise Exception('repo create error.')
 
         # 建立 Jenkins Job (Multibranch Pipeline 模板)
-        job_name = get_job_name(username, repo_name)
-        if JENKINS_.job_exists(job_name):
-            raise Exception('job already exists.')
-        gitlab_repo_url = f"{GITLAB_URL}/{username}/{repo_name}"
-        config_xml = CONFIG_XML.replace('set_remote', gitlab_repo_url)
-        JENKINS_.create_job(job_name, config_xml)
-
+        create_jenkins_job(username=username, repo_name=repo_name)
         # 建立 GitLab webhook
-        jenkins_webhook_url = f'{JENKINS_URL}/project/{job_name}'
-        gitlab_webhook = {
-            'url': jenkins_webhook_url,
-            'push_events': 1,
-            'merge_requests_events': 1,
-        }
-        project = GITLAB_.projects.get(user_project.id)
-        if project.hooks.list():
-            raise Exception('webhook in github already exists.')
-        project.hooks.create(gitlab_webhook)
+        create_gitlab_webhook(username=username, repo_name=repo_name, project=user_project)
 
         return redirect('repo_project', user=username, project=repo_name)
 
@@ -231,24 +215,20 @@ def repo_new_template(request):
         parent_package = str(__name__).rsplit('.', 2)[0]
         template_path = f'resources/repo_templates/{selected_template}'
         template = get_data(parent_package, template_path)
-        # 匯入到 gitlab
-        output = GITLAB_.projects.import_project(
-            file=template,
-            path=repo_name,
-            namespace=username,
-            overwrite=False,
-        )
-        project_import = GITLAB_.projects.get(output['id'], lazy=True).imports.get()
-        # 等待直到匯入完成
-        while project_import.import_status != 'finished':
-            sleep(1)
-            project_import.refresh()
 
-        # 匯入後根據表單更新專案設定值
-        created_project = GITLAB_.projects.get(f'{username}/{repo_name}')
-        created_project.description = form.cleaned_data['description']
-        created_project.visibility = form.cleaned_data['visibility']
-        created_project.save()
+        # 將模板匯入專案
+        project = import_template(
+            username=username,
+            repo_name=repo_name,
+            template_file=template,
+            description=form.cleaned_data['description'],
+            visibility=form.cleaned_data['visibility'],
+        )
+
+        # 建立 Jenkins Job (Multibranch Pipeline 模板)
+        create_jenkins_job(username=username, repo_name=repo_name)
+        # 建立 GitLab webhook
+        create_gitlab_webhook(username=username, repo_name=repo_name, project=project)
 
         return redirect('repo_project', user=username, project=repo_name)
 
