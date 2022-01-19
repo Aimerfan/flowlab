@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load utils %}
 {% block title %}
     {{ lab.name }}
 {% endblock %}
@@ -8,6 +9,7 @@
         <div class="content">
             <h1>{{ lab.name }}</h1>
 
+            {% with display='' %}
             <div class="mb-3 row">
                 <label class="col-sm-2 col-form-label text-start">關聯的專案</label>
                 <div class="px-0 col-sm-8">
@@ -16,8 +18,10 @@
                             <p class="card-text text-start" id="id_repo">
                                 {% if project.name %}
                                     <a href="{% url 'repo_project' user.username project.name %}">{{ project.name }}</a>
+                                    {% set_value 'none' as display %}
                                 {% else %}
                                     無
+                                    {% set_value 'block' as display %}
                                 {% endif %}
                             </p>
                         </div>
@@ -40,6 +44,7 @@
                             <div class="modal-body">
                                 <label for="select_repo" style="display:inline;"></label>
                                 <select class="form-select" id="select_repo" name="select_repo">
+                                    <option>無</option>
                                 {% for repo in project_list %}
                                     <option>{{ repo.name }}</option>
                                 {% empty %}
@@ -90,7 +95,8 @@
                 </div>
                 {% if lab.template %}
                     <div class="mb-3 row align-items-center">
-                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#newModal">使用模板建立新專案</button>
+                        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#newModal"
+                                style="display: {{ display }}">使用模板建立新專案</button>
                     </div>
                     {# 建立 套用模板的專案 的互動視窗 #}
                     <div class="modal fade" id="newModal" tabindex="-1" aria-labelledby="newModalLabel" aria-hidden="true">
@@ -130,6 +136,7 @@
                     </div>
                 {% endif %}
             </div>
+            {% endwith %}
         </div>
     </div>
 {% endblock %}

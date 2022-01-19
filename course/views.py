@@ -103,6 +103,10 @@ def lab_view(request, course_id, lab_id):
                 # 刪除關聯的專案
                 lab.project.remove(repo_obj)
 
+            if selected_repo == '無':
+                messages.success(request, MESSAGE_DICT.get('update_related_project'))
+                return redirect('lab', course_id=course_id, lab_id=lab_id)
+
             # 建立關聯專案
             new_repo_obj = Project.objects.get(user=request.user, name=selected_repo)
             lab.project.add(new_repo_obj)
