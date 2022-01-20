@@ -235,6 +235,16 @@ button {
     cursor: pointer;
 }
 
+/*.btn_ci_flow .active {*/
+/*    color: white;*/
+/*    background: #5c6c7e;*/
+/*}*/
+
+button[class*="btn_ci_flow active"] {
+    color: white;
+    background: #5c6c7e;
+}
+
 /* login page */
 .login_title {
     text-align: center;
