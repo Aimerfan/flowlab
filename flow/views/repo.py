@@ -101,6 +101,7 @@ def repo_view(request, user, project):
 
         # 刪除 Project model
         Project.objects.get(user=request.user, name=project).delete()
+        messages.success(request, MESSAGE_DICT.get('delete_project_success').format(project))
         return JsonResponse({'status': 200})
 
     # 判斷如果是空儲存庫，給空的預設值
@@ -193,6 +194,8 @@ def repo_new_blank(request):
         create_jenkins_job(username=username, repo_name=repo_name)
         # 建立 GitLab webhook
         create_gitlab_webhook(username=username, repo_name=repo_name, project=user_project)
+        # 建立 Project model
+        Project.objects.create(user=request.user, name=repo_name)
 
         return redirect('repo_project', user=username, project=repo_name)
 
@@ -231,6 +234,8 @@ def repo_new_template(request):
         create_jenkins_job(username=username, repo_name=repo_name)
         # 建立 GitLab webhook
         create_gitlab_webhook(username=username, repo_name=repo_name, project=project)
+        # 建立 Project model
+        Project.objects.create(user=request.user, name=repo_name)
 
         return redirect('repo_project', user=username, project=repo_name)
 
