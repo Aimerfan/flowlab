@@ -4,6 +4,7 @@ from .views import repo, ci, ajax
 
 urlpatterns = [
     path('pipeparser/', ajax.create_jenkinsfile, name='pipeparser'),
+    path('template/', repo.template_list, name='template'),
     # FIXME: if username is 'new' with a repo name 'blank'
     path('new/blank', repo.repo_new_blank, name='repo_new_blank'),
     path('new/template', repo.repo_new_template, name='repo_new_template'),

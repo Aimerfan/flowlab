@@ -1,4 +1,6 @@
 {% load static %}
+{% load role_tag %}
+{% is_teacher request as is_teacher %}
 <nav class="navbar navbar-expand-lg navbar-light sticky-top">
     <div class="container-fluid">
         <a id="brand" class="navbar-brand" href="{% url 'index' %}">
@@ -16,6 +18,9 @@
                 {% if user.is_authenticated %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'courses' %}">Courses</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'repo_list' user.username %}">Repository</a></li>
+                {% if is_teacher %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'template' %}">Template</a></li>
+                {% endif %}
                 <li class="nav-item"><a class="nav-link" href="{% url 'analysis' %}">Analysis</a></li>
                 {% endif %}
             </ul>

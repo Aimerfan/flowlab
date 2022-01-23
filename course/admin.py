@@ -12,3 +12,4 @@ class CourseAdmin(admin.ModelAdmin):
 @admin.register(Lab)
 class LabAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Lab._meta.fields]
+    filter_horizontal = ('project',)

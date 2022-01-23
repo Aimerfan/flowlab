@@ -1,5 +1,5 @@
+import os
 import logging
-from time import sleep
 from datetime import datetime
 from pathlib import PurePosixPath
 from pkgutil import get_data
@@ -8,17 +8,19 @@ from gitlab.exceptions import GitlabGetError
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.core.files.base import File
 from django.utils import timezone
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_http_methods
 
-from core.infra import GITLAB_, GITLAB_URL
+from core.infra import GITLAB_
 from core.infra.gitlab_func import timedelta_str, get_repo_verbose, get_tree
-from core.infra import JENKINS_, JENKINS_URL
+from core.infra import JENKINS_
 from core.infra.jenkins_func import get_job_name
 from core.dicts import MESSAGE_DICT
-from ..forms import BlankRepoForm, TemplateRepoForm
-from ..utils import CONFIG_XML
+from ..forms import BlankRepoForm, TemplateRepoForm, ExportTemplateForm
+from ..models import Teacher, Template, Project
+from ..utils import export_template, import_template, create_jenkins_job, create_gitlab_webhook
 
 logger = logging.getLogger(f'flowlab.{__name__}')
 
@@ -55,7 +57,32 @@ def repo_list_view(request, user):
                 'branch_sum': len(branch_list),
             }
 
-    return render(request, 'repo/repo_list.html', {'projects': projects})
+    # 模板 form
+    form = ExportTemplateForm(request.POST or None)
+    # 按下匯出模板按鈕
+    if request.method == 'POST':
+        project_name = request.POST['project']
+        template_name = request.POST['name']
+        teacher = Teacher.objects.get(user=request.user)
+
+        if Template.objects.filter(teacher=teacher, name=template_name):
+            # 模板名稱重複
+            messages.warning(request, MESSAGE_DICT.get('template_name_exist').format(template_name))
+        else:
+            # 匯出模板
+            form.instance.template = export_template(user, project_name, template_name)
+            form.instance.teacher = teacher
+            form.save()
+            messages.success(request, MESSAGE_DICT.get('export_template').format(template_name))
+
+            return redirect('template')
+
+    content = {
+        'form': form,
+        'projects': projects,
+    }
+
+    return render(request, 'repo/repo_list.html', content)
 
 
 @require_http_methods(['GET', 'HEAD', 'DELETE'])
@@ -71,6 +98,9 @@ def repo_view(request, user, project):
         job_name = get_job_name(user, project)
         if JENKINS_.get_job_name(job_name):
             JENKINS_.delete_job(job_name)
+
+        # 刪除 Project model
+        Project.objects.get(user=request.user, name=project).delete()
         return JsonResponse({'status': 200})
 
     # 判斷如果是空儲存庫，給空的預設值
@@ -160,24 +190,9 @@ def repo_new_blank(request):
             raise Exception('repo create error.')
 
         # 建立 Jenkins Job (Multibranch Pipeline 模板)
-        job_name = get_job_name(username, repo_name)
-        if JENKINS_.job_exists(job_name):
-            raise Exception('job already exists.')
-        gitlab_repo_url = f"{GITLAB_URL}/{username}/{repo_name}"
-        config_xml = CONFIG_XML.replace('set_remote', gitlab_repo_url)
-        JENKINS_.create_job(job_name, config_xml)
-
+        create_jenkins_job(username=username, repo_name=repo_name)
         # 建立 GitLab webhook
-        jenkins_webhook_url = f'{JENKINS_URL}/project/{job_name}'
-        gitlab_webhook = {
-            'url': jenkins_webhook_url,
-            'push_events': 1,
-            'merge_requests_events': 1,
-        }
-        project = GITLAB_.projects.get(user_project.id)
-        if project.hooks.list():
-            raise Exception('webhook in github already exists.')
-        project.hooks.create(gitlab_webhook)
+        create_gitlab_webhook(username=username, repo_name=repo_name, project=user_project)
 
         return redirect('repo_project', user=username, project=repo_name)
 
@@ -202,25 +217,61 @@ def repo_new_template(request):
         parent_package = str(__name__).rsplit('.', 2)[0]
         template_path = f'resources/repo_templates/{selected_template}'
         template = get_data(parent_package, template_path)
-        # 匯入到 gitlab
-        output = GITLAB_.projects.import_project(
-            file=template,
-            path=repo_name,
-            namespace=username,
-            overwrite=False,
-        )
-        project_import = GITLAB_.projects.get(output['id'], lazy=True).imports.get()
-        # 等待直到匯入完成
-        while project_import.import_status != 'finished':
-            sleep(1)
-            project_import.refresh()
 
-        # 匯入後根據表單更新專案設定值
-        created_project = GITLAB_.projects.get(f'{username}/{repo_name}')
-        created_project.description = form.cleaned_data['description']
-        created_project.visibility = form.cleaned_data['visibility']
-        created_project.save()
+        # 將模板匯入專案
+        project = import_template(
+            username=username,
+            repo_name=repo_name,
+            template_file=template,
+            description=form.cleaned_data['description'],
+            visibility=form.cleaned_data['visibility'],
+        )
+
+        # 建立 Jenkins Job (Multibranch Pipeline 模板)
+        create_jenkins_job(username=username, repo_name=repo_name)
+        # 建立 GitLab webhook
+        create_gitlab_webhook(username=username, repo_name=repo_name, project=project)
 
         return redirect('repo_project', user=username, project=repo_name)
 
     return render(request, 'repo/repo_new_template.html', {'form': form})
+
+
+def template_list(request):
+    """模板列表"""
+    teacher = Teacher.objects.get(user=request.user)
+    templates = Template.objects.filter(teacher=teacher)
+
+    form = ExportTemplateForm(request.POST or None)
+    if request.method == 'POST' and request.POST['action'] == 'Rename':
+        origin_name = request.POST['origin_name']
+        new_name = request.POST['name']
+        # 修改模板名稱與實際檔案名稱
+        template = Template.objects.get(teacher=teacher, name=origin_name)
+        origin_path = template.template.path
+        new_path = origin_path.replace(origin_name, new_name)
+        os.rename(origin_path, new_path)
+        template.name = new_name
+        template.template = new_path
+        template.save()
+
+        messages.success(request, MESSAGE_DICT.get('rename_template').format(new_name))
+        return redirect('template')
+
+    elif request.method == 'POST' and request.POST['action'] == 'Delete':
+        name = request.POST['name']
+        # 刪除模板 model 與實際檔案
+        template = Template.objects.get(teacher=teacher, name=name)
+        file_path = template.template.path
+        os.remove(file_path)
+        template.delete()
+
+        messages.success(request, MESSAGE_DICT.get('delete_template').format(name))
+        return redirect('template')
+
+    content = {
+        'templates': templates,
+        'form': form,
+    }
+
+    return render(request, 'repo/template_list.html', content)

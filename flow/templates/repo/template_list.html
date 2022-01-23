@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load enumerate %}
+{% block title %}
+    模板列表
+{% endblock %}
+{% block body %}
+    <div class="container_close">
+        <div class="content">
+            <h1 style="padding: 20px 0 0 0; text-align: center;">模板</h1>
+        </div>
+        <div class="content projects_content">
+            <ul style="padding: 5px;">
+                <li class="d-flex border-bottom">
+                    <div class="col-md-1 text-center">
+                        <h6 class="fw-bold">編號</h6>
+                    </div>
+                    <div class="col-md-7">
+                        <h6 class="fw-bold">名稱</h6>
+                    </div>
+                    <div class="col-md-2">
+                        <h6 class="fw-bold">建立日期</h6>
+                    </div>
+                    <div class="col-md-2">
+                        <h6 class="fw-bold">操作</h6>
+                    </div>
+                </li>
+                {% for index, template in templates|enumerate %}
+                    <li class="d-flex">
+                        <div class="col-md-1 text-center">
+                            <h6>{{ index }}</h6>
+                        </div>
+                        <div class="col-md-7">
+                            <h6>{{ template.name }}</h6>
+                        </div>
+                        <div class="col-md-2">
+                            <h6>{{ template.date }}</h6>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn" data-bs-toggle="modal" data-bs-target="#rename_{{ template.name }}">修改</button>
+                            <button class="btn" data-bs-toggle="modal" data-bs-target="#del_{{ template.name }}">刪除</button>
+                            {#  修改模板名稱的互動視窗  #}
+                            <div class="modal fade" id="rename_{{ template.name }}" tabindex="-1" aria-labelledby="renameTemplateLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <form method="post" action="">
+                                            {% csrf_token %}
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="renameTemplateLabel">模板資訊</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                {{ form }}
+                                                <label style="display: none;">
+                                                    <input id="origin_name" name="origin_name" value="{{ template.name }}">
+                                                </label>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                                <button type="submit" class="btn btn-primary" name="action" value="Rename">修改</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {# 刪除模板的互動視窗 #}
+                            <div class="modal fade" id="del_{{ template.name }}" tabindex="-1" aria-labelledby="delTemplateLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <form method="post" action="">
+                                            {% csrf_token %}
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="delTemplateLabel">你確定要刪除模板嗎?</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h6>此動作無法撤銷，將永久刪除 <span style="color: #0060C1">{{ template.name }}</span> 模板。</h6>
+                                                <label style="display: none;">
+                                                    <input id="name" name="name" value="{{ template.name }}">
+                                                </label>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                                <button type="submit" class="btn btn-primary" name="action" value="Delete">確定刪除</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

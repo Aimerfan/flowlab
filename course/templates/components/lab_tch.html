@@ -19,7 +19,7 @@
     <div class="mb-3 row">
         <label class="col-sm-2 col-form-label text-start" for="{{ form.template.id_for_label }}">套用模板</label>
         <div class="px-0 col-sm-10">
-            <select class="form-select" id="{{ form.template.id_for_label }}" name="{{ form.template.html_name }} required">
+            <select class="form-select" id="{{ form.template.id_for_label }}" name="{{ form.template.html_name }}">
                 {% for template in form.template %}
                     {{ template.tag }}
                 {% endfor %}

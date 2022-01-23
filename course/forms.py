@@ -8,13 +8,8 @@ class LabForm(forms.ModelForm):
     deadline = forms.SplitDateTimeField(
         widget=forms.SplitDateTimeWidget(attrs={
             'class': 'd-flex justify-content-start',
+            # FIXME: 繳交期限無法'選填'
         }),
-    )
-    template = forms.ChoiceField(
-        initial='none',
-        choices=[('none', '無')],
-        # TODO: 暫時設定為非必填, 否則無法通過表單驗證
-        required=False,
     )
 
     class Meta:
@@ -35,5 +30,7 @@ class LabForm(forms.ModelForm):
                 'class': 'form-control',
                 'strip': True,
             }),
-            # 'template': forms.Select(),
+            'template': forms.Select(attrs={
+                'required': False,
+            }),
         }

@@ -1,6 +1,7 @@
 from django import forms
 
 from .dicts import REPO_TEMPLATES_SRC
+from .models import Template
 
 
 class BaseRepoForm(forms.Form):
@@ -47,6 +48,18 @@ class TemplateRepoForm(BaseRepoForm):
         initial='',
         choices=[('', '(選擇一個模板)')] + REPO_TEMPLATES_SRC['local']['templates'],
     )
+
+
+class ExportTemplateForm(forms.ModelForm):
+
+    class Meta:
+        model = Template
+        fields = ['name']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+            }),
+        }
 
 
 class TestSelectForm(forms.Form):
