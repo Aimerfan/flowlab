@@ -35,6 +35,11 @@
             {% include 'components/lab_tch.html' %}
         </div>
     </div>
+    <div class="container container_close">
+        <div class="content">
+            <a href="{% url 'lab_submit' course_id lab_id %}"><button class="btn btn-secondary">查看學生繳交情況</button></a>
+        </div>
+    </div>
 
     {# import jQuery #}
     <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
