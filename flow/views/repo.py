@@ -1,3 +1,4 @@
+import os
 import logging
 from datetime import datetime
 from pathlib import PurePosixPath
@@ -7,6 +8,7 @@ from gitlab.exceptions import GitlabGetError
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.core.files.base import File
 from django.utils import timezone
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_http_methods
@@ -17,7 +19,7 @@ from core.infra import JENKINS_
 from core.infra.jenkins_func import get_job_name
 from core.dicts import MESSAGE_DICT
 from ..forms import BlankRepoForm, TemplateRepoForm, ExportTemplateForm
-from ..models import Teacher, Template
+from ..models import Teacher, Template, Project
 from ..utils import export_template, import_template, create_jenkins_job, create_gitlab_webhook
 
 logger = logging.getLogger(f'flowlab.{__name__}')
@@ -242,21 +244,30 @@ def template_list(request):
 
     form = ExportTemplateForm(request.POST or None)
     if request.method == 'POST' and request.POST['action'] == 'Rename':
-        # 修改模板名稱
-        # TODO: 修改實際檔案名稱
         origin_name = request.POST['origin_name']
         new_name = request.POST['name']
+        # 修改模板名稱與實際檔案名稱
         template = Template.objects.get(teacher=teacher, name=origin_name)
+        origin_path = template.template.path
+        new_path = origin_path.replace(origin_name, new_name)
+        os.rename(origin_path, new_path)
         template.name = new_name
+        template.template = new_path
         template.save()
+
         messages.success(request, MESSAGE_DICT.get('rename_template').format(new_name))
+        return redirect('template')
 
     elif request.method == 'POST' and request.POST['action'] == 'Delete':
-        # 刪除模板
-        # TODO: 刪除實際檔案
         name = request.POST['name']
-        Template.objects.get(teacher=teacher, name=name).delete()
+        # 刪除模板 model 與實際檔案
+        template = Template.objects.get(teacher=teacher, name=name)
+        file_path = template.template.path
+        os.remove(file_path)
+        template.delete()
+
         messages.success(request, MESSAGE_DICT.get('delete_template').format(name))
+        return redirect('template')
 
     content = {
         'templates': templates,
