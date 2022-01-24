@@ -8,7 +8,6 @@ from gitlab.exceptions import GitlabGetError
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.core.files.base import File
 from django.utils import timezone
 from django.http import JsonResponse, Http404
 from django.views.decorators.http import require_http_methods

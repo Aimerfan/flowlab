@@ -23,7 +23,7 @@
                     <td>{{ stu.stu_name }}</td>
                     <td>
                         {% if stu.repo_name %}
-                            {{ stu.repo_name }}
+                            <a href="{% url 'stu_tree_root' course_id lab_id stu_username stu.repo_name %}">{{ stu.repo_name }}</a>
                         {% else %}
                             <span style="color: #ed1e45; font-weight: bold;">尚未建立專案</span>
                         {% endif %}
