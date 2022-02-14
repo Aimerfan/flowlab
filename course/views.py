@@ -28,13 +28,13 @@ def course_list_view(request):
     context = {}
 
     if Role.STUDENT in get_roles(request.user):
-        stu_id = Student.objects.filter(full_name=request.user.username).get().id
+        stu_id = Student.objects.filter(user=request.user).get().id
         context.update({'courses': Course.objects.filter(students=stu_id)})
-        context.update(get_nav_side_dict(request.user.username, 'student'))
+        context.update(get_nav_side_dict(request.user, 'student'))
     elif Role.TEACHER in get_roles(request.user):
-        tch_id = Teacher.objects.filter(full_name=request.user.username).get().id
+        tch_id = Teacher.objects.filter(user=request.user).get().id
         context.update({'courses': Course.objects.filter(teacher=tch_id)})
-        context.update(get_nav_side_dict(request.user.username, 'teacher'))
+        context.update(get_nav_side_dict(request.user, 'teacher'))
 
     return render(request, 'course_list.html', context)
 
@@ -66,7 +66,7 @@ def course_view(request, course_id):
                 }
             context['project'].update(project_dict)
 
-        context.update(get_nav_side_dict(request.user.username, 'student'))
+        context.update(get_nav_side_dict(request.user, 'student'))
         return render(request, 'course_stu.html', context)
 
     elif Role.TEACHER in get_roles(request.user):
@@ -119,7 +119,7 @@ def course_view(request, course_id):
                 lab.name: counts,
             })
 
-        context.update(get_nav_side_dict(request.user.username, 'teacher'))
+        context.update(get_nav_side_dict(request.user, 'teacher'))
         return render(request, 'course_tch.html', context)
 
 
@@ -147,7 +147,7 @@ def lab_view(request, course_id, lab_id):
             'project_list': project_list,
             'form': repo_form,
         }
-        context.update(get_nav_side_dict(request.user.username, 'student'))
+        context.update(get_nav_side_dict(request.user, 'student'))
 
         # 按下更新按鈕, 更新關聯專案
         if request.method == 'POST' and request.POST['action'] == 'UpdateRepo':
@@ -233,7 +233,7 @@ def lab_view(request, course_id, lab_id):
             'lab_id': lab_id,
             'form': form,
         }
-        context.update(get_nav_side_dict(request.user.username, 'teacher'))
+        context.update(get_nav_side_dict(request.user, 'teacher'))
         return render(request, 'lab_tch.html', context)
 
 
