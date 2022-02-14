@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}
     {{ course.name }}
 {% endblock %}
@@ -42,7 +43,39 @@
         </div>
         <hr>
         <div class="content">
-            <h2>Students</h2>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-8"><h2>Students</h2></div>
+                <div class="col-sm-2">
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#importModal">匯入學生資料</button>
+                </div>
+                {#  匯入學生的互動視窗  #}
+                <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form method="post" action="">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="importModalLabel">匯入學生資料</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <pre>
+檔案格式：.csv 檔案
+資料格式：每位學生一列
+由左至右欄位內容：帳號、密碼、學生名稱、email
+                                    </pre>
+                                    <input type="file" name="file" id="file_upload">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-primary" id="fileUpload">匯入</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <table class="table table-light table-hover">
                 <thead class="table-secondary">
                     <tr>
@@ -59,4 +92,32 @@
             </table>
         </div>
     </div>
+
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script>
+    {
+        let uploadBtn = $('#fileUpload');
+        {# 確認上傳檔案的行為 #}
+        uploadBtn.click(function () {
+            uploadBtn.attr('disabled', true);
+            let form_data = new FormData();
+            let file_info = $('#file_upload')[0].files[0];
+            form_data.append('file', file_info);
+            $.ajax({
+                type: 'POST',
+                url: window.location.href,
+                data: form_data,
+                processData: false,
+                contentType: false,
+                {# 補上 csrf token #}
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+            })
+                .done(function (response) {
+                    window.location.href = "{% url 'course' course_id %}";
+                })
+        });
+    }
+    </script>
 {% endblock %}
