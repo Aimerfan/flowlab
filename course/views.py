@@ -70,8 +70,36 @@ def course_view(request, course_id):
         return render(request, 'course_stu.html', context)
 
     elif Role.TEACHER in get_roles(request.user):
+        # 新增單筆學生資料
+        if request.method == 'POST' and request.POST['action'] == 'create':
+            username = request.POST['username']
+            password = request.POST['password']
+            name = request.POST['name']
+            email = request.POST['email']
+
+            # 建立使用者帳號
+            if User.objects.filter(username=username):
+                user = User.objects.get(username=username)
+            else:
+                user = User.objects.create_user(username=username, password=password, email=email)
+                user.save()
+                # 建立 GitLab 帳號
+                gl_user = GITLAB_.users.create({'username': username, 'password': password,
+                                                'name': name, 'email': email})
+                gl_user.save()
+            # 建立學生身份 並設定名稱
+            if Student.objects.filter(user=user):
+                student = Student.objects.get(user=user)
+            else:
+                student = Student.objects.create(user=user, full_name=name)
+                student.save()
+            # 將學生加入課程
+            course = Course.objects.get(id=course_id)
+            course.students.add(student)
+            course.save()
+
         # 批量匯入學生資料
-        if request.method == 'POST':
+        elif request.method == 'POST' and request.POST['action'] == 'import':
             file_obj = request.FILES.get('file')
             file_path = os.path.join(MEDIA_ROOT, file_obj.name)
             # 將上傳的檔案 存到指定路徑下
