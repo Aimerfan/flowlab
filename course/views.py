@@ -15,7 +15,7 @@ from core.dicts import MESSAGE_DICT
 from core.infra import GITLAB_
 from core.infra.gitlab_func import get_repo_verbose, get_tree
 from .forms import LabForm
-from .models import Course, Lab
+from .models import Course, Lab, Question, Option, Answer
 from .utils import get_nav_side_dict, check_stu_lab_status
 from flow.models import Project
 from flow.forms import TemplateRepoForm
@@ -379,3 +379,47 @@ def stu_blob_view(request, course_id, lab_id, student, project, path):
         'branch': branch,
         'blob': blob,
     })
+
+
+@check_role([Role.TEACHER])
+def lab_question_view(request, course_id, lab_id):
+    course = Course.objects.filter(id=course_id).get()
+    lab = Lab.objects.filter(id=lab_id).get()
+    questions = Question.objects.filter(lab=lab)
+
+    # 新增 問答題(純文字回答)
+    if request.method == 'POST' and request.POST['action'] == 'newWordQuestion':
+        number = Question.objects.filter(lab=lab).last().number
+        Question.objects.update_or_create(type='text', content=request.POST['content'], lab=lab, number=number + 1)
+    # 新增 單選題
+    elif request.method == 'POST' and request.POST['action'] == 'newSingleQuestion':
+        number = Question.objects.filter(lab=lab).last().number
+        Question.objects.update_or_create(type='single', content=request.POST['content'], lab=lab, number=number + 1)
+    # 新增 多選題
+    elif request.method == 'POST' and request.POST['action'] == 'newMultiQuestion':
+        number = Question.objects.filter(lab=lab).last().number
+        Question.objects.update_or_create(type='multiple', content=request.POST['content'], lab=lab, number=number + 1)
+    # 刪除
+    elif request.method == 'POST' and request.POST['action'] == 'delQuestion':
+        Question.objects.get(id=request.POST['id']).delete()
+        # 刪除 問答題(純文字回答)
+        if request.POST['type'] == 'text':
+            pass
+        # 刪除 單選題
+        elif request.POST['type'] == 'single':
+            pass
+        # 刪除 多選題
+        elif request.POST['type'] == 'multiple':
+            pass
+    # 更新
+    # elif request.method == 'POST' and request.POST['action'] == 'updateQuestion':
+    #     question = Question.objects.get(id=request.POST['id'])
+    #     question.content = request.POST['content']
+    #     question.save()
+
+    content = {
+        'course': course,
+        'lab': lab,
+        'questions': questions,
+    }
+    return render(request, 'question_tch.html', content)
