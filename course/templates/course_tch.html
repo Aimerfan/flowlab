@@ -117,12 +117,40 @@
                 <thead class="table-secondary">
                     <tr>
                         <th>名稱</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for stu in students %}
                     <tr>
-                        <td>{{ stu }}</td>
+                        <td class="align-middle">{{ stu }}</td>
+                        <td><button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#remove_{{ stu }}">移除</button></td>
+                        {#  刪除單筆學生的互動視窗  #}
+                        <div class="modal fade" id="remove_{{ stu }}" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="removeModalLabel">從課程中移除該學生</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="my-3">
+                                                <h6>你確定要從課程中移除該學生嗎?</h6>
+                                                <h6>請輸入學生名稱 <span style="background: #B2B7BC">{{ stu }}</span> 並再次確認</h6>
+                                                <input class="form-control" type="text" name="name" id="name" required>
+                                                <label style="display: none;"><input name="username" value="{{ stu.user }}"></label>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                            <button type="submit" class="btn btn-primary" name="action" value="remove">確認移除</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </tr>
                 {% endfor %}
                 </tbody>

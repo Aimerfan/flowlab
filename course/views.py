@@ -138,6 +138,16 @@ def course_view(request, course_id):
 
             return HttpResponse('OK')
 
+        # 將學生從課程中移除 (不會刪除 gitlab 帳號)
+        elif request.method == 'POST' and request.POST['action'] == 'remove':
+            # 將學生從課程中移除
+            user = User.objects.get(username=request.POST['username'])
+            student = Student.objects.get(user=user)
+            course = Course.objects.get(id=course_id)
+            course.students.remove(student)
+            course.save()
+            messages.success(request, MESSAGE_DICT.get('remove_stu_in_course_success').format(request.POST['name']))
+
         for lab in context['labs']:
             students_obj = context['course'].students.all()
             submit_br = lab.branch
