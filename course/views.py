@@ -95,8 +95,12 @@ def course_view(request, course_id):
                 student.save()
             # 將學生加入課程
             course = Course.objects.get(id=course_id)
-            course.students.add(student)
-            course.save()
+            if course.students.filter(user=user):
+                messages.warning(request, MESSAGE_DICT.get('stu_is_in_course').format(name))
+            else:
+                course.students.add(student)
+                course.save()
+                messages.success(request, MESSAGE_DICT.get('create_stu_in_course_success').format(name))
 
         # 批量匯入學生資料
         elif request.method == 'POST' and request.POST['action'] == 'import':
@@ -130,6 +134,7 @@ def course_view(request, course_id):
                     course = Course.objects.get(id=course_id)
                     course.students.add(student)
                     course.save()
+                messages.success(request, MESSAGE_DICT.get('import_stu_in_course_success'))
 
             return HttpResponse('OK')
 
