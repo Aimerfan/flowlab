@@ -55,3 +55,65 @@ class Lab(models.Model):
 
     def __str__(self):
         return f'{self.course.name}/{self.name}'
+
+
+class Question(models.Model):
+    QUESTION_TYPES = (
+        ('text', '問答題'),
+        ('single', '單選題'),
+        ('multiple', '多選題'),
+    )
+
+    type = models.CharField('題目類型', max_length=50, choices=QUESTION_TYPES)
+    content = models.CharField('題目內容', max_length=256)
+    lab = models.ForeignKey(
+        Lab,
+        on_delete=models.CASCADE,
+        verbose_name='實驗',
+    )
+    number = models.DecimalField('編號', decimal_places=0, max_digits=3)
+
+    class Meta:
+        unique_together = ['lab', 'id']
+        verbose_name = verbose_name_plural = '題目'
+
+    def __str__(self):
+        return f'{self.content}'
+
+
+class Option(models.Model):
+    content = models.CharField('選項內容', max_length=256)
+    topic = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        verbose_name='題目',
+    )
+    number = models.DecimalField('編號', decimal_places=0, max_digits=2)
+
+    class Meta:
+        unique_together = ['topic', 'number']
+        verbose_name = verbose_name_plural = '選項'
+
+    def __str__(self):
+        return f'{self.content}'
+
+
+class Answer(models.Model):
+    content = models.CharField('答案', max_length=256)
+    topic = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        verbose_name='題目',
+    )
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        verbose_name='學生',
+    )
+
+    class Meta:
+        unique_together = ['content']
+        verbose_name = verbose_name_plural = '答案'
+
+    def __str__(self):
+        return f'{self.content}'
