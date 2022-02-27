@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 
 from accounts.models import Teacher, Student
 from core.infra import GITLAB_
-from .models import Course, Lab, Question, Option
+from .models import Course, Lab, Question, Option, Answer
 
 
 def get_nav_side_dict(user, identity):
@@ -54,6 +54,33 @@ def check_stu_lab_status(lab, students_obj, submit_br):
             'stu_name': stu_name,
             'repo_name': stu_repo_name,
             'is_submit': is_submit,
+        }
+    return students
+
+
+def check_stu_evaluation_status(lab, students_obj):
+    """
+    檢查學生 評量 填寫狀態
+    """
+    students = {}
+    for student in students_obj:
+        stu_username = student.user.username
+
+        is_finish = False
+        question_exist = Question.objects.filter(lab=lab)
+        print(question_exist)
+        if question_exist:
+            # questions = question_exist.get()
+            # print(questions)
+            for question in question_exist:
+                answer = Answer.objects.filter(student=student, topic=question)
+                if answer:
+                    is_finish = True
+                    break
+
+        students[stu_username] = {
+            'full_name': student,
+            'is_finish': is_finish,
         }
     return students
 

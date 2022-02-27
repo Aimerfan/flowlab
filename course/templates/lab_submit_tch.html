@@ -40,5 +40,34 @@
             </tbody>
         </table>
     </div>
+    <div class="container container_close">
+        <div class="content">
+            <h2>Students' 形成性評量</h2>
+            <table class="table table-light table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">姓名</th>
+                        <th scope="col">是否完成評量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for stu_username, stu in students_eva.items %}
+                    <tr>
+                        <td>{{ stu_username }}</td>
+                        <td>{{ stu.full_name }}</td>
+                        <td>
+                            {% if stu.is_finish %}
+                                <a href="{% url 'lab_eva_submit' course_id lab_id stu_username %}" target="_blank">是</a>
+                            {% else %}
+                                <span style="color: #ed1e45; font-weight: bold;">否</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -6,6 +6,7 @@ from .views import \
     lab_new_view, \
     lab_view, \
     lab_evaluation_view, \
+    lab_evaluation_submit_view, \
     lab_submit_view, \
     stu_tree_view, \
     stu_blob_view
@@ -16,6 +17,8 @@ urlpatterns = [
     path('<int:course_id>/lab/new', lab_new_view, name='lab_new'),
     path('<int:course_id>/lab/<int:lab_id>', lab_view, name='lab'),
     path('<int:course_id>/lab/<int:lab_id>/evaluation', lab_evaluation_view, name='lab_evaluation'),
+    path('<int:course_id>/lab/<int:lab_id>/evaluation/<str:student>', lab_evaluation_submit_view,
+         name='lab_eva_submit'),
     path('<int:course_id>/lab/<int:lab_id>/submit', lab_submit_view, name='lab_submit'),
     path('<int:course_id>/lab/<int:lab_id>/submit/<str:student>/<str:project>/-/tree/', stu_tree_view,
          name='stu_tree_root'),
