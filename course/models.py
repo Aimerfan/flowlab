@@ -61,10 +61,9 @@ class Question(models.Model):
     QUESTION_TYPES = (
         ('text', '問答題'),
         ('single', '單選題'),
-        ('multiple', '多選題'),
     )
 
-    type = models.CharField('題目類型', max_length=50, choices=QUESTION_TYPES)
+    type = models.CharField('題目類型', max_length=25, choices=QUESTION_TYPES)
     content = models.CharField('題目內容', max_length=256)
     lab = models.ForeignKey(
         Lab,
@@ -112,7 +111,7 @@ class Answer(models.Model):
     )
 
     class Meta:
-        unique_together = ['content']
+        unique_together = ['student', 'topic']
         verbose_name = verbose_name_plural = '答案'
 
     def __str__(self):
