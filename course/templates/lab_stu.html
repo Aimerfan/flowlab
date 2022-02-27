@@ -139,4 +139,11 @@
             {% endwith %}
         </div>
     </div>
+
+    <div class="container container_close">
+        <div class="content">
+            <a href="{% url 'lab_evaluation' course_id lab.id %}"><button class="btn btn-success">填寫形成性評量</button></a>
+        </div>
+    </div>
+</div>
 {% endblock %}

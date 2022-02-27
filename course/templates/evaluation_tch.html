@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load parser %}
+{% block title %}
+    形成性評量
+{% endblock %}
+{% block body %}
+    {% include 'components/sidebar.html' %}
+    <div class="container container_close">
+        <div class="content">
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-8"><h2>{{ course.name }} - {{ lab.name }}</h2><br><h1>形成性評量</h1></div>
+                <div class="col-sm-2"></div>
+            </div>
+            <div class="d-flex justify-content-center mt-3">
+                <button class="btn btn-secondary mx-3" data-bs-toggle="modal" data-bs-target="#question">新增問題</button>
+                {# 新增問題 #}
+                <div class="modal fade" id="question" tabindex="-1" aria-labelledby="questionLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id=questionLabel">新增問題</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-floating">
+                                        <textarea class="form-control" placeholder="請輸入題目...." id="question" name="content" style="height: 160px"></textarea>
+                                        <label for="question">題目</label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="submit" class="btn btn-primary" name="action" value="newQuestion">新增</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-outline-dark mx-3" data-bs-toggle="modal" data-bs-target="#syntax">撰寫語法</button>
+                {# 撰寫問題的語法 #}
+                <div class="modal fade" id="syntax" tabindex="-1" aria-labelledby="syntaxLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id=syntaxLabel">撰寫語法</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-floating">
+                                        <pre class="text-start" style="font-size: 16px;">問題分為「問答題」與「單選題」
+使用「()」開頭時，表示該行為單選題的選項，
+否則皆視為題目的一部分。
+
+範例 1 問答題：
+該 lab 讓你學會哪些內容?
+
+範例 2 單選題：
+經練習後，是否能獨立且順暢地完成該 lab 的要求?
+() 可以
+() 無法</pre>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container container_close">
+        <div class="content">
+            {% for question in questions %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-2 row">
+                        <label style="display: none;"><input name="id" value="{{ question.id }}"></label>
+                        {% if question.type == 'text' %}
+                            <label class="form-label text-start">
+                                {{ question }}
+                            </label>
+                        {% elif question.type == 'single' %}
+                            <label class="form-label text-start">
+                                {{ question }}
+                            </label>
+                            <div class="text-start">
+                            {% for id, options in q_options.items %}
+                                {% if id == question.id %}
+                                    {% for option in options %}
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input class="form-check-input" type="radio" name="radio" value="{{ option.number }}">{{ option }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#update_{{ question.id }}">update</button>
+                        <button type="submit" class="btn btn-outline-danger btn-sm" name="action" value="delQuestion">delete</button>
+                        <hr>
+                        {# 更新問題 #}
+                        <div class="modal fade" id="update_{{ question.id }}" tabindex="-1" aria-labelledby="updateLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id=updateLabel">更新問題</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-floating">
+                                            {% if question.type == 'text' %}
+                                                <textarea class="form-control" id="question" name="content" style="height: 160px;">{{ question }}</textarea>
+                                            {% elif question.type == 'single'%}
+                                                {% for id, options in q_options.items %}
+                                                    {% if id == question.id %}
+                                                        <textarea class="form-control" id="question" name="content" style="height: 160px;">{{ question.content|combine:options }}</textarea>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                                <label for="question">題目</label>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                            <button type="submit" class="btn btn-primary" name="action" value="updateQuestion">更新</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

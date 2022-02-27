@@ -15,8 +15,8 @@ from core.dicts import MESSAGE_DICT
 from core.infra import GITLAB_
 from core.infra.gitlab_func import get_repo_verbose, get_tree
 from .forms import LabForm
-from .models import Course, Lab
-from .utils import get_nav_side_dict, check_stu_lab_status
+from .models import Course, Lab, Question, Option, Answer
+from .utils import get_nav_side_dict, check_stu_lab_status, question_parser
 from flow.models import Project
 from flow.forms import TemplateRepoForm
 from flow.utils import import_template, create_jenkins_job, create_gitlab_webhook
@@ -379,3 +379,77 @@ def stu_blob_view(request, course_id, lab_id, student, project, path):
         'branch': branch,
         'blob': blob,
     })
+
+
+def lab_evaluation_view(request, course_id, lab_id):
+    """形成性評量"""
+    content = {}
+    course = Course.objects.filter(id=course_id).get()
+    lab = Lab.objects.filter(id=lab_id).get()
+    questions = Question.objects.filter(lab=lab).order_by('id')
+
+    # 過濾出選擇題中對應的選項
+    q_options = {}
+    for question in questions:
+        if question.type == 'single':
+            option = Option.objects.filter(topic=question)
+            q_options[question.id] = option
+
+    if Role.STUDENT in get_roles(request.user):
+        student = Student.objects.get(user=request.user)
+        # 過濾出問題對應的回答
+        q_ans = {}
+        for question in questions:
+            ans = Answer.objects.get(topic=question, student=student)
+            q_ans[question.id] = ans
+        content.update({'q_ans': q_ans})
+
+        if request.method == 'POST':
+            question_ids = request.POST.getlist('id')
+            # 驗證每個問題是否都有填寫
+            for id in question_ids:
+                if request.POST.get(f'answer_{id}') is None or request.POST.get(f'answer_{id}') == '':
+                    messages.warning(request, MESSAGE_DICT.get('answer_all_questions'))
+                    redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
+
+            # 更新每個問題的回答
+            for id in question_ids:
+                q_id = Question.objects.get(id=id)
+                answer = Answer.objects.filter(student=student, topic=q_id)
+                ans_content = request.POST.get(f'answer_{id}')
+                if answer:
+                    answer.update(content=ans_content)
+                else:
+                    Answer.objects.update_or_create(student=student, topic=q_id, content=ans_content)
+            return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
+
+    elif Role.TEACHER in get_roles(request.user):
+        # 新增問題
+        if request.method == 'POST' and request.POST['action'] == 'newQuestion':
+            q_exist = Question.objects.filter(lab=lab)
+            number = q_exist.last().number if q_exist else 0
+            Question.objects.update_or_create(type='text', content=request.POST['content'], lab=lab, number=number + 1)
+            question_obj = Question.objects.get(type='text', content=request.POST['content'], lab=lab, number=number + 1)
+            question_parser(question_obj, request.POST['content'])
+            return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
+        # 更新問題
+        elif request.method == 'POST' and request.POST['action'] == 'updateQuestion':
+            question_obj = Question.objects.get(id=request.POST['id'])
+            question_parser(question_obj, request.POST['content'])
+            return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
+        # 刪除問題
+        elif request.method == 'POST' and request.POST['action'] == 'delQuestion':
+            Question.objects.get(id=request.POST['id']).delete()
+            return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
+
+    content.update({
+        'course': course,
+        'lab': lab,
+        'questions': questions,
+        'q_options': q_options,
+    })
+
+    if Role.STUDENT in get_roles(request.user):
+        return render(request, 'evaluation_stu.html', content)
+    elif Role.TEACHER in get_roles(request.user):
+        return render(request, 'evaluation_tch.html', content)
