@@ -315,7 +315,7 @@ def lab_new_view(request, course_id):
 
 @check_role([Role.TEACHER])
 def lab_submit_view(request, course_id, lab_id):
-    """學生繳交 lab 與 形成性評量 的總覽頁面"""
+    """學生繳交 lab 與 互動式評量 的總覽頁面"""
     course = Course.objects.filter(id=course_id).get()
     students_obj = course.students.all()
     lab = Lab.objects.filter(id=lab_id).get()
@@ -397,7 +397,7 @@ def stu_blob_view(request, course_id, lab_id, student, project, path):
 
 
 def lab_evaluation_view(request, course_id, lab_id):
-    """形成性評量"""
+    """互動式評量"""
     context = {}
     course = Course.objects.filter(id=course_id).get()
     lab = Lab.objects.filter(id=lab_id).get()
@@ -474,7 +474,7 @@ def lab_evaluation_view(request, course_id, lab_id):
 
 @check_role([Role.TEACHER])
 def lab_evaluation_submit_view(request, course_id, lab_id, student):
-    """老師檢視單個學生的形成性評量"""
+    """老師檢視單個學生的互動式評量"""
     course = Course.objects.filter(id=course_id).get()
     lab = Lab.objects.filter(id=lab_id).get()
     questions = Question.objects.filter(lab=lab).order_by('id')
