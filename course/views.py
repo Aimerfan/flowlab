@@ -408,6 +408,7 @@ def lab_evaluation_view(request, course_id, lab_id):
 
     if Role.STUDENT in get_roles(request.user):
         student = Student.objects.get(user=request.user)
+        context.update(get_nav_side_dict(request.user, 'student'))
         # 過濾出問題對應的回答
         q_ans = {}
         for question in questions:
@@ -437,6 +438,7 @@ def lab_evaluation_view(request, course_id, lab_id):
             return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
 
     elif Role.TEACHER in get_roles(request.user):
+        context.update(get_nav_side_dict(request.user, 'teacher'))
         # 新增問題
         if request.method == 'POST' and request.POST['action'] == 'newQuestion':
             q_exist = Question.objects.filter(lab=lab)
