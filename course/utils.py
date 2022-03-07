@@ -68,10 +68,7 @@ def check_stu_evaluation_status(lab, students_obj):
 
         is_finish = False
         question_exist = Question.objects.filter(lab=lab)
-        print(question_exist)
         if question_exist:
-            # questions = question_exist.get()
-            # print(questions)
             for question in question_exist:
                 answer = Answer.objects.filter(student=student, topic=question)
                 if answer:
