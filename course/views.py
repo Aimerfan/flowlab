@@ -304,11 +304,7 @@ def lab_new_view(request, course_id):
         form.save()
         messages.success(request, MESSAGE_DICT.get('create_lab_success'))
 
-        context = {
-            'labs': Lab.objects.filter(course=course_id),
-            'course': Course.objects.filter(id=course_id).get(),
-        }
-        return render(request, 'course_tch.html', context)
+        return redirect('course', course_id=course_id)
 
     return render(request, 'lab_new.html', {'form': form})
 
