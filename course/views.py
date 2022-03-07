@@ -29,11 +29,11 @@ def course_list_view(request):
 
     if Role.STUDENT in get_roles(request.user):
         stu_id = Student.objects.filter(user=request.user).get().id
-        context.update({'courses': Course.objects.filter(students=stu_id)})
+        context.update({'courses': Course.objects.filter(students=stu_id).order_by('id')})
         context.update(get_nav_side_dict(request.user, 'student'))
     elif Role.TEACHER in get_roles(request.user):
         tch_id = Teacher.objects.filter(user=request.user).get().id
-        context.update({'courses': Course.objects.filter(teacher=tch_id)})
+        context.update({'courses': Course.objects.filter(teacher=tch_id).order_by('id')})
         context.update(get_nav_side_dict(request.user, 'teacher'))
 
     return render(request, 'course_list.html', context)
@@ -43,7 +43,7 @@ def course_view(request, course_id):
     """課程內容"""
     context = {
         'course_id': course_id,
-        'labs': Lab.objects.filter(course=course_id),
+        'labs': Lab.objects.filter(course=course_id).order_by('id'),
         'course': Course.objects.filter(id=course_id).get(),
         'project': {},
         'submit': {},

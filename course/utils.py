@@ -13,14 +13,14 @@ def get_nav_side_dict(user, identity):
 
     if identity == 'student':
         stu_id = Student.objects.filter(user=user).get().id
-        courses = Course.objects.filter(students=stu_id)
+        courses = Course.objects.filter(students=stu_id).order_by('id')
     elif identity == 'teacher':
         tch_id = Teacher.objects.filter(user=user).get().id
-        courses = Course.objects.filter(teacher=tch_id)
+        courses = Course.objects.filter(teacher=tch_id).order_by('id')
 
     return {
         'courses': courses,
-        'all_labs': Lab.objects.all(),
+        'all_labs': Lab.objects.all().order_by('id'),
     }
 
 
