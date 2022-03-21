@@ -1,5 +1,6 @@
 from gitlab import Gitlab
 from jenkins import Jenkins
+from sonarqube import SonarQubeClient
 
 
 # read {project_root}/.env file as python objs.
@@ -27,4 +28,13 @@ JENKINS_ = Jenkins(
     JENKINS_URL,
     username=ENVIRON['JENKINS_ROOT_USERNAME'],
     password=ENVIRON['JENKINS_ROOT_PASSWORD'],
+)
+
+
+"""新增一個共用的 SonarQube Instance"""
+SONARQUBE_URL = f'http://{ENVIRON["SONARQUBE_HOST"]}:{ENVIRON["SONARQUBE_PORT"]}'
+SONAR_ = SonarQubeClient(
+    sonarqube_url=SONARQUBE_URL,
+    username=ENVIRON["SONARQUBE_ROOT_USERNAME"],
+    password=ENVIRON["SONARQUBE_ROOT_PASSWORD"]
 )
