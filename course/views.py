@@ -53,7 +53,20 @@ def course_view(request, course_id):
 
     if Role.STUDENT in get_roles(request.user):
         for lab in context['labs']:
-            # 找出與 lab 關聯的專案
+            student_obj = context['course'].students.filter(user=request.user)
+            submit_br = lab.branch
+            # 檢查學生 lab 繳交狀態
+            student_dict = check_stu_lab_status(lab, student_obj, submit_br)
+            student = student_dict[request.user.username]
+            if student['is_submit']:
+                context['submit'].update({
+                    lab.name: '✔',
+                })
+            else:
+                context['submit'].update({
+                    lab.name: '✖',
+                })
+
             project = lab.project.filter(user=request.user)
             # 若找的到, lab 對應到'專案名稱'
             if project:
