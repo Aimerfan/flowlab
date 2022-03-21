@@ -415,17 +415,12 @@ def lab_evaluation_view(request, course_id, lab_id):
             ans = Answer.objects.filter(topic=question, student=student)
             if ans:
                 q_ans[question.id] = ans.get()
+            else:
+                q_ans[question.id] = ''
         context.update({'q_ans': q_ans})
 
         if request.method == 'POST':
             question_ids = request.POST.getlist('id')
-            # TODO: 改從前端驗證表單是否填寫完全
-            # 驗證每個問題是否都有填寫
-            for id in question_ids:
-                if request.POST.get(f'answer_{id}') is None or request.POST.get(f'answer_{id}') == '':
-                    messages.warning(request, MESSAGE_DICT.get('answer_all_questions'))
-                    return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
-
             # 更新每個問題的回答
             for id in question_ids:
                 q_id = Question.objects.get(id=id)

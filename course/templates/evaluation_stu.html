@@ -29,10 +29,8 @@
                             <label class="form-label text-start">
                                 {% for id, ans in q_ans.items %}
                                     {% if id == question.id %}
-                                        <textarea class="form-control" name="answer_{{ question.id }}" style="height: 100px;">{{ ans.content }}</textarea>
+                                        <textarea class="form-control" name="answer_{{ question.id }}" style="height: 100px;" required>{{ ans.content }}</textarea>
                                     {% endif %}
-                                {% empty %}
-                                    <textarea class="form-control" name="answer_{{ question.id }}" style="height: 100px;"></textarea>
                                 {% endfor %}
                             </label>
                         {% elif question.type == 'single' %}
@@ -51,7 +49,7 @@
                                                             checked
                                                         {% endif %}
                                                     {% endfor %}
-                                                >
+                                                required>
                                                 {{ option }}
                                             </label>
                                         </div>
