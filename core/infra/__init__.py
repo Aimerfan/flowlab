@@ -1,3 +1,4 @@
+from requests.auth import HTTPBasicAuth
 from gitlab import Gitlab
 from jenkins import Jenkins
 from sonarqube import SonarQubeClient
@@ -28,6 +29,10 @@ JENKINS_ = Jenkins(
     JENKINS_URL,
     username=ENVIRON['JENKINS_ROOT_USERNAME'],
     password=ENVIRON['JENKINS_ROOT_PASSWORD'],
+)
+JENKINS_AUTH = HTTPBasicAuth(
+    ENVIRON['JENKINS_ROOT_USERNAME'],
+    ENVIRON['JENKINS_ROOT_PASSWORD'],
 )
 
 

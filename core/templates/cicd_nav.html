@@ -12,7 +12,7 @@
             <a href="{% url 'build' user.username project info.branch %}">
                 <button class="btn-md btn_ci_flow {%if url_name == 'build' %}active{% endif %}" type="button">建構</button>
             </a>
-            <a href="{% url 'test_reports' user.username project %}">
+            <a href="{% url 'test_reports' user.username project info.branch %}">
                 <button class="btn-md btn_ci_flow {%if url_name == 'test_reports' %}active{% endif %}" type="button">測試報告</button>
             </a>
         </form>

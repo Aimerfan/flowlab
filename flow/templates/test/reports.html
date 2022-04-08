@@ -19,7 +19,7 @@
                             <h5><a href="{{ sonar_url }}" target="_blank">查看詳細報告</a></h5>
                         </div>
                     </div>
-                    <table class="table table-bordered table-success table-striped">
+                    <table class="table table-bordered table-warning table-striped">
                         <thead>
                             <tr>
                                 <th>錯誤 (Bugs)</th>
@@ -38,28 +38,38 @@
                         </tbody>
                     </table>
                 {% endif %}
+                <div style="padding: 15px;">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownBranch" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span style="width: 100px;">{{ branch }}</span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownBranch">
+                        {% for branch in info.branches %}
+                            <li><a class="dropdown-item" href="{% url 'test_reports' user.username info.name branch.name %}">{{ branch.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% if junit_info %}
+                    <h1>Junit 測試結果</h1>
+                    <table class="table table-bordered table-success table-striped">
+                        <thead>
+                            <tr>
+                                <th>失敗</th>
+                                <th>略過</th>
+                                <th>通過</th>
+                                <th>總計</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>{{ junit_info.fail }}</th>
+                                <th>{{ junit_info.skip }}</th>
+                                <th>{{ junit_info.success }}</th>
+                                <th>{{ junit_info.total}}</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endif %}
             </div>
-            {% if junit_info %}
-                <h1>Junit 測試結果</h1>
-                <table class="table table-bordered table-success table-striped">
-                    <thead>
-                        <tr>
-                            <th>失敗</th>
-                            <th>略過</th>
-                            <th>通過</th>
-                            <th>總計</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th>{{ junit_info.fail }}</th>
-                            <th>{{ junit_info.skip }}</th>
-                            <th>{{ junit_info.success }}</th>
-                            <th>{{ junit_info.total}}</th>
-                        </tr>
-                    </tbody>
-                </table>
-            {% endif %}
         </div>
     </div>
 {% endblock %}
