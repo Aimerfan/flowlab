@@ -47,22 +47,23 @@ def build_view(request, user, project, branch):
 
     if JENKINS_.job_exists(job_name):
         multibr_default_job = JENKINS_.get_job_info(job_name)
-        # 取得該 branch 最新的建置編號
-        last_build_number = multibr_default_job['lastCompletedBuild']['number']
-        # 取得該 branch 的最新 5 個建置結果 (由新至舊)
-        for number in range(last_build_number, last_build_number - 5, -1):
-            if number > 0:
-                build_info = JENKINS_.get_build_console_output(job_name, number).split('\n')
-                last_line = build_info[-2]
-                # 擷取 console 的結果
-                if 'SUCCESS' in last_line:
-                    build_results[number] = 'success'
-                elif 'FAILURE' in last_line:
-                    build_results[number] = 'failure'
-                elif 'ABORTED' in last_line:
-                    build_results[number] = 'stop'
-                else:
-                    build_results[number] = ''
+        # 取得該 branch 最新的建置編號 (先確認是否有建置結果)
+        if 'lastCompletedBuild' in multibr_default_job.keys():
+            last_build_number = multibr_default_job['lastCompletedBuild']['number']
+            # 取得該 branch 的最新 5 個建置結果 (由新至舊)
+            for number in range(last_build_number, last_build_number - 5, -1):
+                if number > 0:
+                    build_info = JENKINS_.get_build_console_output(job_name, number).split('\n')
+                    last_line = build_info[-2]
+                    # 擷取 console 的結果
+                    if 'SUCCESS' in last_line:
+                        build_results[number] = 'success'
+                    elif 'FAILURE' in last_line:
+                        build_results[number] = 'failure'
+                    elif 'ABORTED' in last_line:
+                        build_results[number] = 'stop'
+                    else:
+                        build_results[number] = ''
 
     return render(request, 'ci/build.html', {
         'info': project_info,
