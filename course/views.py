@@ -99,7 +99,7 @@ def course_view(request, course_id):
                 user.save()
                 # 建立 GitLab 帳號
                 gl_user = GITLAB_.users.create({'username': username, 'password': password,
-                                                'name': name, 'email': email})
+                                                'name': name, 'email': email, 'skip_confirmation': True})
                 gl_user.save()
                 # 建立 SonarQube 帳號
                 SONAR_.users.create_user(login=username, name=name, password=password, email=email)
@@ -139,7 +139,7 @@ def course_view(request, course_id):
                         user.save()
                         # 建立 GitLab 帳號
                         gl_user = GITLAB_.users.create({'username': row[0], 'password': row[1],
-                                                        'name': row[2], 'email': row[3]})
+                                                        'name': row[2], 'email': row[3], 'skip_confirmation': True})
                         gl_user.save()
                     # 建立學生身份 並設定名稱
                     if Student.objects.filter(user=user):
