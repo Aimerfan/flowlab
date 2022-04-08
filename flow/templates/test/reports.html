@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    測試報告
+{% endblock %}
+{% block body %}
+    {% include 'cicd_nav.html' with project=info.name %}
+    {% if have_sonarqube %}
+        <div class="container_close">
+            <div class="content">
+                {% if sonar_url %}
+                    <div class="row">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-8">
+                            <h1>SonarQube 測試報告</h1>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="right_content">
+                                <h5><a href="{{ sonar_url }}" target="_blank">查看詳細報告</a></h5>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-success table-striped">
+                        <thead>
+                            <tr>
+                                <th>錯誤 (Bugs)</th>
+                                <th>漏洞 (Vulnerabilities)</th>
+                                <th>安全疑慮 (Security Hotspots)</th>
+                                <th>程式碼異味 (Code Smells)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>{{ sonar_info.bugs }}</th>
+                                <th>{{ sonar_info.vulnerabilities }}</th>
+                                <th>{{ sonar_info.security_hotspots }}</th>
+                                <th>{{ sonar_info.code_smells }}</th>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
