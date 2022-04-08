@@ -20,7 +20,7 @@ def reports_view(request, user, project):
             # 獲得 sonarqube 部分資訊 (metrics)
             metrics = 'bugs, vulnerabilities, security_hotspots, code_smells'
             sonar_measures = SONAR_.measures.get_component_with_specified_measures(component=project_name,
-                                                                               metricKeys=metrics)
+                                                                                   metricKeys=metrics)
             sonar_info = {}
             measures = sonar_measures['component']['measures']
             for measure in measures:
@@ -29,7 +29,6 @@ def reports_view(request, user, project):
 
     context = {
         'info': project_info,
-        'have_sonarqube': True,
         'sonar_url': sonar_url,
         'sonar_info': sonar_info,
     }

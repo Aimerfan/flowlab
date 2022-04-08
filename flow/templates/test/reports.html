@@ -5,19 +5,18 @@
 {% endblock %}
 {% block body %}
     {% include 'cicd_nav.html' with project=info.name %}
-    {% if have_sonarqube %}
-        <div class="container_close">
-            <div class="content">
-                {% if sonar_url %}
-                    <div class="row">
-                        <div class="col-sm-2"></div>
-                        <div class="col-sm-8">
-                            <h1>SonarQube 測試報告</h1>
-                        </div>
-                        <div class="col-sm-2">
-                            <div class="right_content">
-                                <h5><a href="{{ sonar_url }}" target="_blank">查看詳細報告</a></h5>
-                            </div>
+    <div class="container_close">
+        <div class="content">
+            {% if sonar_info %}
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-8">
+                        <h1>SonarQube 測試報告</h1>
+                        <p>僅顯示最新的一筆結果</p>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="right_content">
+                            <h5><a href="{{ sonar_url }}" target="_blank">查看詳細報告</a></h5>
                         </div>
                     </div>
                     <table class="table table-bordered table-success table-striped">
@@ -40,6 +39,27 @@
                     </table>
                 {% endif %}
             </div>
+            {% if junit_info %}
+                <h1>Junit 測試結果</h1>
+                <table class="table table-bordered table-success table-striped">
+                    <thead>
+                        <tr>
+                            <th>失敗</th>
+                            <th>略過</th>
+                            <th>通過</th>
+                            <th>總計</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>{{ junit_info.fail }}</th>
+                            <th>{{ junit_info.skip }}</th>
+                            <th>{{ junit_info.success }}</th>
+                            <th>{{ junit_info.total}}</th>
+                        </tr>
+                    </tbody>
+                </table>
+            {% endif %}
         </div>
-    {% endif %}
+    </div>
 {% endblock %}
