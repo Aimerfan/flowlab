@@ -6,7 +6,47 @@
 {% block body %}
 <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
 <script src="{% static 'js/jquery.cookie-1.4.1.min.js' %}"></script>
-{% include 'cicd_nav.html' with project=info.name %}
+<div class="row">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8">
+        {% include 'cicd_nav.html' with project=info.name %}
+    </div>
+    <div class="col-sm-2 d-flex align-items-center">
+        <button type="button" class="btn btn-light" data-bs-toggle="offcanvas" data-bs-target="#tips" aria-controls="tips">
+            小提示
+        </button>
+        <div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="tips" aria-labelledby=tipsLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="tipsLabel">Jenkins File 撰寫小提示</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <h4>【加入 SonarQube 檢測】</h4>
+                <p>
+                    1. 在任意 stage 中加入 environment 的段落<br>
+                    2. 設定 <mark><small>SONAR_TOKEN</small></mark> 與 <mark><small>PROJECT_NAME</small></mark> 變數<br>
+                    3. <mark><small>PROJECT_NAME</small></mark> 的值是由 "你的使用者名稱" 加上"底線(_)" 再加上 "你的專案名稱" 而來<br><br>
+                    steps 中的 sh 區段表示要執行的指令，其中需要<br>
+                    4. 修改 <mark><small>&lt;IP&gt;</small></mark> 與 <mark><small>&lt;port&gt;</small></mark><br><br>
+                    更完整的寫法 ↓ ↓ ↓
+                </p>
+                <pre><code>stage('Sonarqube') {
+    environment {
+        SONAR_TOKEN = credentials('sonarqube_token')
+        PROJECT_NAME = '&lt;使用者名稱&gt;_&lt;專案名稱&gt;'
+    }
+    steps {
+        sh '''./gradlew sonarqube \
+            -Dsonar.projectKey=$PROJECT_NAME \
+            -Dsonar.host.url=http://&lt;IP&gt;:&lt;port&gt; \
+            -Dsonar.login=$SONAR_TOKEN
+        '''
+    }
+}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
     <div class="container container_close">
         <div class="align_both_sides">
             <div class="col-md-5">
