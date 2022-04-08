@@ -100,10 +100,9 @@ def repo_view(request, user, project):
         if JENKINS_.get_job_name(job_name):
             JENKINS_.delete_job(job_name)
 
-        # 刪除 SonarQube project 與 token
+        # 刪除 SonarQube project
         project_name = get_project_name(user, project)
         SONAR_.projects.delete_project(project=project_name)
-        SONAR_.user_tokens.revoke_user_token(project_name)
 
         # 刪除 Project model
         Project.objects.get(user=request.user, name=project).delete()
@@ -200,11 +199,9 @@ def repo_new_blank(request):
         create_jenkins_job(username=username, repo_name=repo_name)
         # 建立 GitLab webhook
         create_gitlab_webhook(username=username, repo_name=repo_name, project=user_project)
-        # 建立 SonarQube project 與 token
+        # 建立 SonarQube project
         project_name = get_project_name(username, repo_name)
         SONAR_.projects.create_project(project=project_name, name=project_name)
-        user_token = SONAR_.user_tokens.generate_user_token(project_name)
-
         # 建立 Project model
         Project.objects.create(user=request.user, name=repo_name)
 
@@ -245,11 +242,9 @@ def repo_new_template(request):
         create_jenkins_job(username=username, repo_name=repo_name)
         # 建立 GitLab webhook
         create_gitlab_webhook(username=username, repo_name=repo_name, project=project)
-        # 建立 SonarQube project 與 token
+        # 建立 SonarQube project
         project_name = get_project_name(username, repo_name)
         SONAR_.projects.create_project(project=project_name, name=project_name)
-        user_token = SONAR_.user_tokens.generate_user_token(project_name)
-
         # 建立 Project model
         Project.objects.create(user=request.user, name=repo_name)
 
