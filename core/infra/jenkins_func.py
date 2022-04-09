@@ -1,5 +1,7 @@
 # functools
+import json
 import requests
+import xmltodict
 
 from . import JENKINS_URL, JENKINS_AUTH
 
@@ -39,3 +41,39 @@ def get_junit_result(user, project, branch, build_no):
                 })
                 return junit
     return junit
+
+
+def get_coverage_result(user, project, branch, build_no):
+    job_name = get_job_name(user, project)
+
+    # 使用 api 獲得 coverage 測試的結果
+    api_url = f'{JENKINS_URL}/job/{job_name}/job/{branch}/{build_no}/jacoco/api/xml'
+    response = requests.get(api_url, auth=JENKINS_AUTH)
+
+    # 確認 api 接收成功
+    if response.status_code == 200:
+        xml_string = response.content.decode()
+        # 將 xml 轉成 dict, 並提取必要資訊
+        return parser_coverage_xml(xml_string)
+    return {}
+
+
+def parser_coverage_xml(xml):
+    """將 xml 形式的字串 轉成 dict 形式, 並提取必要資訊"""
+    result = {}
+
+    # xml to dict
+    obj = xmltodict.parse(xml)
+    obj_dict = json.loads(json.dumps(obj))
+    reports = obj_dict['coverageReport']
+
+    result.update({
+        'instruction': reports['instructionCoverage'],
+        'branch': reports['branchCoverage'],
+        'complexity': reports['complexityScore'],
+        'line': reports['lineCoverage'],
+        'method': reports['methodCoverage'],
+        'class': reports['classCoverage'],
+    })
+
+    return result

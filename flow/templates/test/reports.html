@@ -30,10 +30,10 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <th>{{ sonar_info.bugs }}</th>
-                                <th>{{ sonar_info.vulnerabilities }}</th>
-                                <th>{{ sonar_info.security_hotspots }}</th>
-                                <th>{{ sonar_info.code_smells }}</th>
+                                <td>{{ sonar_info.bugs }}</td>
+                                <td>{{ sonar_info.vulnerabilities }}</td>
+                                <td>{{ sonar_info.security_hotspots }}</td>
+                                <td>{{ sonar_info.code_smells }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -61,12 +61,40 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <th>{{ junit_info.fail }}</th>
-                                <th>{{ junit_info.skip }}</th>
-                                <th>{{ junit_info.success }}</th>
-                                <th>{{ junit_info.total}}</th>
+                                <td>{{ junit_info.fail }}</td>
+                                <td>{{ junit_info.skip }}</td>
+                                <td>{{ junit_info.success }}</td>
+                                <td>{{ junit_info.total}}</td>
                             </tr>
                         </tbody>
+                    </table>
+                {% endif %}
+                {% if coverage_info %}
+                    <h1>覆蓋率測試結果</h1>
+                    <table class="table table-bordered table-primary table-striped">
+                        <thead>
+                            <tr>
+                                <th>名稱</th>
+                                <th>instruction</th>
+                                <th>branch</th>
+                                <th>complexity</th>
+                                <th>line</th>
+                                <th>method</th>
+                                <th>class</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>所有類別</th>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.instruction %}</td>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.branch %}</td>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.complexity %}</td>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.line %}</td>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.method %}</td>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.class %}</td>
+                            </tr>
+                        </tbody>
+
                     </table>
                 {% endif %}
             </div>
