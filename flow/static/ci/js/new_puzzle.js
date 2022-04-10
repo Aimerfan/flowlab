@@ -41,6 +41,25 @@ function newStages() {
   block.append(stages, choiceStage);
 }
 
+function newPost() {
+  let layer = 2;
+  document.getElementById("addPost").style.display = "none";
+  let block = document.getElementById("post");
+  block.className += " post"
+
+  let post = document.createElement("div");
+  post.textContent = "post";
+  post.className = "jenkins_puzzle puz_" + layer;
+
+  let choiceAlways = document.createElement("div");
+  choiceAlways.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
+  choiceAlways.textContent = "+ always";
+  choiceAlways.id = "addAlways";
+  choiceAlways.addEventListener("click", newAlways.bind(this, (layer + 1)));
+
+  block.append(post, choiceAlways);
+}
+
 
 {
   let idStage = 0;
@@ -174,6 +193,40 @@ function newSteps(layer, idStage, idSteps) {
   block.append(steps, choiceSh, choiceEcho);
 }
 
+function newAlways(layer) {
+  document.getElementById("addAlways").style.display = "none";
+  let post = document.getElementById("post");
+
+  let block = document.createElement("div");
+  block.className = "puz_bl_" + layer + " always";
+  block.id = "always";
+  post.appendChild(block);
+
+  let steps = document.createElement("div");
+  steps.className = "jenkins_puzzle puz_" + layer;
+  steps.textContent = "always";
+
+  let choiceSh = document.createElement("div");
+  choiceSh.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
+  choiceSh.textContent = "+ sh";
+  choiceSh.id = "addSh";
+  choiceSh.addEventListener("click", newAlwaysSh.bind(this, (layer + 1)));
+
+  let choiceEcho = document.createElement("div");
+  choiceEcho.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
+  choiceEcho.textContent = "+ echo";
+  choiceEcho.id = "addEcho";
+  choiceEcho.addEventListener("click", newAlwaysEcho.bind(this, (layer + 1)));
+
+  let choiceJunit = document.createElement("div");
+  choiceJunit.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
+  choiceJunit.textContent = "+ junit";
+  choiceJunit.id = "addJunit";
+  choiceJunit.addEventListener("click", newJunit.bind(this, (layer + 1)));
+
+  block.append(steps, choiceSh, choiceEcho, choiceJunit);
+}
+
 
 function newParallel(layer, idStage, idParallel) {
   document.getElementById("addSteps_" + idStage).style.display = "none";
@@ -220,7 +273,34 @@ function newParallel(layer, idStage, idParallel) {
     shLabel.appendChild(shTextarea)
     let sh = document.createElement("div");
     sh.className = "ver_top jenkins_puzzle puz_" + layer;
-    sh.append("sh", shLabel)
+    sh.append("sh", shLabel);
+
+    block.appendChild(sh);
+  }
+}
+
+{
+  let idAlwaysSh = 0;
+
+  function newAlwaysSh(layer) {
+    let always = document.getElementById("always");
+
+    let block = document.createElement("div");
+    block.className = "puz_bl_" + layer + " always_sh";
+    idAlwaysSh += 1;
+    block.id = "always_sh_" + idAlwaysSh;
+    always.appendChild(block);
+
+    let shLabel = document.createElement("label");
+    shLabel.for = "always_sh_" + idAlwaysSh;
+    let shTextarea = document.createElement("textarea");
+    shTextarea.id = "always_sh_" + idAlwaysSh;
+    shTextarea.className = "form-control puz_form width_textarea";
+    shTextarea.name = "always_sh";
+    shLabel.appendChild(shTextarea)
+    let sh = document.createElement("div");
+    sh.className = "ver_top jenkins_puzzle puz_" + layer;
+    sh.append("sh", shLabel);
 
     block.appendChild(sh);
   }
@@ -247,10 +327,66 @@ function newParallel(layer, idStage, idParallel) {
     echoInput.className = "form-control puz_form";
     echoInput.name = "echo";
     echoLabel.appendChild(echoInput)
-    let sh = document.createElement("div");
-    sh.className = "jenkins_puzzle puz_" + layer;
-    sh.append("echo", echoLabel)
+    let echo = document.createElement("div");
+    echo.className = "jenkins_puzzle puz_" + layer;
+    echo.append("echo", echoLabel);
 
-    block.appendChild(sh);
+    block.appendChild(echo);
+  }
+}
+
+{
+  let idAlwaysEcho = 0;
+
+  function newAlwaysEcho(layer){
+    let always = document.getElementById("always");
+
+    let block = document.createElement("div");
+    block.className = "puz_bl_" + layer + " always_echo";
+    idAlwaysEcho += 1;
+    block.id = "always_echo_" + idAlwaysEcho;
+    always.appendChild(block)
+
+    let echoLabel = document.createElement("label");
+    echoLabel.for = "always_echo_" + idAlwaysEcho;
+    let echoInput = document.createElement("input");
+    echoInput.type = "text";
+    echoInput.id = "always_echo_" + idAlwaysEcho;
+    echoInput.className = "form-control puz_form";
+    echoInput.name = "always_echo";
+    echoLabel.appendChild(echoInput)
+    let echo = document.createElement("div");
+    echo.className = "jenkins_puzzle puz_" + layer;
+    echo.append("echo", echoLabel);
+
+    block.appendChild(echo);
+  }
+}
+
+{
+  let idJunit = 0;
+
+  function newJunit(layer) {
+    let always = document.getElementById("always");
+
+    let block = document.createElement("div");
+    block.className = "puz_bl_" + layer + " junit";
+    idJunit += 1;
+    block.id = "junit_" + idJunit;
+    always.appendChild(block)
+
+    let junitLabel = document.createElement("label");
+    junitLabel.for = "junit_" + idJunit;
+    let junitInput = document.createElement("input");
+    junitInput.type = "text";
+    junitInput.id = "junit_" + idJunit;
+    junitInput.className = "form-control puz_form";
+    junitInput.name = "junit";
+    junitLabel.appendChild(junitInput)
+    let junit = document.createElement("div");
+    junit.className = "jenkins_puzzle puz_" + layer;
+    junit.append("junit", junitLabel)
+
+    block.appendChild(junit);
   }
 }

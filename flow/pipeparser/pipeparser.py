@@ -155,7 +155,7 @@ class NonLeafInputSection(NonLeafSection, LeafInputSection):
 class Pipeline(NonLeafSection):
 
     html_class = 'pipeline'
-    allowed_subsections = ['agent', 'stages']
+    allowed_subsections = ['agent', 'post', 'stages']
 
 
 class Agent(LeafInputSection):
@@ -164,6 +164,12 @@ class Agent(LeafInputSection):
     def __str__(self, tabwidth=4, level=0):
         original_context = super().__str__(tabwidth, level)
         return original_context.replace("'", '')
+
+
+class Post(NonLeafSection):
+
+    html_class = 'post'
+    allowed_subsections = ['always']
 
 
 class Stages(NonLeafSection):
@@ -189,6 +195,12 @@ class Steps(NonLeafSection):
     allowed_subsections = ['sh', 'echo']
 
 
+class Always(NonLeafSection):
+
+    html_class = 'always'
+    allowed_subsections = ['always_sh', 'always_echo', 'junit']
+
+
 class Parallel(NonLeafSection):
 
     html_class = 'parallel'
@@ -210,20 +222,56 @@ class Sh(LeafTextSection):
             return f"{indent}{self.html_class} '{self.section_context}'\n"
 
 
+class AlwaysSh(Sh):
+
+    html_class = 'always_sh'
+
+    # FIXME: html_class 為 'always_sh', 但實際印出的值需要是 'sh' (目前: hard code)
+    def __str__(self, tabwidth=4, level=0):
+        original_context = super().__str__(tabwidth, level)
+        if '\n' in self.section_context:
+            original_context = original_context.replace('{', "'''")
+            original_context = original_context.replace('}', "'''")
+            return original_context
+        else:
+            indent = ' ' * tabwidth * level
+            return f"{indent}sh '{self.section_context}'\n"
+
+
 class Echo(LeafInputSection):
 
     html_class = 'echo'
+
+
+class AlwaysEcho(Echo):
+
+    html_class = 'always_echo'
+
+    # FIXME: html_class 為 'always_echo', 但實際印出的值需要是 'echo' (目前: hard code)
+    def __str__(self, tabwidth=4, level=0):
+        indent = ' ' * tabwidth * level
+        return f"{indent}echo '{self.section_context}'\n"
+
+
+class Junit(LeafInputSection):
+
+    html_class = 'junit'
 
 
 # {'html class name': python class name, ...}
 _SECTION_DICT = {
     'pipeline': Pipeline,
     'agent': Agent,
+    'post': Post,
     'stages': Stages,
     'stage': Stage,
     'when': When,
     'steps': Steps,
+    'always': Always,
     'parallel': Parallel,
     'sh': Sh,
+    'always_sh': AlwaysSh,
     'echo': Echo,
+    'always_echo': AlwaysEcho,
+    'junit': Junit,
 }
