@@ -61,12 +61,6 @@
                         </div>
                     </div>
                     <div class="ver_mid">
-                        <div>
-                            <button type="button" class="btn btn-secondary">
-                                <img src="{% static 'core/images/download.png' %}"
-                                     style="width: 18px;" alt="download">
-                            </button>
-                        </div>
                         <div style="padding: 15px;">
                             {% include 'repo/btn_clone_repo.html' %}
                         </div>
@@ -86,8 +80,7 @@
                             <h6>{{ info.last_activity_at }}</h6>
                         </div>
                         <div class="copy_sha">
-                            <h6 style="margin-right: 5px;">{{ info.sha }}</h6>
-                            <button class="btn-sm">COPY</button>
+                            <h6>{{ info.sha }}</h6>
                         </div>
                     </div>
                 </div>
