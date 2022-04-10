@@ -38,6 +38,9 @@
 
     let junitElement = document.getElementsByName("junit");
     record_input_data(junitElement, "junit");
+
+    let jacocoElement = document.getElementsByName("jacoco");
+    record_input_data(jacocoElement, "jacoco");
   }
 
 

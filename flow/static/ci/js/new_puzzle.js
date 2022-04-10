@@ -190,7 +190,13 @@ function newSteps(layer, idStage, idSteps) {
   choiceEcho.id = "addEcho_" + idSteps;
   choiceEcho.addEventListener("click", newEcho.bind(this, (layer + 1), idSteps));
 
-  block.append(steps, choiceSh, choiceEcho);
+  let choiceJacoco = document.createElement("div");
+  choiceJacoco.className = "jenkins_puzzle puz_add puz_" + (layer + 1);
+  choiceJacoco.textContent = "+ jacoco";
+  choiceJacoco.id = "addJacoco_" + idSteps;
+  choiceJacoco.addEventListener("click", newJacoco.bind(this, (layer + 1), idSteps));
+
+  block.append(steps, choiceSh, choiceEcho, choiceJacoco);
 }
 
 function newAlways(layer) {
@@ -388,5 +394,33 @@ function newParallel(layer, idStage, idParallel) {
     junit.append("junit", junitLabel)
 
     block.appendChild(junit);
+  }
+}
+
+{
+  let idJacoco = 0;
+
+  function newJacoco(layer, idSteps) {
+    document.getElementById("addJacoco_" + idSteps).style.display = "none";
+    let steps = document.getElementById("steps_" + idSteps);
+
+    let block = document.createElement("div");
+    block.className = "puz_bl_" + layer + " jacoco";
+    idJacoco += 1;
+    block.id = "jacoco_" + idJacoco;
+    steps.appendChild(block);
+
+    let jacocoLabel = document.createElement("label");
+    jacocoLabel.for = "jacoco_" + idJacoco;
+    let jacocoTextarea = document.createElement("textarea");
+    jacocoTextarea.id = "jacoco_" + idJacoco;
+    jacocoTextarea.className = "form-control puz_form width_textarea";
+    jacocoTextarea.name = "jacoco";
+    jacocoLabel.appendChild(jacocoTextarea)
+    let jacoco = document.createElement("div");
+    jacoco.className = "ver_top jenkins_puzzle puz_" + layer;
+    jacoco.append("jacoco", jacocoLabel);
+
+    block.appendChild(jacoco);
   }
 }

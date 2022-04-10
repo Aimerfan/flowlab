@@ -192,7 +192,7 @@ class When(LeafTextSection):
 class Steps(NonLeafSection):
 
     html_class = 'steps'
-    allowed_subsections = ['sh', 'echo']
+    allowed_subsections = ['sh', 'echo', 'jacoco']
 
 
 class Always(NonLeafSection):
@@ -258,6 +258,22 @@ class Junit(LeafInputSection):
     html_class = 'junit'
 
 
+class Jacoco(LeafTextSection):
+
+    html_class = 'jacoco'
+    # allowed_subsections = ['classPattern:', 'inclusionPattern:', 'exclusionPattern:', 'execPattern:']
+
+    def __str__(self, tabwidth=4, level=0):
+        original_context = super().__str__(tabwidth, level)
+        if '\n' in self.section_context:
+            original_context = original_context.replace('{', "(")
+            original_context = original_context.replace('}', ")")
+            return original_context
+        else:
+            indent = ' ' * tabwidth * level
+            return f"{indent}{self.html_class}({self.section_context})\n"
+
+
 # {'html class name': python class name, ...}
 _SECTION_DICT = {
     'pipeline': Pipeline,
@@ -274,4 +290,5 @@ _SECTION_DICT = {
     'echo': Echo,
     'always_echo': AlwaysEcho,
     'junit': Junit,
+    'jacoco': Jacoco,
 }
