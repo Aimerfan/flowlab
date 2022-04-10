@@ -24,6 +24,9 @@
     let whenElement = document.getElementsByName("when");
     record_input_data(whenElement, "when_child");
 
+    let envElement = document.getElementsByName("environment");
+    record_input_data(envElement, "env_child");
+
     let shElement = document.getElementsByName("sh");
     record_input_data(shElement, "sh");
 

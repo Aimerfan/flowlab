@@ -181,12 +181,27 @@ class Stages(NonLeafSection):
 class Stage(NonLeafInputSection):
 
     html_class = 'stage'
-    allowed_subsections = ['when', 'steps', 'parallel']
+    allowed_subsections = ['when', 'environment', 'steps', 'parallel']
 
 
 class When(LeafTextSection):
 
     html_class = 'when'
+
+
+class Environment(LeafTextSection):
+
+    html_class = 'environment'
+
+    # def __str__(self, tabwidth=4, level=0):
+    #     indent = ' ' * tabwidth * level
+    #     context_indent = ' ' * tabwidth * (level + 1)
+    #     context_list = self.section_context.split('\n')
+    #     indented_context = ''
+    #     # 縮排 context_indent 的每行文字
+    #     for line in context_list:
+    #         indented_context = indented_context + f"{context_indent}{line}\n"
+    #     return f"{indent}environment {{\n{indented_context}{indent}}}\n"
 
 
 class Steps(NonLeafSection):
@@ -282,6 +297,7 @@ _SECTION_DICT = {
     'stages': Stages,
     'stage': Stage,
     'when': When,
+    'environment': Environment,
     'steps': Steps,
     'always': Always,
     'parallel': Parallel,
