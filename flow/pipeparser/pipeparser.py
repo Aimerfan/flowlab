@@ -155,7 +155,7 @@ class NonLeafInputSection(NonLeafSection, LeafInputSection):
 class Pipeline(NonLeafSection):
 
     html_class = 'pipeline'
-    allowed_subsections = ['agent', 'stages']
+    allowed_subsections = ['agent', 'post', 'stages']
 
 
 class Agent(LeafInputSection):
@@ -164,6 +164,12 @@ class Agent(LeafInputSection):
     def __str__(self, tabwidth=4, level=0):
         original_context = super().__str__(tabwidth, level)
         return original_context.replace("'", '')
+
+
+class Post(NonLeafSection):
+
+    html_class = 'post'
+    allowed_subsections = ['always']
 
 
 class Stages(NonLeafSection):
@@ -175,7 +181,7 @@ class Stages(NonLeafSection):
 class Stage(NonLeafInputSection):
 
     html_class = 'stage'
-    allowed_subsections = ['when', 'steps', 'parallel']
+    allowed_subsections = ['when', 'environment', 'steps', 'parallel']
 
 
 class When(LeafTextSection):
@@ -183,10 +189,31 @@ class When(LeafTextSection):
     html_class = 'when'
 
 
+class Environment(LeafTextSection):
+
+    html_class = 'environment'
+
+    # def __str__(self, tabwidth=4, level=0):
+    #     indent = ' ' * tabwidth * level
+    #     context_indent = ' ' * tabwidth * (level + 1)
+    #     context_list = self.section_context.split('\n')
+    #     indented_context = ''
+    #     # 縮排 context_indent 的每行文字
+    #     for line in context_list:
+    #         indented_context = indented_context + f"{context_indent}{line}\n"
+    #     return f"{indent}environment {{\n{indented_context}{indent}}}\n"
+
+
 class Steps(NonLeafSection):
 
     html_class = 'steps'
-    allowed_subsections = ['sh', 'echo']
+    allowed_subsections = ['sh', 'echo', 'jacoco']
+
+
+class Always(NonLeafSection):
+
+    html_class = 'always'
+    allowed_subsections = ['always_sh', 'always_echo', 'junit']
 
 
 class Parallel(NonLeafSection):
@@ -210,20 +237,74 @@ class Sh(LeafTextSection):
             return f"{indent}{self.html_class} '{self.section_context}'\n"
 
 
+class AlwaysSh(Sh):
+
+    html_class = 'always_sh'
+
+    # FIXME: html_class 為 'always_sh', 但實際印出的值需要是 'sh' (目前: hard code)
+    def __str__(self, tabwidth=4, level=0):
+        original_context = super().__str__(tabwidth, level)
+        if '\n' in self.section_context:
+            original_context = original_context.replace('{', "'''")
+            original_context = original_context.replace('}', "'''")
+            return original_context
+        else:
+            indent = ' ' * tabwidth * level
+            return f"{indent}sh '{self.section_context}'\n"
+
+
 class Echo(LeafInputSection):
 
     html_class = 'echo'
+
+
+class AlwaysEcho(Echo):
+
+    html_class = 'always_echo'
+
+    # FIXME: html_class 為 'always_echo', 但實際印出的值需要是 'echo' (目前: hard code)
+    def __str__(self, tabwidth=4, level=0):
+        indent = ' ' * tabwidth * level
+        return f"{indent}echo '{self.section_context}'\n"
+
+
+class Junit(LeafInputSection):
+
+    html_class = 'junit'
+
+
+class Jacoco(LeafTextSection):
+
+    html_class = 'jacoco'
+    # allowed_subsections = ['classPattern:', 'inclusionPattern:', 'exclusionPattern:', 'execPattern:']
+
+    def __str__(self, tabwidth=4, level=0):
+        original_context = super().__str__(tabwidth, level)
+        if '\n' in self.section_context:
+            original_context = original_context.replace('{', "(")
+            original_context = original_context.replace('}', ")")
+            return original_context
+        else:
+            indent = ' ' * tabwidth * level
+            return f"{indent}{self.html_class}({self.section_context})\n"
 
 
 # {'html class name': python class name, ...}
 _SECTION_DICT = {
     'pipeline': Pipeline,
     'agent': Agent,
+    'post': Post,
     'stages': Stages,
     'stage': Stage,
     'when': When,
+    'environment': Environment,
     'steps': Steps,
+    'always': Always,
     'parallel': Parallel,
     'sh': Sh,
+    'always_sh': AlwaysSh,
     'echo': Echo,
+    'always_echo': AlwaysEcho,
+    'junit': Junit,
+    'jacoco': Jacoco,
 }

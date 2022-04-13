@@ -11,7 +11,7 @@ def reports_view(request, user, project, branch):
     """顯示 測試報告"""
     project_info = get_repo_verbose(user, project)
 
-    # 檢查該分支的最新建構結果
+    # 檢查該分支的最新建置結果
     job_name = get_job_name(user, project, branch)
     junit_info = None
     coverage_info = None

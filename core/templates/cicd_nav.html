@@ -10,7 +10,7 @@
                 <button class="btn-md btn_ci_flow {%if url_name == 'repo_project' %}active{% endif %}" type="button">程式碼 儲存庫</button>
             </a>
             <a href="{% url 'build' user.username project info.branch %}">
-                <button class="btn-md btn_ci_flow {%if url_name == 'build' %}active{% endif %}" type="button">建構</button>
+                <button class="btn-md btn_ci_flow {%if url_name == 'build' %}active{% endif %}" type="button">建置</button>
             </a>
             <a href="{% url 'test_reports' user.username project info.branch %}">
                 <button class="btn-md btn_ci_flow {%if url_name == 'test_reports' %}active{% endif %}" type="button">測試報告</button>

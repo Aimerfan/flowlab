@@ -14,6 +14,7 @@ from accounts.utils.check_role import get_roles, check_role
 from core.dicts import MESSAGE_DICT
 from core.infra import GITLAB_, SONAR_
 from core.infra.gitlab_func import get_repo_verbose, get_tree
+from core.infra.sonarqube_func import get_project_name
 from .forms import LabForm
 from .models import Course, Lab, Question, Option, Answer
 from .utils import get_nav_side_dict, check_stu_lab_status, check_stu_evaluation_status, question_parser
@@ -263,6 +264,9 @@ def lab_view(request, course_id, lab_id):
             create_jenkins_job(username=username, repo_name=repo_name)
             # 建立 GitLab webhook
             create_gitlab_webhook(username=username, repo_name=repo_name, project=project)
+            # 建立 SonarQube project
+            project_name = get_project_name(username, repo_name)
+            SONAR_.projects.create_project(project=project_name, name=project_name)
 
             # 建立 Project model
             Project.objects.create(**{

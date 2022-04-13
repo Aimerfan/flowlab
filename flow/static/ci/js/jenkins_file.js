@@ -24,11 +24,26 @@
     let whenElement = document.getElementsByName("when");
     record_input_data(whenElement, "when_child");
 
-    let singleShElement = document.getElementsByName("sh");
-    record_input_data(singleShElement, "sh");
+    let envElement = document.getElementsByName("environment");
+    record_input_data(envElement, "env_child");
+
+    let shElement = document.getElementsByName("sh");
+    record_input_data(shElement, "sh");
+
+    let alwaysShElement = document.getElementsByName("always_sh");
+    record_input_data(alwaysShElement, "always_sh");
 
     let echoElement = document.getElementsByName("echo");
     record_input_data(echoElement, "echo");
+
+    let alwaysEchoElement = document.getElementsByName("always_echo");
+    record_input_data(alwaysEchoElement, "always_echo");
+
+    let junitElement = document.getElementsByName("junit");
+    record_input_data(junitElement, "junit");
+
+    let jacocoElement = document.getElementsByName("jacoco");
+    record_input_data(jacocoElement, "jacoco");
   }
 
 

@@ -48,7 +48,8 @@ def build_view(request, user, project, branch):
     if JENKINS_.job_exists(job_name):
         multibr_default_job = JENKINS_.get_job_info(job_name)
         # 取得該 branch 最新的建置編號 (先確認是否有建置結果)
-        if 'lastCompletedBuild' in multibr_default_job.keys():
+        if 'lastCompletedBuild' in multibr_default_job.keys() and \
+                'number' in multibr_default_job['lastCompletedBuild'].keys():
             last_build_number = multibr_default_job['lastCompletedBuild']['number']
             # 取得該 branch 的最新 5 個建置結果 (由新至舊)
             for number in range(last_build_number, last_build_number - 5, -1):
