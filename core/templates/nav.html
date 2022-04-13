@@ -26,8 +26,6 @@
                 <li class="nav-item {% if url_name == 'template' %}active{% endif %}">
                     <a class="nav-link" href="{% url 'template' %}">Template</a></li>
                 {% endif %}
-                <li class="nav-item {% if url_name == 'analysis' %}active{% endif %}">
-                    <a class="nav-link" href="{% url 'analysis' %}">Analysis</a></li>
                 {% endif %}
             </ul>
             {% endwith %}

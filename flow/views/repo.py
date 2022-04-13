@@ -16,6 +16,8 @@ from core.infra import GITLAB_
 from core.infra.gitlab_func import timedelta_str, get_repo_verbose, get_tree
 from core.infra import JENKINS_
 from core.infra.jenkins_func import get_job_name
+from core.infra import SONAR_
+from core.infra.sonarqube_func import get_project_name
 from core.dicts import MESSAGE_DICT
 from ..forms import BlankRepoForm, TemplateRepoForm, ExportTemplateForm
 from ..models import Teacher, Template, Project
@@ -97,6 +99,10 @@ def repo_view(request, user, project):
         job_name = get_job_name(user, project)
         if JENKINS_.get_job_name(job_name):
             JENKINS_.delete_job(job_name)
+
+        # 刪除 SonarQube project
+        project_name = get_project_name(user, project)
+        SONAR_.projects.delete_project(project=project_name)
 
         # 刪除 Project model
         Project.objects.get(user=request.user, name=project).delete()
@@ -193,6 +199,9 @@ def repo_new_blank(request):
         create_jenkins_job(username=username, repo_name=repo_name)
         # 建立 GitLab webhook
         create_gitlab_webhook(username=username, repo_name=repo_name, project=user_project)
+        # 建立 SonarQube project
+        project_name = get_project_name(username, repo_name)
+        SONAR_.projects.create_project(project=project_name, name=project_name)
         # 建立 Project model
         Project.objects.create(user=request.user, name=repo_name)
 
@@ -233,6 +242,9 @@ def repo_new_template(request):
         create_jenkins_job(username=username, repo_name=repo_name)
         # 建立 GitLab webhook
         create_gitlab_webhook(username=username, repo_name=repo_name, project=project)
+        # 建立 SonarQube project
+        project_name = get_project_name(username, repo_name)
+        SONAR_.projects.create_project(project=project_name, name=project_name)
         # 建立 Project model
         Project.objects.create(user=request.user, name=repo_name)
 

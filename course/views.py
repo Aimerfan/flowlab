@@ -12,7 +12,7 @@ from django.http import JsonResponse, Http404, HttpResponse
 from accounts.models import Role, Teacher, Student
 from accounts.utils.check_role import get_roles, check_role
 from core.dicts import MESSAGE_DICT
-from core.infra import GITLAB_
+from core.infra import GITLAB_, SONAR_
 from core.infra.gitlab_func import get_repo_verbose, get_tree
 from .forms import LabForm
 from .models import Course, Lab, Question, Option, Answer
@@ -99,8 +99,11 @@ def course_view(request, course_id):
                 user.save()
                 # 建立 GitLab 帳號
                 gl_user = GITLAB_.users.create({'username': username, 'password': password,
-                                                'name': name, 'email': email})
+                                                'name': name, 'email': email, 'skip_confirmation': True})
                 gl_user.save()
+                # 建立 SonarQube 帳號
+                SONAR_.users.create_user(login=username, name=name, password=password, email=email)
+
             # 建立學生身份 並設定名稱
             if Student.objects.filter(user=user):
                 student = Student.objects.get(user=user)
@@ -136,7 +139,7 @@ def course_view(request, course_id):
                         user.save()
                         # 建立 GitLab 帳號
                         gl_user = GITLAB_.users.create({'username': row[0], 'password': row[1],
-                                                        'name': row[2], 'email': row[3]})
+                                                        'name': row[2], 'email': row[3], 'skip_confirmation': True})
                         gl_user.save()
                     # 建立學生身份 並設定名稱
                     if Student.objects.filter(user=user):
