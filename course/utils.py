@@ -13,14 +13,14 @@ def get_nav_side_dict(user, identity):
 
     if identity == 'student':
         stu_id = Student.objects.filter(user=user).get().id
-        courses = Course.objects.filter(students=stu_id)
+        courses = Course.objects.filter(students=stu_id).order_by('id')
     elif identity == 'teacher':
         tch_id = Teacher.objects.filter(user=user).get().id
-        courses = Course.objects.filter(teacher=tch_id)
+        courses = Course.objects.filter(teacher=tch_id).order_by('id')
 
     return {
         'courses': courses,
-        'all_labs': Lab.objects.all(),
+        'all_labs': Lab.objects.all().order_by('id'),
     }
 
 
@@ -68,10 +68,7 @@ def check_stu_evaluation_status(lab, students_obj):
 
         is_finish = False
         question_exist = Question.objects.filter(lab=lab)
-        print(question_exist)
         if question_exist:
-            # questions = question_exist.get()
-            # print(questions)
             for question in question_exist:
                 answer = Answer.objects.filter(student=student, topic=question)
                 if answer:

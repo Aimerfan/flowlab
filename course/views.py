@@ -29,11 +29,11 @@ def course_list_view(request):
 
     if Role.STUDENT in get_roles(request.user):
         stu_id = Student.objects.filter(user=request.user).get().id
-        context.update({'courses': Course.objects.filter(students=stu_id)})
+        context.update({'courses': Course.objects.filter(students=stu_id).order_by('id')})
         context.update(get_nav_side_dict(request.user, 'student'))
     elif Role.TEACHER in get_roles(request.user):
         tch_id = Teacher.objects.filter(user=request.user).get().id
-        context.update({'courses': Course.objects.filter(teacher=tch_id)})
+        context.update({'courses': Course.objects.filter(teacher=tch_id).order_by('id')})
         context.update(get_nav_side_dict(request.user, 'teacher'))
 
     return render(request, 'course_list.html', context)
@@ -43,7 +43,7 @@ def course_view(request, course_id):
     """課程內容"""
     context = {
         'course_id': course_id,
-        'labs': Lab.objects.filter(course=course_id),
+        'labs': Lab.objects.filter(course=course_id).order_by('id'),
         'course': Course.objects.filter(id=course_id).get(),
         'project': {},
         'submit': {},
@@ -53,7 +53,20 @@ def course_view(request, course_id):
 
     if Role.STUDENT in get_roles(request.user):
         for lab in context['labs']:
-            # 找出與 lab 關聯的專案
+            student_obj = context['course'].students.filter(user=request.user)
+            submit_br = lab.branch
+            # 檢查學生 lab 繳交狀態
+            student_dict = check_stu_lab_status(lab, student_obj, submit_br)
+            student = student_dict[request.user.username]
+            if student['is_submit']:
+                context['submit'].update({
+                    lab.name: '✔',
+                })
+            else:
+                context['submit'].update({
+                    lab.name: '✖',
+                })
+
             project = lab.project.filter(user=request.user)
             # 若找的到, lab 對應到'專案名稱'
             if project:
@@ -304,11 +317,7 @@ def lab_new_view(request, course_id):
         form.save()
         messages.success(request, MESSAGE_DICT.get('create_lab_success'))
 
-        context = {
-            'labs': Lab.objects.filter(course=course_id),
-            'course': Course.objects.filter(id=course_id).get(),
-        }
-        return render(request, 'course_tch.html', context)
+        return redirect('course', course_id=course_id)
 
     return render(request, 'lab_new.html', {'form': form})
 
@@ -412,23 +421,19 @@ def lab_evaluation_view(request, course_id, lab_id):
 
     if Role.STUDENT in get_roles(request.user):
         student = Student.objects.get(user=request.user)
+        context.update(get_nav_side_dict(request.user, 'student'))
         # 過濾出問題對應的回答
         q_ans = {}
         for question in questions:
             ans = Answer.objects.filter(topic=question, student=student)
             if ans:
                 q_ans[question.id] = ans.get()
+            else:
+                q_ans[question.id] = ''
         context.update({'q_ans': q_ans})
 
         if request.method == 'POST':
             question_ids = request.POST.getlist('id')
-            # TODO: 改從前端驗證表單是否填寫完全
-            # 驗證每個問題是否都有填寫
-            for id in question_ids:
-                if request.POST.get(f'answer_{id}') is None or request.POST.get(f'answer_{id}') == '':
-                    messages.warning(request, MESSAGE_DICT.get('answer_all_questions'))
-                    return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
-
             # 更新每個問題的回答
             for id in question_ids:
                 q_id = Question.objects.get(id=id)
@@ -441,6 +446,7 @@ def lab_evaluation_view(request, course_id, lab_id):
             return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
 
     elif Role.TEACHER in get_roles(request.user):
+        context.update(get_nav_side_dict(request.user, 'teacher'))
         # 新增問題
         if request.method == 'POST' and request.POST['action'] == 'newQuestion':
             q_exist = Question.objects.filter(lab=lab)
