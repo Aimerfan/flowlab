@@ -1,17 +1,22 @@
+from pathlib import PurePosixPath
+
+from gitlab.exceptions import GitlabGetError
+
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 
+from accounts.models import Role, Teacher, Student
+from accounts.utils.check_role import get_roles, check_role
 from core.dicts import MESSAGE_DICT
 from core.infra import GITLAB_
+from core.infra.gitlab_func import get_repo_verbose, get_tree
 from .forms import LabForm
 from .models import Course, Lab
-from .utils import get_nav_side_dict
+from .utils import get_nav_side_dict, check_stu_lab_status
 from flow.models import Project
 from flow.forms import TemplateRepoForm
 from flow.utils import import_template, create_jenkins_job, create_gitlab_webhook
-from accounts.models import Role, Teacher, Student
-from accounts.utils.check_role import get_roles
 
 
 def course_list_view(request):
@@ -36,6 +41,7 @@ def course_view(request, course_id):
         'labs': Lab.objects.filter(course=course_id),
         'course': Course.objects.filter(id=course_id).get(),
         'project': {},
+        'submit': {},
     }
     context.update({'students': context['course'].students.all()})
 
@@ -59,6 +65,20 @@ def course_view(request, course_id):
         return render(request, 'course_stu.html', context)
 
     elif Role.TEACHER in get_roles(request.user):
+        for lab in context['labs']:
+            students_obj = context['course'].students.all()
+            submit_br = lab.branch
+            # 檢查學生 lab 繳交狀態
+            students = check_stu_lab_status(lab, students_obj, submit_br)
+            # 計算各 lab 學生繳交人數
+            counts = 0
+            for name in students:
+                if students[name]['is_submit']:
+                    counts += 1
+            context['submit'].update({
+                lab.name: counts,
+            })
+
         context.update(get_nav_side_dict(request.user.username, 'teacher'))
         return render(request, 'course_tch.html', context)
 
@@ -177,6 +197,7 @@ def lab_view(request, course_id, lab_id):
         return render(request, 'lab_tch.html', context)
 
 
+@check_role([Role.TEACHER])
 def lab_new_view(request, course_id):
     """新增實驗 (lab)"""
     form = LabForm(request.POST or None)
@@ -195,3 +216,83 @@ def lab_new_view(request, course_id):
         return render(request, 'course_tch.html', context)
 
     return render(request, 'lab_new.html', {'form': form})
+
+
+@check_role([Role.TEACHER])
+def lab_submit_view(request, course_id, lab_id):
+    """學生繳交 lab 總覽頁面"""
+    course = Course.objects.filter(id=course_id).get()
+    students_obj = course.students.all()
+    lab = Lab.objects.filter(id=lab_id).get()
+    submit_br = lab.branch
+
+    # 檢查學生 lab 繳交狀態
+    students = check_stu_lab_status(lab, students_obj, submit_br)
+
+    context = {
+        'course_id': course_id,
+        'lab_id': lab_id,
+        'course': course,
+        'lab': lab,
+        'students': students,
+    }
+
+    return render(request, 'lab_submit_tch.html', context)
+
+
+@check_role([Role.TEACHER])
+def stu_tree_view(request, course_id, lab_id, student, project, path=''):
+    """檢視學生的儲存庫資料夾"""
+    lab = Lab.objects.filter(id=lab_id).get()
+    branch = lab.branch
+
+    project_info = get_repo_verbose(student, project)
+    folders, files = get_tree(student, project, path, branch)
+
+    content = {
+        'course_id': course_id,
+        'lab_id': lab_id,
+        'student': student,
+        'info': project_info,
+        'tree_path': f'{path}/' if path else '',
+        'folders': folders,
+        'files': files,
+    }
+    return render(request, 'stu_repo/repo_tree.html', content)
+
+
+@check_role([Role.TEACHER])
+def stu_blob_view(request, course_id, lab_id, student, project, path):
+    """檢視學生的儲存庫檔案"""
+    lab = Lab.objects.filter(id=lab_id).get()
+    branch = lab.branch
+
+    full_path = PurePosixPath(path)
+    blob = {
+        'path': str(full_path.parent),
+    }
+
+    project_inst = GITLAB_.projects.get(f'{student}/{project}')
+    project_info = get_repo_verbose(student, project)
+
+    try:
+        file = project_inst.files.get(file_path=str(full_path), ref=branch)
+    except GitlabGetError:
+        raise Http404(f'"{student}/{project}/{branch}/{path}" does not exist!')
+    else:
+        # 先解 base64, 然後要再進行一次 utf-8 decode
+        content = file.decode().decode('utf-8')
+        content = content.split('\n')
+
+    blob.update({
+        'name': full_path.name,
+        'content': content,
+        'format': full_path.name.rsplit('.')[-1]
+    })
+
+    return render(request, 'stu_repo/repo_blob.html', {
+        'info': project_info,
+        'student': student,
+        'branch': branch,
+        'blob': blob,
+    })
