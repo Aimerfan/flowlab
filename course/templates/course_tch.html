@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}
     {{ course.name }}
 {% endblock %}
@@ -42,21 +43,147 @@
         </div>
         <hr>
         <div class="content">
-            <h2>Students</h2>
+            <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6"><h2>Students</h2></div>
+                <div class="col-sm-3">
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#createModal">新增學生</button>
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#importModal">匯入學生資料</button>
+                </div>
+                {#  新增單筆學生的互動視窗  #}
+                <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="createModalLabel">新增學生資料</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="my-3 row">
+                                        <label class="col-form-label text-start" for="username">帳號</label>
+                                        <input class="form-control" type="text" name="username" id="username" maxlength="24" required>
+                                    </div>
+                                    <div class="my-3 row">
+                                        <label class="col-form-label text-start" for="password">密碼</label>
+                                        <input class="form-control" type="text" name="password" id="password" maxlength="24" required>
+                                    </div>
+                                    <div class="my-3 row">
+                                        <label class="col-form-label text-start" for="name">學生名稱</label>
+                                        <input class="form-control" type="text" name="name" id="name" maxlength="24" required>
+                                    </div>
+                                    <div class="my-3 row">
+                                        <label class="col-form-label text-start" for="email">email</label>
+                                        <input class="form-control" type="text" name="email" id=email maxlength="50" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="submit" class="btn btn-primary" name="action" value="create">新增學生</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {#  匯入學生的互動視窗  #}
+                <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="importModalLabel">匯入學生資料</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <pre>
+檔案格式：.csv 檔案
+資料格式：每位學生一列
+由左至右欄位內容：帳號、密碼、學生名稱、email
+                                    </pre>
+                                    <input type="file" name="file" id="file_upload">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-primary" id="fileUpload">匯入</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <table class="table table-light table-hover">
                 <thead class="table-secondary">
                     <tr>
                         <th>名稱</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for stu in students %}
                     <tr>
-                        <td>{{ stu }}</td>
+                        <td class="align-middle">{{ stu }}</td>
+                        <td><button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#remove_{{ stu }}">移除</button></td>
+                        {#  刪除單筆學生的互動視窗  #}
+                        <div class="modal fade" id="remove_{{ stu }}" tabindex="-1" aria-labelledby="removeModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="removeModalLabel">從課程中移除該學生</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="my-3">
+                                                <h6>你確定要從課程中移除該學生嗎?</h6>
+                                                <h6>請輸入學生名稱 <span style="background: #B2B7BC">{{ stu }}</span> 並再次確認</h6>
+                                                <input class="form-control" type="text" name="name" id="name" required>
+                                                <label style="display: none;"><input name="username" value="{{ stu.user }}"></label>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                            <button type="submit" class="btn btn-primary" name="action" value="remove">確認移除</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script>
+    {
+        let uploadBtn = $('#fileUpload');
+        {# 確認上傳檔案的行為 #}
+        uploadBtn.click(function () {
+            uploadBtn.attr('disabled', true);
+            let form_data = new FormData();
+            let file_info = $('#file_upload')[0].files[0];
+            form_data.append('file', file_info);
+            form_data.append('action', 'import');
+            $.ajax({
+                type: 'POST',
+                url: window.location.href,
+                data: form_data,
+                processData: false,
+                contentType: false,
+                {# 補上 csrf token #}
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                },
+            })
+                .done(function (response) {
+                    window.location.href = "{% url 'course' course_id %}";
+                })
+        });
+    }
+    </script>
 {% endblock %}

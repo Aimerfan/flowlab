@@ -1,10 +1,13 @@
+import csv
+import os
 from pathlib import PurePosixPath
 
 from gitlab.exceptions import GitlabGetError
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.http import JsonResponse, Http404
+from django.contrib.auth.models import User
+from django.http import JsonResponse, Http404, HttpResponse
 
 from accounts.models import Role, Teacher, Student
 from accounts.utils.check_role import get_roles, check_role
@@ -17,6 +20,7 @@ from .utils import get_nav_side_dict, check_stu_lab_status
 from flow.models import Project
 from flow.forms import TemplateRepoForm
 from flow.utils import import_template, create_jenkins_job, create_gitlab_webhook
+from flowlab.settings import MEDIA_ROOT
 
 
 def course_list_view(request):
@@ -24,13 +28,13 @@ def course_list_view(request):
     context = {}
 
     if Role.STUDENT in get_roles(request.user):
-        stu_id = Student.objects.filter(full_name=request.user.username).get().id
+        stu_id = Student.objects.filter(user=request.user).get().id
         context.update({'courses': Course.objects.filter(students=stu_id)})
-        context.update(get_nav_side_dict(request.user.username, 'student'))
+        context.update(get_nav_side_dict(request.user, 'student'))
     elif Role.TEACHER in get_roles(request.user):
-        tch_id = Teacher.objects.filter(full_name=request.user.username).get().id
+        tch_id = Teacher.objects.filter(user=request.user).get().id
         context.update({'courses': Course.objects.filter(teacher=tch_id)})
-        context.update(get_nav_side_dict(request.user.username, 'teacher'))
+        context.update(get_nav_side_dict(request.user, 'teacher'))
 
     return render(request, 'course_list.html', context)
 
@@ -38,6 +42,7 @@ def course_list_view(request):
 def course_view(request, course_id):
     """課程內容"""
     context = {
+        'course_id': course_id,
         'labs': Lab.objects.filter(course=course_id),
         'course': Course.objects.filter(id=course_id).get(),
         'project': {},
@@ -61,10 +66,88 @@ def course_view(request, course_id):
                 }
             context['project'].update(project_dict)
 
-        context.update(get_nav_side_dict(request.user.username, 'student'))
+        context.update(get_nav_side_dict(request.user, 'student'))
         return render(request, 'course_stu.html', context)
 
     elif Role.TEACHER in get_roles(request.user):
+        # 新增單筆學生資料
+        if request.method == 'POST' and request.POST['action'] == 'create':
+            username = request.POST['username']
+            password = request.POST['password']
+            name = request.POST['name']
+            email = request.POST['email']
+
+            # 建立使用者帳號
+            if User.objects.filter(username=username):
+                user = User.objects.get(username=username)
+            else:
+                user = User.objects.create_user(username=username, password=password, email=email)
+                user.save()
+                # 建立 GitLab 帳號
+                gl_user = GITLAB_.users.create({'username': username, 'password': password,
+                                                'name': name, 'email': email})
+                gl_user.save()
+            # 建立學生身份 並設定名稱
+            if Student.objects.filter(user=user):
+                student = Student.objects.get(user=user)
+            else:
+                student = Student.objects.create(user=user, full_name=name)
+                student.save()
+            # 將學生加入課程
+            course = Course.objects.get(id=course_id)
+            if course.students.filter(user=user):
+                messages.warning(request, MESSAGE_DICT.get('stu_is_in_course').format(name))
+            else:
+                course.students.add(student)
+                course.save()
+                messages.success(request, MESSAGE_DICT.get('create_stu_in_course_success').format(name))
+
+        # 批量匯入學生資料
+        elif request.method == 'POST' and request.POST['action'] == 'import':
+            file_obj = request.FILES.get('file')
+            file_path = os.path.join(MEDIA_ROOT, file_obj.name)
+            # 將上傳的檔案 存到指定路徑下
+            with open(file_path, 'wb') as file:
+                for chunk in file_obj.chunks():
+                    file.write(chunk)
+
+            with open(file_path, 'r') as file:
+                rows = csv.reader(file)
+                for row in rows:
+                    # 建立使用者帳號
+                    if User.objects.filter(username=row[0]):
+                        user = User.objects.get(username=row[0])
+                    else:
+                        user = User.objects.create_user(username=row[0], password=row[1], email=row[3])
+                        user.save()
+                        # 建立 GitLab 帳號
+                        gl_user = GITLAB_.users.create({'username': row[0], 'password': row[1],
+                                                        'name': row[2], 'email': row[3]})
+                        gl_user.save()
+                    # 建立學生身份 並設定名稱
+                    if Student.objects.filter(user=user):
+                        student = Student.objects.get(user=user)
+                    else:
+                        student = Student.objects.create(user=user, full_name=row[2])
+                        student.save()
+                    # 將學生加入課程
+                    course = Course.objects.get(id=course_id)
+                    course.students.add(student)
+                    course.save()
+                messages.success(request, MESSAGE_DICT.get('import_stu_in_course_success'))
+
+            return HttpResponse('OK')
+
+        # 將學生從課程中移除 (不會刪除 gitlab 帳號)
+        elif request.method == 'POST' and request.POST['action'] == 'remove':
+            # 將學生從課程中移除
+            user = User.objects.get(username=request.POST['username'])
+            student = Student.objects.get(user=user)
+            course = Course.objects.get(id=course_id)
+            course.students.remove(student)
+            course.save()
+            messages.success(request, MESSAGE_DICT.get('remove_stu_in_course_success').format(request.POST['name']))
+
         for lab in context['labs']:
             students_obj = context['course'].students.all()
             submit_br = lab.branch
@@ -79,7 +162,7 @@ def course_view(request, course_id):
                 lab.name: counts,
             })
 
-        context.update(get_nav_side_dict(request.user.username, 'teacher'))
+        context.update(get_nav_side_dict(request.user, 'teacher'))
         return render(request, 'course_tch.html', context)
 
 
@@ -107,7 +190,7 @@ def lab_view(request, course_id, lab_id):
             'project_list': project_list,
             'form': repo_form,
         }
-        context.update(get_nav_side_dict(request.user.username, 'student'))
+        context.update(get_nav_side_dict(request.user, 'student'))
 
         # 按下更新按鈕, 更新關聯專案
         if request.method == 'POST' and request.POST['action'] == 'UpdateRepo':
@@ -193,7 +276,7 @@ def lab_view(request, course_id, lab_id):
             'lab_id': lab_id,
             'form': form,
         }
-        context.update(get_nav_side_dict(request.user.username, 'teacher'))
+        context.update(get_nav_side_dict(request.user, 'teacher'))
         return render(request, 'lab_tch.html', context)
 
 
