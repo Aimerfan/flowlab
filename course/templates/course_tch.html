@@ -21,6 +21,7 @@
                         <th scope="col">實驗名稱</th>
                         <th scope="col">繳交期限</th>
                         <th scope="col">繳交人數</th>
+                        <th scope="col">評量填寫人數</th>
                         <th scope="col">繳交情況</th>
                     </tr>
                 </thead>
@@ -30,6 +31,12 @@
                         <td><a href="{% url 'lab' course.id lab.id %}">{{ lab.name }}</a></td>
                         <td>{% if lab.deadline %}{{ lab.deadline }}{% else %}無{% endif %}</td>
                         <td>{% for key, value in submit.items %}
+                                {% if key == lab.name %}
+                                    {{ value }}
+                                {% endif %}
+                            {% endfor %}
+                            /{{ students.count }}</td>
+                        <td>{% for key, value in finish.items %}
                                 {% if key == lab.name %}
                                     {{ value }}
                                 {% endif %}

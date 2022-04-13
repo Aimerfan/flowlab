@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 
 from accounts.models import Teacher, Student
 from core.infra import GITLAB_
-from .models import Course, Lab
+from .models import Course, Lab, Question, Option, Answer
 
 
 def get_nav_side_dict(user, identity):
@@ -56,3 +56,60 @@ def check_stu_lab_status(lab, students_obj, submit_br):
             'is_submit': is_submit,
         }
     return students
+
+
+def check_stu_evaluation_status(lab, students_obj):
+    """
+    檢查學生 評量 填寫狀態
+    """
+    students = {}
+    for student in students_obj:
+        stu_username = student.user.username
+
+        is_finish = False
+        question_exist = Question.objects.filter(lab=lab)
+        print(question_exist)
+        if question_exist:
+            # questions = question_exist.get()
+            # print(questions)
+            for question in question_exist:
+                answer = Answer.objects.filter(student=student, topic=question)
+                if answer:
+                    is_finish = True
+                    break
+
+        students[stu_username] = {
+            'full_name': student,
+            'is_finish': is_finish,
+        }
+    return students
+
+
+def question_parser(question_obj, content):
+    """
+    剖析 'question' 字串, 區分成 題目 (Topic) 與 選項 (Option)
+    題目: 開頭不為 '()'
+    選項: 開頭須為 '()' or '() '
+    """
+    lines = content.split('\n')
+    topic = ''
+    number = 0
+    if question_obj.type == 'single':
+        Option.objects.filter(topic=question_obj).delete()
+
+    for line in lines:
+        # 該行為 '選項' 的情況
+        if line[0] == '(' and line[1] == ')':
+            number = number + 1
+            option_text = line[2:] if line[2] != ' ' else line[3:]
+            Option.objects.update_or_create(topic=question_obj, number=number, content=option_text)
+        else:
+            topic += line
+
+    if number:
+        question_obj.type = 'single'
+    else:
+        question_obj.type = 'text'
+
+    question_obj.content = topic
+    question_obj.save()

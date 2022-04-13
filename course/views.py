@@ -15,8 +15,8 @@ from core.dicts import MESSAGE_DICT
 from core.infra import GITLAB_
 from core.infra.gitlab_func import get_repo_verbose, get_tree
 from .forms import LabForm
-from .models import Course, Lab
-from .utils import get_nav_side_dict, check_stu_lab_status
+from .models import Course, Lab, Question, Option, Answer
+from .utils import get_nav_side_dict, check_stu_lab_status, check_stu_evaluation_status, question_parser
 from flow.models import Project
 from flow.forms import TemplateRepoForm
 from flow.utils import import_template, create_jenkins_job, create_gitlab_webhook
@@ -47,6 +47,7 @@ def course_view(request, course_id):
         'course': Course.objects.filter(id=course_id).get(),
         'project': {},
         'submit': {},
+        'finish': {},
     }
     context.update({'students': context['course'].students.all()})
 
@@ -160,6 +161,17 @@ def course_view(request, course_id):
                     counts += 1
             context['submit'].update({
                 lab.name: counts,
+            })
+
+            # 檢查學生 評量 繳交狀態
+            students_eva = check_stu_evaluation_status(lab, students_obj)
+            # 計算各 評量 學生繳交人數
+            counts_eva = 0
+            for name in students_eva:
+                if students_eva[name]['is_finish']:
+                    counts_eva += 1
+            context['finish'].update({
+                lab.name: counts_eva,
             })
 
         context.update(get_nav_side_dict(request.user, 'teacher'))
@@ -303,7 +315,7 @@ def lab_new_view(request, course_id):
 
 @check_role([Role.TEACHER])
 def lab_submit_view(request, course_id, lab_id):
-    """學生繳交 lab 總覽頁面"""
+    """學生繳交 lab 與 互動式評量 的總覽頁面"""
     course = Course.objects.filter(id=course_id).get()
     students_obj = course.students.all()
     lab = Lab.objects.filter(id=lab_id).get()
@@ -311,6 +323,8 @@ def lab_submit_view(request, course_id, lab_id):
 
     # 檢查學生 lab 繳交狀態
     students = check_stu_lab_status(lab, students_obj, submit_br)
+    # 檢查學生 評量 填寫狀態
+    students_eva = check_stu_evaluation_status(lab, students_obj)
 
     context = {
         'course_id': course_id,
@@ -318,6 +332,7 @@ def lab_submit_view(request, course_id, lab_id):
         'course': course,
         'lab': lab,
         'students': students,
+        'students_eva': students_eva,
     }
 
     return render(request, 'lab_submit_tch.html', context)
@@ -332,7 +347,7 @@ def stu_tree_view(request, course_id, lab_id, student, project, path=''):
     project_info = get_repo_verbose(student, project)
     folders, files = get_tree(student, project, path, branch)
 
-    content = {
+    context = {
         'course_id': course_id,
         'lab_id': lab_id,
         'student': student,
@@ -341,7 +356,7 @@ def stu_tree_view(request, course_id, lab_id, student, project, path=''):
         'folders': folders,
         'files': files,
     }
-    return render(request, 'stu_repo/repo_tree.html', content)
+    return render(request, 'stu_repo/repo_tree.html', context)
 
 
 @check_role([Role.TEACHER])
@@ -379,3 +394,116 @@ def stu_blob_view(request, course_id, lab_id, student, project, path):
         'branch': branch,
         'blob': blob,
     })
+
+
+def lab_evaluation_view(request, course_id, lab_id):
+    """互動式評量"""
+    context = {}
+    course = Course.objects.filter(id=course_id).get()
+    lab = Lab.objects.filter(id=lab_id).get()
+    questions = Question.objects.filter(lab=lab).order_by('id')
+
+    # 過濾出選擇題中對應的選項
+    q_options = {}
+    for question in questions:
+        if question.type == 'single':
+            option = Option.objects.filter(topic=question)
+            q_options[question.id] = option
+
+    if Role.STUDENT in get_roles(request.user):
+        student = Student.objects.get(user=request.user)
+        # 過濾出問題對應的回答
+        q_ans = {}
+        for question in questions:
+            ans = Answer.objects.filter(topic=question, student=student)
+            if ans:
+                q_ans[question.id] = ans.get()
+        context.update({'q_ans': q_ans})
+
+        if request.method == 'POST':
+            question_ids = request.POST.getlist('id')
+            # TODO: 改從前端驗證表單是否填寫完全
+            # 驗證每個問題是否都有填寫
+            for id in question_ids:
+                if request.POST.get(f'answer_{id}') is None or request.POST.get(f'answer_{id}') == '':
+                    messages.warning(request, MESSAGE_DICT.get('answer_all_questions'))
+                    return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
+
+            # 更新每個問題的回答
+            for id in question_ids:
+                q_id = Question.objects.get(id=id)
+                answer = Answer.objects.filter(student=student, topic=q_id)
+                ans_content = request.POST.get(f'answer_{id}')
+                if answer:
+                    answer.update(content=ans_content)
+                else:
+                    Answer.objects.update_or_create(student=student, topic=q_id, content=ans_content)
+            return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
+
+    elif Role.TEACHER in get_roles(request.user):
+        # 新增問題
+        if request.method == 'POST' and request.POST['action'] == 'newQuestion':
+            q_exist = Question.objects.filter(lab=lab)
+            number = q_exist.last().number if q_exist else 0
+            Question.objects.update_or_create(type='text', content=request.POST['content'], lab=lab, number=number + 1)
+            question_obj = Question.objects.get(type='text', content=request.POST['content'], lab=lab, number=number + 1)
+            question_parser(question_obj, request.POST['content'])
+            return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
+        # 更新問題
+        elif request.method == 'POST' and request.POST['action'] == 'updateQuestion':
+            question_obj = Question.objects.get(id=request.POST['id'])
+            question_parser(question_obj, request.POST['content'])
+            return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
+        # 刪除問題
+        elif request.method == 'POST' and request.POST['action'] == 'delQuestion':
+            Question.objects.get(id=request.POST['id']).delete()
+            return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
+
+    context.update({
+        'course': course,
+        'lab': lab,
+        'questions': questions,
+        'q_options': q_options,
+    })
+
+    if Role.STUDENT in get_roles(request.user):
+        return render(request, 'evaluation_stu.html', context)
+    elif Role.TEACHER in get_roles(request.user):
+        return render(request, 'evaluation_tch.html', context)
+
+
+@check_role([Role.TEACHER])
+def lab_evaluation_submit_view(request, course_id, lab_id, student):
+    """老師檢視單個學生的互動式評量"""
+    course = Course.objects.filter(id=course_id).get()
+    lab = Lab.objects.filter(id=lab_id).get()
+    questions = Question.objects.filter(lab=lab).order_by('id')
+    # 獲取學生物件
+    stu_id = User.objects.get(username=student)
+    student_obj = Student.objects.get(user=stu_id)
+
+    # 過濾出選擇題中對應的選項
+    q_options = {}
+    for question in questions:
+        if question.type == 'single':
+            option = Option.objects.filter(topic=question)
+            q_options[question.id] = option
+
+    # 過濾出問題對應的回答
+    q_ans = {}
+    for question in questions:
+        pass
+        ans = Answer.objects.filter(topic=question, student=student_obj)
+        if ans:
+            q_ans[question.id] = ans.get()
+
+    context = {
+        'course': course,
+        'lab': lab,
+        'student': student_obj,
+        'questions': questions,
+        'q_options': q_options,
+        'q_ans': q_ans,
+    }
+
+    return render(request, 'evaluation_submit_tch.html', context)
