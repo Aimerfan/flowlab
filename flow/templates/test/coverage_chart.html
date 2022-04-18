@@ -1,0 +1,10 @@
+<div class="progress">
+    <div class="progress-bar {% if data.percentage >= '50' %}bg-success{% endif %}" role="progressbar"
+         style="width: {{ data.percentage }}%;"
+         aria-valuenow="{{ data.percentage }}"
+         aria-valuemin="0" aria-valuemax="100">
+        {{ data.percentage }}%
+    </div>
+</div>
+未覆蓋: {{ data.missed }}<br>
+已覆蓋: {{ data.covered }}

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{ course.name }}-{{ lab.name }} 繳交情況
+{% endblock %}
+{% block body %}
+    <div class="container container_close">
+    <div class="content">
+        <h1>{{ course.name }} - {{ lab.name }}</h1>
+        <h2>Students' HW</h2>
+        <table class="table table-light table-hover">
+            <thead class="table-secondary">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">姓名</th>
+                    <th scope="col">專案名稱</th>
+                    <th scope="col">是否繳交 {{ lab.branch }} 分支</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for stu_username, stu in students.items %}
+                <tr>
+                    <td>{{ stu_username }}</td>
+                    <td>{{ stu.stu_name }}</td>
+                    <td>
+                        {% if stu.repo_name %}
+                            <a href="{% url 'stu_tree_root' course_id lab_id stu_username stu.repo_name %}">{{ stu.repo_name }}</a>
+                        {% else %}
+                            <span style="color: #ed1e45; font-weight: bold;">尚未建立專案</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if stu.is_submit %}
+                            是
+                        {% else %}
+                            <span style="color: #ed1e45; font-weight: bold;">否</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="container container_close">
+        <div class="content">
+            <h2>Students' 互動式評量</h2>
+            <table class="table table-light table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">姓名</th>
+                        <th scope="col">是否完成評量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for stu_username, stu in students_eva.items %}
+                    <tr>
+                        <td>{{ stu_username }}</td>
+                        <td>{{ stu.full_name }}</td>
+                        <td>
+                            {% if stu.is_finish %}
+                                <a href="{% url 'lab_eva_submit' course_id lab_id stu_username %}" target="_blank">是</a>
+                            {% else %}
+                                <span style="color: #ed1e45; font-weight: bold;">否</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

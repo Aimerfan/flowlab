@@ -1,0 +1,36 @@
+<form method="post">
+    {% csrf_token %}
+    <div class="my-3 row">
+        <label class="col-sm-2 col-form-label text-start" for="{{ form.name.id_for_label }}">實驗名稱</label>
+        <div class="px-0 col-sm-10">
+            {{ form.name }}
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="form-label text-start" for="{{ form.description.id_for_label }}">實驗說明</label>
+        {% if form.description %}{{ form.description }}{% else %}無繳交期限{% endif %}
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label text-start" for="{{ form.branch.id_for_label }}">實驗繳交分支</label>
+        <div class="px-0 col-sm-10">
+            {{ form.branch }}
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label text-start" for="{{ form.template.id_for_label }}">套用模板</label>
+        <div class="px-0 col-sm-10">
+            <select class="form-select" id="{{ form.template.id_for_label }}" name="{{ form.template.html_name }}">
+                {% for template in form.template %}
+                    {{ template.tag }}
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-2 col-form-label text-start" for="{{ form.deadline.id_for_label }}">繳交期限</label>
+        <div class="px-0 col-sm-10">
+            {% if form.deadline %}{{ form.deadline }}{% else %}無{% endif %}
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">儲存</button>
+</form>

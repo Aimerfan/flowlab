@@ -32,6 +32,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core.apps.CoreConfig',
+    'accounts.apps.AccountsConfig',
+    'flow.apps.FlowConfig',
+    'course.apps.CourseConfig',
 ]
 
 MIDDLEWARE = [
@@ -40,6 +44,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'login_required.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -113,13 +118,32 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static/'
+
+MEDIA_URL = '/uploads/'
+MEDIA_ROOT = BASE_DIR / 'uploads/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# django-login-required-middleware
+# https://pypi.org/project/django-login-required-middleware/
+# regex path 白名單
+LOGIN_REQUIRED_IGNORE_PATHS = [
+    r'/admin/*',
+    r'/static/*',
+]
+# url names 白名單
+LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
+    'index',
+    'login',
+]
+
 try:
-    from .local_settings import *
-except ImportError:
-    raise Exception("A local_settings.py file is required to run this project")
+    from .secrets import *
+    from .log import LOGGING
+except Exception as e:
+    raise e

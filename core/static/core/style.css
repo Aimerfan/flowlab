@@ -1,0 +1,606 @@
+/* 常用顏色*/
+/* 深灰色: #313335 */
+/* 淺淺藍色: #82A3D6 */
+/* 淺藍色: #A3C3E0 */
+
+/* 上方導航列 */
+nav {
+    height: 70px;
+}
+
+.navbar{
+    background-color: #D9F5FFFF;
+}
+
+li a {
+    color: #000 !important;
+    font-size: 16px;
+}
+
+/* Change the link color on hover */
+li a:hover {
+    color: #000 !important;
+    background-color: lightblue;
+}
+
+.nav-link {
+    padding: 24px;
+}
+
+.navbar-toggler {
+    background-color: lightgray;
+}
+
+.show_name {
+    padding: 24px 12px;
+}
+
+@media (max-width: 992px) {
+    nav {
+        height: auto;
+    }
+    .nav-link {
+        padding: 10px;
+    }
+    .show_name {
+        display: none;
+    }
+}
+
+.active {
+    background-color: #6CC3D5;
+    color: white;
+}
+
+.ver_mid {
+    /* 垂直置中 */
+    display: flex;
+    align-items: center;
+}
+
+.ver_top {
+    /* 垂直靠上 */
+    display: flex;
+    align-items: flex-start;
+}
+
+.align_both_sides {
+    /* 對齊左右兩邊 */
+    display: flex;
+    justify-content: space-between;
+}
+
+
+body {
+    background-color: lightblue;
+}
+
+a {
+    color: #000 !important;
+}
+
+#brand a:hover {
+    color: #000 !important;
+    background-color: #D9F5FF;
+}
+
+a:hover {
+    color: #000 !important;
+    background-color: lightblue;
+}
+
+pre {
+    margin: 0;
+    padding-left: 10px;
+}
+
+h1 {
+    color: navy;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+h4 {
+    margin: 10px 0;
+}
+
+h5 {
+    margin: 10px;
+}
+
+h6 {
+    margin: 10px;
+    font-weight: 400;
+}
+
+h6 a {
+    text-decoration: none;
+}
+
+/*FORM*/
+.form_title {
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.form-row {
+    margin-top: 5px;
+}
+
+.form-row label {
+    color: #4D4D4D;
+    font-weight: 800;
+}
+
+/*btn*/
+button {
+    outline: none ! important;
+}
+
+.btn_index_login {
+    color: white;
+    background: #633974;
+    border: none;
+    padding: 5px 20px 5px 20px;
+    font-weight: bold;
+    border-radius: 20px;
+    transition: 0.1s linear;
+    cursor: pointer;
+}
+
+.btn_index_login:hover {
+    color: white;
+    background: #FF6722;
+    transition: 0.1s linear;
+}
+
+.btn_gray {
+    float: right;
+    font-weight: bold;
+    color: white;
+    background: #5FAEC6;
+    border: none;
+    padding: 5px 20px 5px 20px;
+    font-weight: bold;
+    border-radius: 20px;
+    transition: 0.1s linear;
+    cursor: pointer;
+}
+
+.btn_gray:hover {
+    color: white;
+    background: #3290B0;
+}
+
+.btn_nav_login {
+    color: #4D4D4D;
+    background: rgba(0, 0, 0, 0);
+    border: 2px solid #4D4D4D;
+    padding: 5px 20px 5px 20px;
+    font-weight: bold;
+    border-radius: 20px;
+    transition: 0.1s linear;
+}
+
+.btn_nav_login:hover {
+    color: white;
+    background: #4D4D4D;
+    transition: 0.1s linear;
+    cursor: pointer;
+}
+
+/* button's size */
+.btn-lg {
+    padding: .5rem 1rem;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    border-radius: .3rem
+}
+
+.btn-md {
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: .25rem
+}
+
+.btn-sm {
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    line-height: 1.5;
+    border-radius: .2rem
+}
+
+.btn-primary {
+    background-color: #3278ff;
+    border-color: #3278ff;
+}
+
+.btn-primary:hover {
+    background-color: #285fcc;
+    border-color: #285fcc;
+}
+
+.btn_ci_flow {
+    color: #33577E;
+    background-color: #BCDCFF;
+    border-radius: 30px 30px 30px 30px;
+    border: 2px solid #33577E;
+}
+
+.btn_ci_flow:hover {
+    color: white;
+    background: #8298B1;
+    transition: 0.1s linear;
+    cursor: pointer;
+}
+
+/*.btn_ci_flow .active {*/
+/*    color: white;*/
+/*    background: #5c6c7e;*/
+/*}*/
+
+button[class*="btn_ci_flow active"] {
+    color: white;
+    background: #5c6c7e;
+}
+
+/* login page */
+.login_title {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.login_title > h3 {
+    font-weight: 700;
+    color: #4d4d4d;
+}
+
+.login_content_title {
+    margin: 20px
+}
+
+.login_content_title > h5 {
+    font-weight: 700;
+    color: #633974;
+}
+
+.login_content {
+    margin: 20px;
+}
+
+.login_content_btn {
+    text-align: center;
+}
+
+.login_content_img {
+    position: relative;
+    min-height: 200px
+}
+
+.login_content_img img {
+    width: 100px;
+    height: 46px;
+    position: absolute;
+    top: calc(50% - 23px);
+    left: calc(50% - 50px);
+}
+
+.login_content > input {
+    width: 200px;
+    border: 0;
+    border-bottom: 2px solid #633974;
+    color: #633974;
+    font-weight: bold;
+    padding: .375rem .75rem;
+}
+
+.login_content > input:hover {
+    border-bottom: 2px solid #FF6722;
+    transition: 0.1s linear;
+}
+
+.login_content > input:focus {
+    border-bottom: 2px solid #FF6722;
+    transition: 0.1s linear;
+    outline: none ! important;
+}
+
+/* register */
+.register_content_title {
+    margin: 20px;
+}
+
+.register_content_title > h5 {
+    font-weight: 700;
+    color: #633974;
+}
+
+.register_content {
+    margin: 20px;
+}
+
+
+
+
+
+
+.content {
+    /*border: 1px solid blue;*/
+    width: 100%;
+    /* 水平置中 */
+    margin: 0 auto;
+    text-align: center;
+}
+
+.high_content {
+    width: 100%;
+    padding: 20px;
+    /* 水平置中 */
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* repo_projects 列表 */
+.projects_content {
+    width: 80%;
+    text-align: left;
+    background-color: whitesmoke;
+    border-radius: 10px;
+}
+
+.container_close {
+    padding: 20px;
+}
+
+.feature {
+    padding: 100px;
+}
+
+.feature_odd {
+    background-color: #d9f5ff;
+}
+
+
+
+
+.text_left {
+    text-align: left;
+}
+
+/* 儲存庫預覽區塊 */
+.repo_content {
+    /*border: 1px solid blue;*/
+    width: 90%;
+    /* 水平置中 */
+    margin: 0 auto;
+    text-align: left;
+}
+
+.frame_gray {
+    border: 1px solid gray;
+    background-color: whitesmoke;
+    border-radius: 10px 10px 10px 10px;
+}
+
+/* command line 區塊 */
+.command_context {
+    background-color: #A3C3E0;
+}
+
+/* 儲存庫檔案瀏覽區 */
+.frame_files {
+    margin-top: 20px;
+    background-color: whitesmoke;
+    border-radius: 10px;
+    border: 1px solid gray;
+}
+
+.frame_files_header {
+    /*border: 1px solid cornflowerblue;*/
+    background-color: #d9f5ff;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+}
+
+.frame_files_info {
+    border-top: 1px solid gray;
+    display: flex;
+}
+
+.copy_sha {
+    display: flex;
+    border: 1px solid gray;
+    border-radius: 5px 5px 5px 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 15px;
+}
+
+.repo_icon {
+    height: 16px;
+    margin: 12px;
+}
+
+/* 儲存庫檔案檢視 (blob) */
+.line_numbers {
+    color: #1b1b1b;
+    text-align: right;
+    font-size: 13px;
+    user-select: none;  /* 無法被選擇 */
+}
+
+.frame_files_context {
+    border-top: 1px solid gray;
+    display: flex;
+    padding: 10px;
+    text-align: left;
+}
+
+.frame {
+    border: 1px solid red;
+}
+
+/* 新增儲存庫 */
+.new_repo_context {
+    width: 80%;
+    /* 水平置中 */
+    margin: 0 auto;
+    text-align: left;
+}
+
+/* jenkins file page*/
+/* 拼圖區塊 */
+.jenkins_puzzle {
+    text-align: left;
+    padding: 0 10px;
+    margin: 1px 0;
+    background-color: whitesmoke;
+}
+
+.puz_add:hover {
+    background-color: #87939A;
+    color: whitesmoke;
+}
+
+.puz_2 {
+    padding-left: 30px;
+}
+
+.puz_3 {
+    padding-left: 60px;
+}
+
+.puz_4 {
+    padding-left: 90px;
+}
+
+.puz_5 {
+    padding-left: 120px;
+}
+
+.puz_6 {
+    padding-left: 150px;
+}
+
+.puz_7 {
+    padding-left: 180px;
+}
+
+.puz_form {
+    display: inline;
+    width: auto;
+    padding: 0 .75rem;
+}
+
+[class*="puz_bl"] {
+    border-color: transparent;
+    border-width: .1rem;
+    border-style: dashed;
+}
+
+.puz_bl_2:hover {
+    border-color: red;
+    border-width: .1rem;
+    border-style: dashed;
+}
+
+.puz_bl_3:hover {
+    border-color: #33577E;
+    border-width: .1rem;
+    border-style: dashed
+}
+
+.puz_bl_4:hover {
+    border-color: #337e36;
+    border-width: .1rem;
+    border-style: dashed
+}
+
+.puz_bl_5:hover {
+    border-color: #FE672F;
+    border-width: .1rem;
+    border-style: dashed
+}
+
+.puz_bl_6:hover {
+    border-color: #198CA2;
+    border-width: .1rem;
+    border-style: dashed
+}
+
+/* 程式碼區塊 */
+.jenkins_code_content {
+    /*width: 80%;*/
+    text-align: left;
+    background-color: whitesmoke;
+    /*border-radius: 10px;*/
+}
+
+/* 靠右 */
+.right_content {
+    margin-right: 12%;
+    text-align: right;
+    padding: 10px 0;
+}
+
+/* 靠左 */
+.left_content {
+    margin-left: 12%;
+    /*padding: 10px;*/
+    text-align: left;
+}
+
+.width_textarea {
+    width: 160%;
+}
+
+/* 字體顏色 */
+#gray {
+    color: #313335;
+}
+
+/* pipeline console highlight 字體顏色 */
+span.pipeline_new_node {
+    color: #0060C1;
+}
+
+/* boostrap toast & django message tag */
+.top-200px {
+    top: 200px!important;
+}
+
+.info {
+    background: #c9dbe6;
+    color: #313335;
+}
+
+.success {
+    background: #9cffaf;
+    color: #313335;
+}
+
+.warning {
+    background: lightgoldenrodyellow;
+    color: #313335;
+}
+
+.error {
+    background: #d7686d;
+    color: white;
+}
+
+/* 上下間距較窄的 card */
+.card-body-close {
+    padding: 0.5rem 1rem;
+}
+
+/* course app 側邊欄 */
+.offcanvas-start {
+    width: 250px;
+}
+
+.offcanvas {
+    /*z-index: ;*/
+    background: #e6f1ff;
+}

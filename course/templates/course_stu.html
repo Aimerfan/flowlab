@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{ course.name }}
+{% endblock %}
+{% block body %}
+    {% include 'components/sidebar.html' %}
+    <div class="container container_close">
+        <div class="content">
+            <h1>{{ course.name }}</h1>
+            <h2>Labs</h2>
+            <table class="table table-light table-hover">
+                <thead class="table-secondary">
+                    <tr>
+                        <th scope="col">是否繳交</th>
+                        <th scope="col">實驗名稱</th>
+                        <th scope="col">關聯專案</th>
+                        <th scope="col">繳交分支</th>
+                        <th scope="col">繳交期限</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for lab in labs %}
+                    <tr>
+                        <td>
+                            {% for key, value in submit.items %}
+                                {% if key == lab.name %}
+                                    {{ value }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td><a href="{% url 'lab' course.id lab.id %}">{{ lab.name }}</a></td>
+                        {% for key, repo in project.items %}
+                            {% if key == lab %}
+                                {% if repo %}
+                                    <td><a href="{% url 'repo_project' user.username repo %}">{{ repo }}</a></td>
+                                {% else %}
+                                    <td>無</td>
+                                {% endif %}
+                            {% endif %}
+                        {% empty %}
+                            <td>無</td>
+                        {% endfor %}
+                        <td>{{ lab.branch }}</td>
+                        <td>{% if lab.deadline %}{{ lab.deadline }}{% else %}無{% endif %}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

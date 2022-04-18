@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load parser %}
+{% block title %}
+    {{ student }} 互動式評量
+{% endblock %}
+{% block body %}
+    {% include 'components/sidebar.html' %}
+    <div class="container container_close">
+        <div class="content">
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-8"><h2>{{ course.name }} - {{ lab.name }}</h2><br><h1>互動式評量</h1><br><h2>{{ student.user }} {{ student.full_name }}</h2></div>
+                <div class="col-sm-2 d-flex align-items-end"></div>
+            </div>
+        </div>
+    </div>
+    <div class="container container_close">
+        <div class="content">
+{#            <form method="post">#}
+{#                {% csrf_token %}#}
+                {% for question in questions %}
+                    <div class="mb-2 row">
+                        <label style="display: none;"><input name="id" value="{{ question.id }}"></label>
+                        {% if question.type == 'text' %}
+                            <label class="form-label text-start">
+                                {{ question }}
+                            </label>
+                            <label class="form-label text-start">
+                                {% for id, ans in q_ans.items %}
+                                    {% if id == question.id %}
+                                        <textarea class="form-control" name="answer_{{ question.id }}" style="height: 100px;" disabled>{{ ans.content }}</textarea>
+                                    {% endif %}
+                                {% empty %}
+                                    <textarea class="form-control" name="answer_{{ question.id }}" style="height: 100px;" disabled></textarea>
+                                {% endfor %}
+                            </label>
+                        {% elif question.type == 'single' %}
+                            <label class="form-label text-start">
+                                {{ question }}
+                            </label>
+                            <div class="text-start">
+                            {% for id, options in q_options.items %}
+                                {% if id == question.id %}
+                                    {% for option in options %}
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input class="form-check-input" type="radio" name="answer_{{ question.id }}" value="{{ option.number }}" disabled
+                                                    {% for id, ans in q_ans.items %}
+                                                        {% if id == question.id and ans.content == option.number|slugify %}
+                                                            checked
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                >
+                                                {{ option }}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <hr>
+                    </div>
+                {% endfor %}
+{#            </form>#}
+        </div>
+    </div>
+{% endblock %}

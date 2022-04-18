@@ -6,8 +6,10 @@ venv/
 # web source
 /static/
 /media/
-/log/
+/logs/
+/uploads/
 
 # secret
 local_settings.py
+flowlab/secrets.py
 .env

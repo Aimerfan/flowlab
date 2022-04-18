@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-hant">
+<head>
+    <title>{% block title %}FlowLab{% endblock title %}</title>
+    <meta charset="UTF-8">
+    {# -------------------------------響應式網站------------------------------- #}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# --------------------------Boostrap 5.1 導入程式------------------------- #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'core/style.css' %}">
+    <script src="{% static 'core/core.js' %}"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'core/images/favicon.ico' %}">
+    {% block custom_css %}{% endblock %}
+</head>
+<body>
+    {% include 'nav.html' %}
+    {% block body %}{% endblock %}
+    {% block custom_javascript %}{% endblock %}
+
+    {% if messages %}
+    <div class="toast-container position-absolute p-3 top-200px start-50 translate-middle" id="toastPlacement" data-original-class="toast-container position-absolute p-3">
+        {% for message in messages %}
+        <div class="toast fade show{% if message.tags %} {{ message.tags }}{% endif %}" data-name="messageToast">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <div{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</div>
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script>
+        {# message 停留 3 秒後自動消失 #}
+        let toast_div = $('div[data-name="messageToast"]');
+        setTimeout(display_toast, 3000)
+        function display_toast() {
+            {#toast_div.fadeOut('hide');#}
+            toast_div.removeClass('show');
+            toast_div.addClass('hide');
+        }
+    </script>
+    {% endif %}
+</body>
+</html>

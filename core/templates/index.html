@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body %}
+    <div class="feature">
+        <div class="container">
+            <div class="content">
+                <h1>FlowLab</h1>
+                <h2>一套模擬 DevOps 與 CI/CD 自動化流程的實驗室。</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="feature feature_odd">
+        <div class="container">
+            <div class="content">
+                <img src="{% static 'core/images/devops.png' %}" alt="DevOps" style="display:block; margin:auto; width: 60%;">
+                資料來源：https://www.softwebsolutions.com/resources/devops-and-microservices.html
+            </div>
+        </div>
+    </div>
+{% endblock %}

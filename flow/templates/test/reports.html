@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    測試報告
+{% endblock %}
+{% block body %}
+    {% include 'cicd_nav.html' with project=info.name %}
+    <div class="container_close">
+        <div class="content">
+            {% if sonar_info %}
+                <div class="row">
+                    <div class="col-sm-2"></div>
+                    <div class="col-sm-8">
+                        <h1>SonarQube 測試報告</h1>
+                        <p>僅顯示最新的一筆結果</p>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="right_content">
+                            <h5><a href="{{ sonar_url }}" target="_blank">查看詳細報告</a></h5>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-warning table-striped">
+                        <thead>
+                            <tr>
+                                <th>錯誤 (Bugs)</th>
+                                <th>漏洞 (Vulnerabilities)</th>
+                                <th>安全疑慮 (Security Hotspots)</th>
+                                <th>程式碼異味 (Code Smells)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ sonar_info.bugs }}</td>
+                                <td>{{ sonar_info.vulnerabilities }}</td>
+                                <td>{{ sonar_info.security_hotspots }}</td>
+                                <td>{{ sonar_info.code_smells }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endif %}
+                <div style="padding: 15px;">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownBranch" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span style="width: 100px;">{{ branch }}</span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownBranch">
+                        {% for branch in info.branches %}
+                            <li><a class="dropdown-item" href="{% url 'test_reports' user.username info.name branch.name %}">{{ branch.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% if junit_info %}
+                    <h1>Junit 測試結果</h1>
+                    <table class="table table-bordered table-success table-striped">
+                        <thead>
+                            <tr>
+                                <th>失敗</th>
+                                <th>略過</th>
+                                <th>通過</th>
+                                <th>總計</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ junit_info.fail }}</td>
+                                <td>{{ junit_info.skip }}</td>
+                                <td>{{ junit_info.success }}</td>
+                                <td>{{ junit_info.total}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {% endif %}
+                {% if coverage_info %}
+                    <h1>覆蓋率測試結果</h1>
+                    <table class="table table-bordered table-primary table-striped">
+                        <thead>
+                            <tr>
+                                <th>名稱</th>
+                                <th>instruction</th>
+                                <th>branch</th>
+                                <th>complexity</th>
+                                <th>line</th>
+                                <th>method</th>
+                                <th>class</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>所有類別</th>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.instruction %}</td>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.branch %}</td>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.complexity %}</td>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.line %}</td>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.method %}</td>
+                                <td>{% include 'test/coverage_chart.html' with data=coverage_info.class %}</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

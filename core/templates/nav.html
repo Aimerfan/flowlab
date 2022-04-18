@@ -1,0 +1,46 @@
+{% load static %}
+{% load role_tag %}
+{% is_teacher request as is_teacher %}
+<nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <div class="container-fluid">
+        <a id="brand" class="navbar-brand" href="{% url 'index' %}">
+            <img src="{% static 'core/images/flowlab-logo.png' %}" alt="FlowLab" style="display:block; margin:9px; height: 50px;">
+        </a>
+        {# -------------------------------手機版------------------------------- #}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#linkbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        {# -------------------------------電腦版------------------------------- #}
+        <div class="collapse navbar-collapse" id="linkbar">
+            {% with url_name=request.resolver_match.url_name %}
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item {% if url_name == 'index' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'index' %}">Home</a></li>
+                {# -------------------------------已經登入-------------------------------#}
+                {% if user.is_authenticated %}
+                <li class="nav-item {% if url_name == 'courses' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'courses' %}">Courses</a></li>
+                <li class="nav-item {% if url_name == 'repo_list' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'repo_list' user.username %}">Repository</a></li>
+                {% if is_teacher %}
+                <li class="nav-item {% if url_name == 'template' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'template' %}">Template</a></li>
+                {% endif %}
+                {% endif %}
+            </ul>
+            {% endwith %}
+            <div>
+                <ul class="navbar-nav me-auto">
+                    {# -------------------------------尚未登入-------------------------------#}
+                    {% if not user.is_authenticated %}
+                    <li class="nav-item" style="float:right"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    {# -------------------------------已經登入-------------------------------#}
+                    {% else %}
+                    <div class="show_name"><a>{{ user.username }}</a></div>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>

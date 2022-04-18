@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    {{ info.name }}/{{ tree_path }}
+{% endblock %}
+{% block body %}
+    <div class="container container_close">
+        <div class="repo_content">
+            <div>
+                <h2>{{ student }} / {{ info.name }}</h2>
+            </div>
+            <hr style="height: 3px; background: #aaaaaa; margin: 0">
+            <div class="align_both_sides">
+                <div class="ver_mid">
+                    <div>
+                        <h5>{{ tree_path }}</h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="frame_files">
+                <div class="frame_files_header align_both_sides" style="padding: 5px;">
+                    <div class="ver_mid">
+                        <div class="col-md-auto">
+                            <h6>{{ info.author_name }}</h6>
+                        </div>
+                        <div style="color: #585858">
+                            {{ info.last_info }}
+                        </div>
+                    </div>
+                    <div class="ver_mid">
+                        <div class="col-md-auto">
+                            <h6>Latest commit <a style="font-size: 13px;">{{ info.sha }}</a> {{ info.last_time }}</h6>
+                        </div>
+                    </div>
+                </div>
+                {% for key, folder in folders.items %}
+                <div class="frame_files_info">
+                    <div style="width: 300px;" class="col-md-auto text_left">
+                        {% with tree_path|add:key as tree_path %}
+                        <div style="display: flex;">
+                            <img src="{% static 'core/images/folder.png' %}" alt="folder" class="repo_icon">
+                            <h6><a href="{% url 'stu_tree' course_id lab_id student info.name tree_path %}">{{ key }}</a></h6>
+                        </div>
+                        {% endwith %}
+                    </div>
+                    <div style="width: calc(100% - 500px);" class="col-md-auto text_left">
+                        <h6>{{ folder.last_info }}</h6>
+                    </div>
+                    <div style="width: 200px; text-align: left;" class="col-md-auto text_left">
+                        <h6>{{ folder.last_time }}</h6>
+                    </div>
+                </div>
+                {% endfor %}
+                {% for key, file in files.items %}
+                <div class="frame_files_info">
+                    <div style="width: 300px;" class="col-md-auto text_left">
+                        {% with tree_path|add:key as tree_path %}
+                        <div style="display: flex;">
+                            <img src="{% static 'core/images/file.png' %}" alt="folder" class="repo_icon">
+                                <h6><a href="{% url 'stu_blob' course_id lab_id student info.name tree_path %}">{{ key }}</a></h6>
+                        </div>
+                        {% endwith %}
+                    </div>
+                    <div style="width: calc(100% - 500px);" class="col-md-auto text_left">
+                        <h6>{{ file.last_info }}</h6>
+                    </div>
+                    <div style="width: 200px; text-align: left;" class="col-md-auto text_left">
+                        <h6>{{ file.last_time }}</h6>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

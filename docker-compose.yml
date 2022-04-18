@@ -3,8 +3,9 @@ version: "3"
 services:
   db:
     image: postgres:13.2
-    # ports:
-    #   - "5432:5432"
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
@@ -14,13 +15,78 @@ services:
   
   web:
     image: aimerfan/flowlab
-    command: python3 manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/flowlab
-    ports:
-      - "8000:8000"
     depends_on:
       - db
+    restart: unless-stopped
+    command: python3 manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/flowlab
+
+  gitlab:
+    restart: unless-stopped
+    image: ${GITLAB_IMG_TAG}
+    privileged: true
+    ports:
+      - "${GITLAB_HTTP_PORT}:80"
+      - "${GITLAB_SSH_PORT}:22"
+    volumes:
+      - gitlab_conf:/etc/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_data:/var/opt/gitlab
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://${GITLAB_HOST}:${GITLAB_HTTP_PORT}'
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        gitlab_rails['initial_root_password'] = '${GITLAB_ROOT_PASSWORD}'
+        gitlab_rails['gitlab_shell_ssh_port'] = ${GITLAB_SSH_PORT}
+
+  jenkins:
+    restart: unless-stopped
+    image: ${JENKINS_IMG_TAG}
+    privileged: true
+    group_add:
+       - ${DOCKER_GID}
+    ports:
+      - "${JENKINS_PORT}:8080"
+      - "${JENKINS_AGENT_PORT}:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock # 使 Jenkins 可以控制本機 docker
+    environment:
+      JAVA_OPTS: "-Djava.awt.headless=true \
+                  -Dhudson.model.DirectoryBrowserSupport.CSP=\"script-src 'self' 'unsafe-inline'\" \
+                  -Duser.timezone=Asia/Taipei
+                 "
+
+  sonarqube:
+    restart: unless-stopped
+    image: ${SONARQUBE_IMG_TAG}
+    depends_on:
+      - db
+    ports:
+      - "${SONARQUBE_PORT}:9000"
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_exts:/opt/sonarqube/extensions
+      - sonar_logs:/opt/sonarqube/logs
+      - sonar_temp:/opt/sonarqube/temp
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonar
+      SONAR_JDBC_USERNAME: ${POSTGRES_USER}
+      SONAR_JDBC_PASSWORD: ${POSTGRES_PASSWORD}
+    # command: -Dsonar.ce.javaOpts=-Xmx2048m -Dsonar.web.javaOpts=-Xmx2048m
+
 
 volumes:
   pgdata:
+  gitlab_conf:
+  gitlab_logs:
+  gitlab_data:
+  jenkins_home:
+  sonar_data:
+  sonar_exts:
+  sonar_logs:
+  sonar_temp:

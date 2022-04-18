@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    Login
+{% endblock %}
+{% block body %}
+    <div class="container">
+        <div class="content">
+            <div class="col.md-1">
+                <h1>登入 FlowLab</h1>
+                <div>
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <div class="login_content_title">
+                            <label>UserName：</label>
+                        </div>
+                        <div class="login_content">
+                            {{ form.username }}
+                        </div>
+                        <div class="login_content_title">
+                            <label>Password：</label>
+                        </div>
+                        <div class="login_content">
+                            {{ form.password }}
+                        </div>
+                        <div class="login_content login_content_btn">
+                            <button class="btn_index_login" type="submit">登入</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
