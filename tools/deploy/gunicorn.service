@@ -1,0 +1,17 @@
+[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=<projectroot_path> # 輸入Django專案的路徑
+ExecStart=<gunicorn_path> \         # 輸入gunicorn的路徑
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/gunicorn.sock \
+          flowlab.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
