@@ -7,6 +7,7 @@ from core.infra.gitlab_func import get_repo_verbose
 from core.dicts import MESSAGE_DICT
 from ..forms import TestSelectForm
 from ..utils import update_jenkinsfile, push_jenkinsfile
+from .ajax import create_jenkinsfile
 
 
 def jenkins_file_view(request, user, project):
@@ -19,13 +20,13 @@ def jenkins_file_view(request, user, project):
 
     if request.method == 'POST':
         # 修改並顯示 Jenkinsfile
-        if request.POST['action'] == 'update' and form.is_valid():
+        if 'action' in request.POST and request.POST['action'] == 'update' and form.is_valid():
             # 讀取選擇的分支與測試
             selected_branch = request.POST.get('selected_branch')
             selected_tests = form.cleaned_data['selected_tests']
             pipe_content = update_jenkinsfile(repo_name, selected_branch, selected_tests)
         # 將前端顯示的 Jenkisfile 推至儲存庫
-        elif request.POST['action'] == 'push':
+        elif 'action' in request.POST and request.POST['action'] == 'push':
             selected_branch = request.POST.get('selected_branch')
             pipe_content = request.POST.get('pipe_content')
             push_jenkinsfile(repo_name, selected_branch, pipe_content)
