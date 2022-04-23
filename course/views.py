@@ -450,7 +450,8 @@ def lab_evaluation_view(request, course_id, lab_id):
                     answer.update(content=ans_content)
                 else:
                     Answer.objects.update_or_create(student=student, topic=q_id, content=ans_content)
-            return redirect('lab_evaluation', course_id=course_id, lab_id=lab_id)
+            messages.success(request, MESSAGE_DICT.get('save_evaluation_success'))
+            return redirect('lab', course_id=course_id, lab_id=lab_id)
 
     elif Role.TEACHER in get_roles(request.user):
         context.update(get_nav_side_dict(request.user, 'teacher'))
