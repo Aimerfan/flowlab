@@ -1,6 +1,7 @@
 # enviroment
 .idea/
 __pycache__/
+*.py[cod]
 venv/
 
 # web source
