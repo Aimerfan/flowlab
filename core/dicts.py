@@ -13,6 +13,7 @@ MESSAGE_DICT = {
     'create_stu_in_course_success': '成功新增 {} 學生',
     'import_stu_in_course_success': '成功匯入學生資料',
     'remove_stu_in_course_success': '成功移除 {} 學生',
+    'save_evaluation_success': '已儲存評量',
     # warning
     'gitlab_project_not_found': 'Gitlab 找不到專案 {}',
     'template_name_exist': '{} 模板已存在, 請修改模板名稱',

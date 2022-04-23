@@ -51,7 +51,7 @@
         <div class="align_both_sides">
             <div class="col-md-5">
                 <button type="button" class="btn btn-info" style="float: right;" id="switch_mode" value="simpleMode">進階模式</button>
-                <div id="simpleMode" style="display: block;">
+                <div id="simpleMode" style="display: none;">
                     <h5>Simple Setting</h5>
                     <form id="config_form" method="post" action="">
                         {% csrf_token %}
@@ -78,7 +78,7 @@
                         <button class="btn btn-primary float-end" name="action" value="update">確認修改</button>
                     </form>
                 </div>
-                <div id="puzzleMode" style="display: none;">
+                <div id="puzzleMode" style="display: block;">
                     <h5>Jenkins File Puzzle</h5>
                     <form method="post" action="" name="pipeline" id="pipe_form">
                         {% csrf_token %}
