@@ -247,6 +247,7 @@ class AlwaysSh(Sh):
         if '\n' in self.section_context:
             original_context = original_context.replace('{', "'''")
             original_context = original_context.replace('}', "'''")
+            original_context = original_context.replace('always_sh', 'sh')
             return original_context
         else:
             indent = ' ' * tabwidth * level

@@ -54,7 +54,10 @@
        - 勾選 `Enabled`
        - Name: `inbound`
        - Docker Image: `jenkins/inbound-agent:4.9-1`
-8. 建立 global credentials (for gitlab and sonarqube)
+8. 建立 API token
+   - (右上角) Admin 帳號 > 設定 > API token > Add new Token
+   - 複製 token 到 `.env` 的 `JENKINS_API_TOKEN`
+9. 建立 global credentials (for gitlab and sonarqube)
    - 管理 Jenkins > manage credentials > Stores scoped to Jenkins 的 (global) > Add Credentials
    - 建立 GitLab API token, ID 為 `gitlab_token`, API token 為 gitlab 的 access token (待設定完 gitlab)
    - 建立 Secret text, ID 為 `sonarqube_token`, Secret 為 sonarqube 的 access token (待設定完 sonarqube)

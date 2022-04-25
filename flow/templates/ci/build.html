@@ -47,7 +47,11 @@
                 </table>
             </div>
             {% else %}
-                <h2 class="text-center">該分支上目前無建置結果</h2>
+                {% if not_built %}
+                    <h2 class="text-center">該分支正在建置中，請稍後再重整頁面</h2>
+                {% else %}
+                    <h2 class="text-center">該分支上目前無建置結果</h2>
+                {% endif %}
             {% endif %}
         </div>
     </div>
