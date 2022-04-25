@@ -17,7 +17,8 @@ from core.infra.gitlab_func import get_repo_verbose, get_tree
 from core.infra.sonarqube_func import get_project_name
 from .forms import LabForm
 from .models import Course, Lab, Question, Option, Answer
-from .utils import get_nav_side_dict, check_stu_lab_status, check_stu_evaluation_status, question_parser
+from .utils import get_nav_side_dict, check_stu_lab_status, check_stu_evaluation_status, count_stu_lab_submit, \
+    count_stu_evaluation_submit, question_parser
 from flow.models import Project
 from flow.forms import TemplateRepoForm
 from flow.utils import import_template, create_jenkins_job, create_gitlab_webhook
@@ -169,24 +170,14 @@ def course_view(request, course_id):
         for lab in context['labs']:
             students_obj = context['course'].students.all()
             submit_br = lab.branch
-            # 檢查學生 lab 繳交狀態
-            students = check_stu_lab_status(lab, students_obj, submit_br)
             # 計算各 lab 學生繳交人數
-            counts = 0
-            for name in students:
-                if students[name]['is_submit']:
-                    counts += 1
+            counts = count_stu_lab_submit(lab, students_obj, submit_br)
             context['submit'].update({
                 lab.name: counts,
             })
 
-            # 檢查學生 評量 繳交狀態
-            students_eva = check_stu_evaluation_status(lab, students_obj)
             # 計算各 評量 學生繳交人數
-            counts_eva = 0
-            for name in students_eva:
-                if students_eva[name]['is_finish']:
-                    counts_eva += 1
+            counts_eva = count_stu_evaluation_submit(lab, students_obj)
             context['finish'].update({
                 lab.name: counts_eva,
             })
@@ -521,3 +512,49 @@ def lab_evaluation_submit_view(request, course_id, lab_id, student):
     }
 
     return render(request, 'evaluation_submit_tch.html', context)
+
+
+@check_role([Role.TEACHER])
+def lab_evaluation_total_view(request, course_id, lab_id):
+    """老師檢視所有學生的互動式評量(統計結果)"""
+    course = Course.objects.filter(id=course_id).get()
+    lab = Lab.objects.filter(id=lab_id).get()
+    questions = Question.objects.filter(lab=lab).order_by('id')
+    # 計算 班級人數
+    stu_total = course.students.count()
+    students_obj = course.students.all()
+    # 計算 已填寫評量人數
+    stu_ans = count_stu_evaluation_submit(lab, students_obj)
+
+    # 過濾出選擇題中對應的選項
+    q_options = {}
+    for question in questions:
+        if question.type == 'single':
+            option = Option.objects.filter(topic=question)
+            q_options[question.id] = option
+
+    # 過濾出問題對應的回答
+    q_ans = {}
+    for question in questions:
+        q_ans[question.id] = {}
+        ans = Answer.objects.filter(topic=question)
+        for op in q_options[question.id]:
+            q_ans[question.id][op.number] = 0
+        if ans:
+            for a in ans:
+                for op in q_options[question.id]:
+                    if a.content == str(op.number):
+                        q_ans[question.id][op.number] += 1
+                        continue
+
+    context = {
+        'course': course,
+        'lab': lab,
+        'stu_noans': stu_total - stu_ans,
+        'stu_ans': stu_ans,
+        'questions': questions,
+        'q_options': q_options,
+        'q_ans': q_ans,
+    }
+
+    return render(request, 'evaluation_total_tch.html', context)

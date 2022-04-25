@@ -82,6 +82,27 @@ def check_stu_evaluation_status(lab, students_obj):
     return students
 
 
+def count_stu_lab_submit(lab, students_obj, submit_br):
+    """計算已繳交 實驗 的學生數量"""
+    students_lab = check_stu_lab_status(lab, students_obj, submit_br)
+    # 計算各 lab 學生繳交人數
+    counts = 0
+    for name in students_lab:
+        if students_lab[name]['is_submit']:
+            counts += 1
+    return counts
+
+
+def count_stu_evaluation_submit(lab, students_obj):
+    """計算已繳交 評量 的學生數量"""
+    students_eva = check_stu_evaluation_status(lab, students_obj)
+    counts = 0
+    for name in students_eva:
+        if students_eva[name]['is_finish']:
+            counts += 1
+    return counts
+
+
 def question_parser(question_obj, content):
     """
     剖析 'question' 字串, 區分成 題目 (Topic) 與 選項 (Option)

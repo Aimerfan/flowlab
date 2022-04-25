@@ -23,6 +23,7 @@
                         <th scope="col">繳交人數</th>
                         <th scope="col">評量填寫人數</th>
                         <th scope="col">繳交情況</th>
+                        <th scope="col">評量統計</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,6 +44,7 @@
                             {% endfor %}
                             /{{ students.count }}</td>
                         <td><a href="{% url 'lab_submit' course.id lab.id %}">Detail</a></td>
+                        <td><a href="{% url 'lab_eva_total' course.id lab.id %}">統計結果</a></td>
                     </tr>
                 {% endfor %}
                 </tbody>
