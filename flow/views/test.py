@@ -15,10 +15,15 @@ def reports_view(request, user, project, branch):
     job_name = get_job_name(user, project, branch)
     junit_info = None
     coverage_info = None
+    not_built = False  # 是否還在建置中
     if JENKINS_.job_exists(job_name):
         multibr_default_job = JENKINS_.get_job_info(job_name)
+        # 仍在建置中
+        if 'color' in multibr_default_job.keys() and \
+                multibr_default_job['color'] == 'notbuilt_anime':
+            not_built = True
         # 取得該 branch 最新的建置編號 (先確認是否有建置結果)
-        if 'lastCompletedBuild' in multibr_default_job.keys():
+        elif 'lastCompletedBuild' in multibr_default_job.keys():
             last_build_number = multibr_default_job['lastCompletedBuild']['number']
             # 檢查有無 junit 測試
             junit_info = get_junit_result(user=user, project=project, branch=branch, build_no=last_build_number)
@@ -46,6 +51,7 @@ def reports_view(request, user, project, branch):
     context = {
         'info': project_info,
         'branch': branch,
+        'not_built': not_built,
         'junit_info': junit_info,
         'coverage_info': coverage_info,
         'sonar_url': sonar_url,
