@@ -48,7 +48,8 @@ def course_view(request, course_id):
         'labs': Lab.objects.filter(course=course_id).order_by('id'),
         'course': Course.objects.filter(id=course_id).get(),
         'project': {},
-        'submit': {},
+        'lab_submit': {},
+        'eva_submit': {},
         'finish': {},
     }
     context.update({'students': context['course'].students.all()})
@@ -61,11 +62,23 @@ def course_view(request, course_id):
             student_dict = check_stu_lab_status(lab, student_obj, submit_br)
             student = student_dict[request.user.username]
             if student['is_submit']:
-                context['submit'].update({
+                context['lab_submit'].update({
                     lab.name: '✔',
                 })
             else:
-                context['submit'].update({
+                context['lab_submit'].update({
+                    lab.name: '✖',
+                })
+
+            # 檢查學生 評量 填寫狀態
+            students_eva = check_stu_evaluation_status(lab, student_obj)
+            student = students_eva[request.user.username]
+            if student['is_finish']:
+                context['eva_submit'].update({
+                    lab.name: '✔',
+                })
+            else:
+                context['eva_submit'].update({
                     lab.name: '✖',
                 })
 
@@ -172,13 +185,13 @@ def course_view(request, course_id):
             submit_br = lab.branch
             # 計算各 lab 學生繳交人數
             counts = count_stu_lab_submit(lab, students_obj, submit_br)
-            context['submit'].update({
+            context['lab_submit'].update({
                 lab.name: counts,
             })
 
             # 計算各 評量 學生繳交人數
             counts_eva = count_stu_evaluation_submit(lab, students_obj)
-            context['finish'].update({
+            context['eva_submit'].update({
                 lab.name: counts_eva,
             })
 

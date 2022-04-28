@@ -31,13 +31,13 @@
                     <tr>
                         <td><a href="{% url 'lab' course.id lab.id %}">{{ lab.name }}</a></td>
                         <td>{% if lab.deadline %}{{ lab.deadline }}{% else %}無{% endif %}</td>
-                        <td>{% for key, value in submit.items %}
+                        <td>{% for key, value in lab_submit.items %}
                                 {% if key == lab.name %}
                                     {{ value }}
                                 {% endif %}
                             {% endfor %}
                             /{{ students.count }}</td>
-                        <td>{% for key, value in finish.items %}
+                        <td>{% for key, value in eva_submit.items %}
                                 {% if key == lab.name %}
                                     {{ value }}
                                 {% endif %}
