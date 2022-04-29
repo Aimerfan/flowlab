@@ -16,6 +16,7 @@ MESSAGE_DICT = {
     'save_evaluation_success': '已儲存評量',
     # warning
     'gitlab_project_not_found': 'Gitlab 找不到專案 {}',
+    'project_is_exist': '{} 專案已存在, 請修改專案名稱',
     'template_name_exist': '{} 模板已存在, 請修改模板名稱',
     'stu_is_in_course': '{} 學生已在課程名單內',
     # error

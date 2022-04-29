@@ -21,7 +21,7 @@ from .utils import get_nav_side_dict, check_stu_lab_status, check_stu_evaluation
     count_stu_evaluation_submit, question_parser
 from flow.models import Project
 from flow.forms import TemplateRepoForm
-from flow.utils import import_template, create_jenkins_job, create_gitlab_webhook
+from flow.utils import import_template, create_jenkins_job, create_gitlab_webhook, same_name_repo
 from flowlab.settings import MEDIA_ROOT
 
 
@@ -254,6 +254,10 @@ def lab_view(request, course_id, lab_id):
             repo_name = request.POST['name']
             # 模板檔案
             template_file = lab.template.template
+
+            # 檢查專案是否同名
+            if same_name_repo(request, repo_name):
+                return redirect('repo_list', user=username)
 
             # 將模板匯入專案
             project = import_template(

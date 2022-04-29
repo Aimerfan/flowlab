@@ -21,7 +21,7 @@ from core.infra.sonarqube_func import get_project_name
 from core.dicts import MESSAGE_DICT
 from ..forms import BlankRepoForm, TemplateRepoForm, ExportTemplateForm
 from ..models import Teacher, Template, Project
-from ..utils import export_template, import_template, create_jenkins_job, create_gitlab_webhook
+from ..utils import export_template, import_template, create_jenkins_job, create_gitlab_webhook, same_name_repo
 
 logger = logging.getLogger(f'flowlab.{__name__}')
 
@@ -180,6 +180,10 @@ def repo_new_blank(request):
     if request.method == 'POST':
         username = request.user.username
         repo_name = request.POST['name']
+
+        # 檢查專案是否同名
+        if same_name_repo(request, repo_name):
+            return redirect('repo_list', user=username)
         
         # 建立 gitlab project
         repo_meta = {
@@ -223,6 +227,10 @@ def repo_new_template(request):
         selected_template = form.cleaned_data['template']
         username = request.user.username
         repo_name = form.cleaned_data['name']
+
+        # 檢查專案是否同名
+        if same_name_repo(request, repo_name):
+            return redirect('repo_list', user=username)
 
         # 從 local repo_templates 匯入專案模板
         parent_package = str(__name__).rsplit('.', 2)[0]
