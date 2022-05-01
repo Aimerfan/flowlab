@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 
 from accounts.models import Teacher, Student
-from core.infra import GITLAB_
+from core.infra import GITLAB_, SONAR_
 from .models import Course, Lab, Question, Option, Answer
 
 
@@ -22,6 +22,49 @@ def get_nav_side_dict(user, identity):
         'courses': courses,
         'all_labs': Lab.objects.all().order_by('id'),
     }
+
+
+def create_user(username, password, name, email=''):
+    """
+    建立使用者帳號, 並建立學生身分
+    包含 GitLab, SonarQube
+    return Student obj.
+    """
+    # 建立使用者帳號
+    if User.objects.filter(username=username):
+        user = User.objects.get(username=username)
+    else:
+        user = User.objects.create_user(username=username, password=password, email=email)
+        user.save()
+
+        # 建立 GitLab 帳號
+        gl_user = GITLAB_.users.create({'username': username, 'password': password,
+                                        'name': name, 'email': email, 'skip_confirmation': True})
+        gl_user.save()
+
+        # 建立 SonarQube 帳號
+        SONAR_.users.create_user(login=username, name=name, password=password, email=email)
+
+    return user
+
+
+def create_stu_identity(user, name, course_id):
+    """建立學生身份, 並加入課程"""
+    # 建立學生身分
+    if Student.objects.filter(user=user):
+        student = Student.objects.get(user=user)
+    else:
+        student = Student.objects.create(user=user, full_name=name)
+        student.save()
+
+    # 將學生加入課程
+    course = Course.objects.get(id=course_id)
+    if course.students.filter(user=user):
+        return False
+    else:
+        course.students.add(student)
+        course.save()
+        return True
 
 
 def check_stu_lab_status(lab, students_obj, submit_br):
@@ -80,6 +123,27 @@ def check_stu_evaluation_status(lab, students_obj):
             'is_finish': is_finish,
         }
     return students
+
+
+def count_stu_lab_submit(lab, students_obj, submit_br):
+    """計算已繳交 實驗 的學生數量"""
+    students_lab = check_stu_lab_status(lab, students_obj, submit_br)
+    # 計算各 lab 學生繳交人數
+    counts = 0
+    for name in students_lab:
+        if students_lab[name]['is_submit']:
+            counts += 1
+    return counts
+
+
+def count_stu_evaluation_submit(lab, students_obj):
+    """計算已繳交 評量 的學生數量"""
+    students_eva = check_stu_evaluation_status(lab, students_obj)
+    counts = 0
+    for name in students_eva:
+        if students_eva[name]['is_finish']:
+            counts += 1
+    return counts
 
 
 def question_parser(question_obj, content):

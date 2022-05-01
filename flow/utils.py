@@ -4,8 +4,10 @@ from xml.etree import ElementTree
 from base64 import b64decode
 from time import sleep
 
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 
+from core.dicts import MESSAGE_DICT
 from core.infra import ENVIRON
 from core.infra import GITLAB_, GITLAB_URL
 from core.infra import JENKINS_, JENKINS_URL
@@ -87,6 +89,16 @@ def push_jenkinsfile(repo_name, selected_branch, pipe_content):
     # push 更新後的 Jenkinsfile 至 GitLab
     file.content = pipe_content
     file.save(branch=selected_branch, commit_message='改變檢測項目')
+
+
+def same_name_repo(request, repo_name):
+    """檢查專案是否同名"""
+    my_projects = GITLAB_.projects.list(owner=True)
+    for project in my_projects:
+        if repo_name == project.name:
+            messages.warning(request, MESSAGE_DICT.get('project_is_exist').format(repo_name))
+            return True
+    return False
 
 
 def export_template(user, project, template_name):

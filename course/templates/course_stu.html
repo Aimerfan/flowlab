@@ -11,7 +11,8 @@
             <table class="table table-light table-hover">
                 <thead class="table-secondary">
                     <tr>
-                        <th scope="col">是否繳交</th>
+                        <th scope="col">繳交實驗</th>
+                        <th scope="col">繳交評量</th>
                         <th scope="col">實驗名稱</th>
                         <th scope="col">關聯專案</th>
                         <th scope="col">繳交分支</th>
@@ -22,7 +23,14 @@
                 {% for lab in labs %}
                     <tr>
                         <td>
-                            {% for key, value in submit.items %}
+                            {% for key, value in lab_submit.items %}
+                                {% if key == lab.name %}
+                                    {{ value }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for key, value in eva_submit.items %}
                                 {% if key == lab.name %}
                                     {{ value }}
                                 {% endif %}
