@@ -17,8 +17,9 @@ from core.infra.gitlab_func import get_repo_verbose, get_tree
 from core.infra.sonarqube_func import get_project_name
 from .forms import LabForm
 from .models import Course, Lab, Question, Option, Answer
-from .utils import get_nav_side_dict, check_stu_lab_status, check_stu_evaluation_status, count_stu_lab_submit, \
-    count_stu_evaluation_submit, question_parser
+from .utils import get_nav_side_dict, create_user, create_stu_identity, \
+    check_stu_lab_status, check_stu_evaluation_status, \
+    count_stu_lab_submit, count_stu_evaluation_submit, question_parser
 from flow.models import Project
 from flow.forms import TemplateRepoForm
 from flow.utils import import_template, create_jenkins_job, create_gitlab_webhook, same_name_repo
@@ -107,32 +108,13 @@ def course_view(request, course_id):
             email = request.POST['email']
 
             # 建立使用者帳號
-            if User.objects.filter(username=username):
-                user = User.objects.get(username=username)
-            else:
-                user = User.objects.create_user(username=username, password=password, email=email)
-                user.save()
-                # 建立 GitLab 帳號
-                gl_user = GITLAB_.users.create({'username': username, 'password': password,
-                                                'name': name, 'email': email, 'skip_confirmation': True})
-                gl_user.save()
-                # 建立 SonarQube 帳號
-                SONAR_.users.create_user(login=username, name=name, password=password, email=email)
-
-            # 建立學生身份 並設定名稱
-            if Student.objects.filter(user=user):
-                student = Student.objects.get(user=user)
-            else:
-                student = Student.objects.create(user=user, full_name=name)
-                student.save()
-            # 將學生加入課程
-            course = Course.objects.get(id=course_id)
-            if course.students.filter(user=user):
-                messages.warning(request, MESSAGE_DICT.get('stu_is_in_course').format(name))
-            else:
-                course.students.add(student)
-                course.save()
+            user = create_user(username=username, password=password, name=name, email=email)
+            # 建立學生身份, 並加入課程
+            create_success = create_stu_identity(user=user, name=name, course_id=course_id)
+            if create_success:
                 messages.success(request, MESSAGE_DICT.get('create_stu_in_course_success').format(name))
+            else:
+                messages.warning(request, MESSAGE_DICT.get('stu_is_in_course').format(name))
 
         # 批量匯入學生資料
         elif request.method == 'POST' and request.POST['action'] == 'import':
@@ -146,26 +128,18 @@ def course_view(request, course_id):
             with open(file_path, 'r') as file:
                 rows = csv.reader(file)
                 for row in rows:
+                    username = row[0]
+                    password = row[1]
+                    name = row[2]
+                    email = row[3]
+
                     # 建立使用者帳號
-                    if User.objects.filter(username=row[0]):
-                        user = User.objects.get(username=row[0])
-                    else:
-                        user = User.objects.create_user(username=row[0], password=row[1], email=row[3])
-                        user.save()
-                        # 建立 GitLab 帳號
-                        gl_user = GITLAB_.users.create({'username': row[0], 'password': row[1],
-                                                        'name': row[2], 'email': row[3], 'skip_confirmation': True})
-                        gl_user.save()
-                    # 建立學生身份 並設定名稱
-                    if Student.objects.filter(user=user):
-                        student = Student.objects.get(user=user)
-                    else:
-                        student = Student.objects.create(user=user, full_name=row[2])
-                        student.save()
-                    # 將學生加入課程
-                    course = Course.objects.get(id=course_id)
-                    course.students.add(student)
-                    course.save()
+                    user = create_user(username=username, password=password, name=name, email=email)
+                    # 建立學生身份, 並加入課程
+                    create_success = create_stu_identity(user=user, name=name, course_id=course_id)
+
+                    if not create_success:
+                        messages.warning(request, MESSAGE_DICT.get('stu_is_in_course').format(name))
                 messages.success(request, MESSAGE_DICT.get('import_stu_in_course_success'))
 
             return HttpResponse('OK')
