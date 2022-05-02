@@ -14,6 +14,7 @@ function newAgent() {
   agentInput.id  = "agent_" + idAgent;
   agentInput.className = "form-control puz_form";
   agentInput.name = "agent";
+  agentInput.value = "any";
   agentLabel.appendChild(agentInput)
   let agent = document.createElement("div");
   agent.className = "jenkins_puzzle puz_" + layer;
