@@ -1,8 +1,17 @@
+import logging
+import requests
+
+from django.contrib import messages
 from django.contrib.auth.models import User
 
 from accounts.models import Teacher, Student
-from core.infra import GITLAB_, SONAR_
+from core.dicts import MESSAGE_DICT
+from core.infra import GITLAB_
+from core.infra import JENKINS_URL, JENKINS_AUTH
+from core.infra import SONAR_
 from .models import Course, Lab, Question, Option, Answer
+
+logger = logging.getLogger(f'flowlab.{__name__}')
 
 
 def get_nav_side_dict(user, identity):
@@ -24,11 +33,11 @@ def get_nav_side_dict(user, identity):
     }
 
 
-def create_user(username, password, name, email=''):
+def create_user(request, username, password, name, email=''):
     """
     建立使用者帳號, 並建立學生身分
-    包含 GitLab, SonarQube
-    return Student obj.
+    包含 GitLab, Jenkins, SonarQube
+    return User obj.
     """
     # 建立使用者帳號
     if User.objects.filter(username=username):
@@ -41,11 +50,32 @@ def create_user(username, password, name, email=''):
         gl_user = GITLAB_.users.create({'username': username, 'password': password,
                                         'name': name, 'email': email, 'skip_confirmation': True})
         gl_user.save()
-
+        # 建立 Jenkins 帳號
+        create_jenkins_user(request=request, username=username, password=password, email=email)
         # 建立 SonarQube 帳號
         SONAR_.users.create_user(login=username, name=name, password=password, email=email)
 
     return user
+
+
+def create_jenkins_user(request, username, password, email):
+    """建立 Jenkins 帳號"""
+
+    data = {
+        'username': username,
+        'password1': password,
+        'password2': password,
+        'fullname': username,
+        'email': email,
+    }
+
+    api_url = f'{JENKINS_URL}/securityRealm/createAccountByAdmin'
+    result = requests.post(api_url, data=data, auth=JENKINS_AUTH)
+
+    if result.status_code != requests.codes.ok:
+        logger.error(f"create '{username}' jenkins account failed")
+        logger.error(result.text)
+        messages.error(request, MESSAGE_DICT.get('create_jenkins_user_failed'))
 
 
 def create_stu_identity(user, name, course_id):

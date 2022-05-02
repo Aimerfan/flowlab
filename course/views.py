@@ -108,7 +108,7 @@ def course_view(request, course_id):
             email = request.POST['email']
 
             # 建立使用者帳號
-            user = create_user(username=username, password=password, name=name, email=email)
+            user = create_user(request=request, username=username, password=password, name=name, email=email)
             # 建立學生身份, 並加入課程
             create_success = create_stu_identity(user=user, name=name, course_id=course_id)
             if create_success:
@@ -134,7 +134,7 @@ def course_view(request, course_id):
                     email = row[3]
 
                     # 建立使用者帳號
-                    user = create_user(username=username, password=password, name=name, email=email)
+                    user = create_user(request=request, username=username, password=password, name=name, email=email)
                     # 建立學生身份, 並加入課程
                     create_success = create_stu_identity(user=user, name=name, course_id=course_id)
 
