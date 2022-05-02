@@ -23,8 +23,8 @@ def load_multibranch_xml():
     config_file = get_data(__name__, 'resources/multibranch_config.xml').decode('utf-8')
     xml = ElementTree.fromstring(config_file)
     xml = ElementTree.tostring(xml).decode()
-    xml = xml.replace('set_username', ENVIRON['GITLAB_ROOT_USERNAME'])
-    xml = xml.replace('set_password', ENVIRON['GITLAB_ROOT_PASSWORD'])
+    xml = xml.replace('set_root_username', ENVIRON['GITLAB_ROOT_USERNAME'])
+    xml = xml.replace('set_root_password', ENVIRON['GITLAB_ROOT_PASSWORD'])
     return xml
 
 
@@ -163,7 +163,8 @@ def create_jenkins_job(username, repo_name):
     if JENKINS_.job_exists(job_name):
         raise Exception('job already exists.')
     gitlab_repo_url = f"{GITLAB_URL}/{username}/{repo_name}"
-    config_xml = CONFIG_XML.replace('set_remote', gitlab_repo_url)
+    config_xml = CONFIG_XML.replace('set_username', username)
+    config_xml = config_xml.replace('set_remote', gitlab_repo_url)
     JENKINS_.create_job(job_name, config_xml)
 
 
