@@ -97,56 +97,57 @@ def create_stu_identity(user, name, course_id):
         return True
 
 
-def check_stu_lab_status(lab, students_obj, submit_br):
+def check_stu_lab_status(lab):
     """
     檢查學生 lab 繳交狀態
     1. 是否指定專案 (stu_repo_name)
     2. 是否繳交指定分支 (is_submit)
     """
-    students = {}
-    for student in students_obj:
-        stu_username = student.user.username
-        stu_id = User.objects.get(username=stu_username)
-        stu_name = Student.objects.get(user=stu_id).full_name
-        stu_repo = lab.project.filter(user=stu_id)
+    lab_prefetch = Lab.objects.filter(id=lab.id).prefetch_related('course__students__user').get()
+    projects_prefetch = lab.project.all().select_related('user')
+    projects_dict = {}
+    for project in projects_prefetch:
+        projects_dict[project.user.username] = project
 
-        stu_repo_name = None
+    students = {}
+    for student in lab_prefetch.course.students.all():
+        uname = student.user.username
+        fullname = student.full_name
+
+        repo_name = None
         is_submit = False
 
-        if stu_repo:
-            stu_repo_name = stu_repo.get().name
-            project = GITLAB_.projects.get(f'{stu_username}/{stu_repo_name}')
+        if uname in projects_dict.keys():
+            repo_name = projects_dict[uname].name
+            project = GITLAB_.projects.get(f'{uname}/{repo_name}')
             branches = project.branches.list()
             # 檢查學生是否建立 lab 指定的 branch 分支
             for branch in branches:
-                if branch.name == submit_br:
+                if branch.name == lab.branch:
                     is_submit = True
                     break
 
-        students[stu_username] = {
-            'stu_name': stu_name,
-            'repo_name': stu_repo_name,
+        students[uname] = {
+            'stu_name': fullname,
+            'repo_name': repo_name,
             'is_submit': is_submit,
         }
     return students
 
 
-def check_stu_evaluation_status(lab, students_obj):
+def check_stu_evaluation_status(lab):
     """
     檢查學生 評量 填寫狀態
     """
+    question_exist = Question.objects.filter(lab=lab)
+    students_set = lab.course.students.all().select_related('user')
     students = {}
-    for student in students_obj:
+    for student in students_set:
         stu_username = student.user.username
 
-        is_finish = False
-        question_exist = Question.objects.filter(lab=lab)
-        if question_exist:
-            for question in question_exist:
-                answer = Answer.objects.filter(student=student, topic=question)
-                if answer:
-                    is_finish = True
-                    break
+        # 學生任意填答一題表示已經作答(前端限制全部必填)
+        answer = Answer.objects.filter(student=student, topic__in=question_exist)
+        is_finish = True if answer else False
 
         students[stu_username] = {
             'full_name': student,
@@ -155,9 +156,9 @@ def check_stu_evaluation_status(lab, students_obj):
     return students
 
 
-def count_stu_lab_submit(lab, students_obj, submit_br):
+def count_stu_lab_submit(lab):
     """計算已繳交 實驗 的學生數量"""
-    students_lab = check_stu_lab_status(lab, students_obj, submit_br)
+    students_lab = check_stu_lab_status(lab)
     # 計算各 lab 學生繳交人數
     counts = 0
     for name in students_lab:
@@ -166,9 +167,9 @@ def count_stu_lab_submit(lab, students_obj, submit_br):
     return counts
 
 
-def count_stu_evaluation_submit(lab, students_obj):
+def count_stu_evaluation_submit(lab):
     """計算已繳交 評量 的學生數量"""
-    students_eva = check_stu_evaluation_status(lab, students_obj)
+    students_eva = check_stu_evaluation_status(lab)
     counts = 0
     for name in students_eva:
         if students_eva[name]['is_finish']:

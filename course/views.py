@@ -60,7 +60,7 @@ def course_view(request, course_id):
             student_obj = context['course'].students.filter(user=request.user)
             submit_br = lab.branch
             # 檢查學生 lab 繳交狀態
-            student_dict = check_stu_lab_status(lab, student_obj, submit_br)
+            student_dict = check_stu_lab_status(lab)
             student = student_dict[request.user.username]
             if student['is_submit']:
                 context['lab_submit'].update({
@@ -72,7 +72,7 @@ def course_view(request, course_id):
                 })
 
             # 檢查學生 評量 填寫狀態
-            students_eva = check_stu_evaluation_status(lab, student_obj)
+            students_eva = check_stu_evaluation_status(lab)
             student = students_eva[request.user.username]
             if student['is_finish']:
                 context['eva_submit'].update({
@@ -157,17 +157,14 @@ def course_view(request, course_id):
         for lab in context['labs']:
             students_obj = context['course'].students.all()
             submit_br = lab.branch
+
             # 計算各 lab 學生繳交人數
-            counts = count_stu_lab_submit(lab, students_obj, submit_br)
-            context['lab_submit'].update({
-                lab.name: counts,
-            })
+            counts = count_stu_lab_submit(lab)
+            context['lab_submit'][lab.name] = counts
 
             # 計算各 評量 學生繳交人數
-            counts_eva = count_stu_evaluation_submit(lab, students_obj)
-            context['eva_submit'].update({
-                lab.name: counts_eva,
-            })
+            counts_eva = count_stu_evaluation_submit(lab)
+            context['eva_submit'][lab.name] = counts_eva
 
         context.update(get_nav_side_dict(request.user, 'teacher'))
         return render(request, 'course_tch.html', context)
@@ -320,9 +317,9 @@ def lab_submit_view(request, course_id, lab_id):
     submit_br = lab.branch
 
     # 檢查學生 lab 繳交狀態
-    students = check_stu_lab_status(lab, students_obj, submit_br)
+    students = check_stu_lab_status(lab)
     # 檢查學生 評量 填寫狀態
-    students_eva = check_stu_evaluation_status(lab, students_obj)
+    students_eva = check_stu_evaluation_status(lab)
 
     context = {
         'course_id': course_id,
@@ -515,7 +512,7 @@ def lab_evaluation_total_view(request, course_id, lab_id):
     stu_total = course.students.count()
     students_obj = course.students.all()
     # 計算 已填寫評量人數
-    stu_ans = count_stu_evaluation_submit(lab, students_obj)
+    stu_ans = count_stu_evaluation_submit(lab)
 
     # 過濾出選擇題中對應的選項
     q_options = {}
