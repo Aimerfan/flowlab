@@ -9,15 +9,20 @@
     <div class="container container_close">
         <div class="repo_content">
             <h1 style="text-align: center">Jenkins Pipeline {{ branch }}</h1>
-            <div style="padding: 15px;">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownBranch" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span style="width: 100px;">{{ branch }}</span>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownBranch">
-                    {% for branch in info.branches %}
-                        <li><a class="dropdown-item" href="{% url 'build' user.username info.name branch.name %}">{{ branch.name }}</a></li>
-                    {% endfor %}
-                </ul>
+            <div class="d-flex justify-content-between" style="padding: 15px;">
+                <div>
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownBranch" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span style="width: 100px;">{{ branch }}</span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownBranch">
+                        {% for branch in info.branches %}
+                            <li><a class="dropdown-item" href="{% url 'build' user.username info.name branch.name %}">{{ branch.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <a href="{{ jenkins_url }}" target="_blank">Jenkins 建置報告</a>
+                </div>
             </div>
             {% if build_results %}
             <div class="ver_mid">

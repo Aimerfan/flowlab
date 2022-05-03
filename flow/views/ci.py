@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from django.contrib import messages
 
-from core.infra import JENKINS_
+from core.infra import JENKINS_, JENKINS_URL
 from core.infra.jenkins_func import get_job_name
 from core.infra.gitlab_func import get_repo_verbose
 from core.dicts import MESSAGE_DICT
 from ..forms import TestSelectForm
 from ..utils import update_jenkinsfile, push_jenkinsfile
-from .ajax import create_jenkinsfile
 
 
 def jenkins_file_view(request, user, project):
@@ -46,9 +45,11 @@ def build_view(request, user, project, branch):
 
     build_results = {}
     not_built = False  # 是否還在建置中
+    jenkins_url = f'{JENKINS_URL}/job/{user}_{project}'
 
     if JENKINS_.job_exists(job_name):
         multibr_default_job = JENKINS_.get_job_info(job_name)
+        jenkins_url = f'{JENKINS_URL}/job/{user}_{project}/job/{branch}'
         # 仍在建置中
         if 'color' in multibr_default_job.keys() and \
                 multibr_default_job['color'] == 'notbuilt_anime':
@@ -80,14 +81,20 @@ def build_view(request, user, project, branch):
         'branch': branch,
         'build_results': build_results,
         'not_built': not_built,
+        'jenkins_url': jenkins_url,
     })
 
 
 def build_console_view(request, user, project, branch, number):
     project_info = get_repo_verbose(user, project)
     job_name = get_job_name(user, project, branch)
+    jenkins_url = f'{JENKINS_URL}/job/{user}_{project}/job/{branch}/{number}'
 
     # 取得 console output
     build_info = JENKINS_.get_build_console_output(job_name, number).split('\n')
 
-    return render(request, 'ci/build_console.html', {'info': project_info, 'build_info': build_info})
+    return render(request, 'ci/build_console.html', {
+        'info': project_info,
+        'build_info': build_info,
+        'jenkins_url': jenkins_url,
+    })

@@ -3,7 +3,11 @@
   <actions/>
   <description></description>
   <properties>
-    <com.cloudbees.hudson.plugins.folder.properties.FolderCredentialsProvider_-FolderCredentialsProperty plugin="cloudbees-folder@6.16">
+    <com.cloudbees.hudson.plugins.folder.properties.AuthorizationMatrixProperty>
+      <inheritanceStrategy class="org.jenkinsci.plugins.matrixauth.inheritance.InheritParentStrategy"/>
+      <permission>USER:hudson.model.Item.Read:set_username</permission>
+    </com.cloudbees.hudson.plugins.folder.properties.AuthorizationMatrixProperty>
+    <com.cloudbees.hudson.plugins.folder.properties.FolderCredentialsProvider_-FolderCredentialsProperty plugin="cloudbees-folder@6.17">
       <domainCredentialsMap class="hudson.util.CopyOnWriteMap$Hash">
         <entry>
           <com.cloudbees.plugins.credentials.domains.Domain plugin="credentials@2.6.1">
@@ -13,8 +17,8 @@
             <com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl plugin="credentials@2.6.1">
               <id>gitlab_root</id>
               <description></description>
-              <username>set_username</username>
-              <password>set_password</password>
+              <username>set_root_username</username>
+              <password>set_root_password</password>
               <usernameSecret>false</usernameSecret>
             </com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl>
           </java.util.concurrent.CopyOnWriteArrayList>
@@ -29,7 +33,7 @@
   <icon class="jenkins.branch.MetadataActionFolderIcon" plugin="branch-api@2.7.0">
     <owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
   </icon>
-  <orphanedItemStrategy class="com.cloudbees.hudson.plugins.folder.computed.DefaultOrphanedItemStrategy" plugin="cloudbees-folder@6.16">
+  <orphanedItemStrategy class="com.cloudbees.hudson.plugins.folder.computed.DefaultOrphanedItemStrategy" plugin="cloudbees-folder@6.17">
     <pruneDeadBranches>true</pruneDeadBranches>
     <daysToKeep>-1</daysToKeep>
     <numToKeep>-1</numToKeep>
@@ -39,7 +43,7 @@
   <sources class="jenkins.branch.MultiBranchProject$BranchSourceList" plugin="branch-api@2.7.0">
     <data>
       <jenkins.branch.BranchSource>
-        <source class="jenkins.plugins.git.GitSCMSource" plugin="git@4.10.0">
+        <source class="jenkins.plugins.git.GitSCMSource" plugin="git@4.10.2">
           <id>08557ccf-8334-467b-a58c-03709ed6146d</id>
           <remote>set_remote</remote>
           <credentialsId>gitlab_root</credentialsId>

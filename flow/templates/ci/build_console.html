@@ -8,7 +8,11 @@
 {% include 'cicd_nav.html' with project=info.name %}
     <div class="container container_close">
         <div class="repo_content">
-            <h1 style="text-align: center">Jenkins Pipeline Console</h1>
+            <div class="row" style="padding: 15px;">
+                <div class="col-2"></div>
+                <div class="col-8"><h1 style="text-align: center">Jenkins Pipeline Console</h1></div>
+                <div class="col-2" style="padding-top: 15px;"><a href="{{ jenkins_url }}" target="_blank">Jenkins 建置報告</a></div>
+            </div>
             <div class="align_both_sides ver_mid">
                 <pre>{% for line in build_info %}
 {% if '[Pipeline]' in line %}<span class="pipeline_new_node">{{ line }}</span>{% else %}{{ line }}{% endif %}{% endfor %}

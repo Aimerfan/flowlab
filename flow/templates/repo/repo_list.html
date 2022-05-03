@@ -10,8 +10,10 @@
         <div class="content">
             <h1 style="padding: 20px 0 0 0; text-align: center;">projects</h1>
             <div class="right_content">
-                <button class="btn btn-primary mx-1" type="button" onclick="location.href='{% url 'repo_new_template' %}'">新增模板專案</button>
-                <button class="btn btn-primary mx-1" type="button" onclick="location.href='{% url 'repo_new_blank' %}'">新增空白專案</button>
+                {% if false %}<button class="btn btn-primary mx-1" type="button" onclick="location.href='{% url 'repo_new_template' %}'">新增模板專案</button>{% endif %}
+                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="此功能不適用本次實驗">
+                    <button class="btn btn-primary mx-1" type="button" onclick="location.href='{% url 'repo_new_blank' %}'" disabled>新增空白專案</button>
+                </span>
             </div>
         </div>
         <div class="content projects_content">
