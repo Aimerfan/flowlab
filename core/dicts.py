@@ -16,9 +16,11 @@ MESSAGE_DICT = {
     'save_evaluation_success': '已儲存評量',
     # warning
     'gitlab_project_not_found': 'Gitlab 找不到專案 {}',
+    'project_is_exist': '{} 專案已存在, 請修改專案名稱',
     'template_name_exist': '{} 模板已存在, 請修改模板名稱',
     'stu_is_in_course': '{} 學生已在課程名單內',
     # error
     'check_role_failed': '你沒有權限檢視這個頁面!',
     'gitlab_user_not_found': '找不到 GitLab 使用者, 請聯絡管理員處理',
+    'create_jenkins_user_failed': '建立 Jenkins 帳號時出錯了, 請聯絡管理員處理',
 }

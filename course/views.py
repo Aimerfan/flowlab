@@ -17,10 +17,12 @@ from core.infra.gitlab_func import get_repo_verbose, get_tree
 from core.infra.sonarqube_func import get_project_name
 from .forms import LabForm
 from .models import Course, Lab, Question, Option, Answer
-from .utils import get_nav_side_dict, check_stu_lab_status, check_stu_evaluation_status, question_parser
+from .utils import get_nav_side_dict, create_user, create_stu_identity, \
+    check_stu_lab_status, check_stu_evaluation_status, \
+    count_stu_lab_submit, count_stu_evaluation_submit, question_parser
 from flow.models import Project
 from flow.forms import TemplateRepoForm
-from flow.utils import import_template, create_jenkins_job, create_gitlab_webhook
+from flow.utils import import_template, create_jenkins_job, create_gitlab_webhook, same_name_repo
 from flowlab.settings import MEDIA_ROOT
 
 
@@ -47,7 +49,8 @@ def course_view(request, course_id):
         'labs': Lab.objects.filter(course=course_id).order_by('id'),
         'course': Course.objects.filter(id=course_id).get(),
         'project': {},
-        'submit': {},
+        'lab_submit': {},
+        'eva_submit': {},
         'finish': {},
     }
     context.update({'students': context['course'].students.all()})
@@ -57,14 +60,26 @@ def course_view(request, course_id):
             student_obj = context['course'].students.filter(user=request.user)
             submit_br = lab.branch
             # 檢查學生 lab 繳交狀態
-            student_dict = check_stu_lab_status(lab, student_obj, submit_br)
+            student_dict = check_stu_lab_status(lab)
             student = student_dict[request.user.username]
             if student['is_submit']:
-                context['submit'].update({
+                context['lab_submit'].update({
                     lab.name: '✔',
                 })
             else:
-                context['submit'].update({
+                context['lab_submit'].update({
+                    lab.name: '✖',
+                })
+
+            # 檢查學生 評量 填寫狀態
+            students_eva = check_stu_evaluation_status(lab)
+            student = students_eva[request.user.username]
+            if student['is_finish']:
+                context['eva_submit'].update({
+                    lab.name: '✔',
+                })
+            else:
+                context['eva_submit'].update({
                     lab.name: '✖',
                 })
 
@@ -93,32 +108,13 @@ def course_view(request, course_id):
             email = request.POST['email']
 
             # 建立使用者帳號
-            if User.objects.filter(username=username):
-                user = User.objects.get(username=username)
-            else:
-                user = User.objects.create_user(username=username, password=password, email=email)
-                user.save()
-                # 建立 GitLab 帳號
-                gl_user = GITLAB_.users.create({'username': username, 'password': password,
-                                                'name': name, 'email': email, 'skip_confirmation': True})
-                gl_user.save()
-                # 建立 SonarQube 帳號
-                SONAR_.users.create_user(login=username, name=name, password=password, email=email)
-
-            # 建立學生身份 並設定名稱
-            if Student.objects.filter(user=user):
-                student = Student.objects.get(user=user)
-            else:
-                student = Student.objects.create(user=user, full_name=name)
-                student.save()
-            # 將學生加入課程
-            course = Course.objects.get(id=course_id)
-            if course.students.filter(user=user):
-                messages.warning(request, MESSAGE_DICT.get('stu_is_in_course').format(name))
-            else:
-                course.students.add(student)
-                course.save()
+            user = create_user(request=request, username=username, password=password, name=name, email=email)
+            # 建立學生身份, 並加入課程
+            create_success = create_stu_identity(user=user, name=name, course_id=course_id)
+            if create_success:
                 messages.success(request, MESSAGE_DICT.get('create_stu_in_course_success').format(name))
+            else:
+                messages.warning(request, MESSAGE_DICT.get('stu_is_in_course').format(name))
 
         # 批量匯入學生資料
         elif request.method == 'POST' and request.POST['action'] == 'import':
@@ -132,26 +128,18 @@ def course_view(request, course_id):
             with open(file_path, 'r') as file:
                 rows = csv.reader(file)
                 for row in rows:
+                    username = row[0]
+                    password = row[1]
+                    name = row[2]
+                    email = row[3]
+
                     # 建立使用者帳號
-                    if User.objects.filter(username=row[0]):
-                        user = User.objects.get(username=row[0])
-                    else:
-                        user = User.objects.create_user(username=row[0], password=row[1], email=row[3])
-                        user.save()
-                        # 建立 GitLab 帳號
-                        gl_user = GITLAB_.users.create({'username': row[0], 'password': row[1],
-                                                        'name': row[2], 'email': row[3], 'skip_confirmation': True})
-                        gl_user.save()
-                    # 建立學生身份 並設定名稱
-                    if Student.objects.filter(user=user):
-                        student = Student.objects.get(user=user)
-                    else:
-                        student = Student.objects.create(user=user, full_name=row[2])
-                        student.save()
-                    # 將學生加入課程
-                    course = Course.objects.get(id=course_id)
-                    course.students.add(student)
-                    course.save()
+                    user = create_user(request=request, username=username, password=password, name=name, email=email)
+                    # 建立學生身份, 並加入課程
+                    create_success = create_stu_identity(user=user, name=name, course_id=course_id)
+
+                    if not create_success:
+                        messages.warning(request, MESSAGE_DICT.get('stu_is_in_course').format(name))
                 messages.success(request, MESSAGE_DICT.get('import_stu_in_course_success'))
 
             return HttpResponse('OK')
@@ -169,27 +157,14 @@ def course_view(request, course_id):
         for lab in context['labs']:
             students_obj = context['course'].students.all()
             submit_br = lab.branch
-            # 檢查學生 lab 繳交狀態
-            students = check_stu_lab_status(lab, students_obj, submit_br)
-            # 計算各 lab 學生繳交人數
-            counts = 0
-            for name in students:
-                if students[name]['is_submit']:
-                    counts += 1
-            context['submit'].update({
-                lab.name: counts,
-            })
 
-            # 檢查學生 評量 繳交狀態
-            students_eva = check_stu_evaluation_status(lab, students_obj)
+            # 計算各 lab 學生繳交人數
+            counts = count_stu_lab_submit(lab)
+            context['lab_submit'][lab.name] = counts
+
             # 計算各 評量 學生繳交人數
-            counts_eva = 0
-            for name in students_eva:
-                if students_eva[name]['is_finish']:
-                    counts_eva += 1
-            context['finish'].update({
-                lab.name: counts_eva,
-            })
+            counts_eva = count_stu_evaluation_submit(lab)
+            context['eva_submit'][lab.name] = counts_eva
 
         context.update(get_nav_side_dict(request.user, 'teacher'))
         return render(request, 'course_tch.html', context)
@@ -250,6 +225,10 @@ def lab_view(request, course_id, lab_id):
             repo_name = request.POST['name']
             # 模板檔案
             template_file = lab.template.template
+
+            # 檢查專案是否同名
+            if same_name_repo(request, repo_name):
+                return redirect('repo_list', user=username)
 
             # 將模板匯入專案
             project = import_template(
@@ -338,9 +317,9 @@ def lab_submit_view(request, course_id, lab_id):
     submit_br = lab.branch
 
     # 檢查學生 lab 繳交狀態
-    students = check_stu_lab_status(lab, students_obj, submit_br)
+    students = check_stu_lab_status(lab)
     # 檢查學生 評量 填寫狀態
-    students_eva = check_stu_evaluation_status(lab, students_obj)
+    students_eva = check_stu_evaluation_status(lab)
 
     context = {
         'course_id': course_id,
@@ -521,3 +500,49 @@ def lab_evaluation_submit_view(request, course_id, lab_id, student):
     }
 
     return render(request, 'evaluation_submit_tch.html', context)
+
+
+@check_role([Role.TEACHER])
+def lab_evaluation_total_view(request, course_id, lab_id):
+    """老師檢視所有學生的互動式評量(統計結果)"""
+    course = Course.objects.filter(id=course_id).get()
+    lab = Lab.objects.filter(id=lab_id).get()
+    questions = Question.objects.filter(lab=lab).order_by('id')
+    # 計算 班級人數
+    stu_total = course.students.count()
+    students_obj = course.students.all()
+    # 計算 已填寫評量人數
+    stu_ans = count_stu_evaluation_submit(lab)
+
+    # 過濾出選擇題中對應的選項
+    q_options = {}
+    for question in questions:
+        if question.type == 'single':
+            option = Option.objects.filter(topic=question)
+            q_options[question.id] = option
+
+    # 過濾出問題對應的回答
+    q_ans = {}
+    for question in questions:
+        q_ans[question.id] = {}
+        ans = Answer.objects.filter(topic=question)
+        for op in q_options[question.id]:
+            q_ans[question.id][op.number] = 0
+        if ans:
+            for a in ans:
+                for op in q_options[question.id]:
+                    if a.content == str(op.number):
+                        q_ans[question.id][op.number] += 1
+                        continue
+
+    context = {
+        'course': course,
+        'lab': lab,
+        'stu_noans': stu_total - stu_ans,
+        'stu_ans': stu_ans,
+        'questions': questions,
+        'q_options': q_options,
+        'q_ans': q_ans,
+    }
+
+    return render(request, 'evaluation_total_tch.html', context)

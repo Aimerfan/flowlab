@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib import messages
 
-from core.infra import JENKINS_
+from core.infra import JENKINS_, JENKINS_URL
 from core.infra.jenkins_func import get_job_name
 from core.infra.gitlab_func import get_repo_verbose
 from core.dicts import MESSAGE_DICT
@@ -19,13 +19,13 @@ def jenkins_file_view(request, user, project):
 
     if request.method == 'POST':
         # 修改並顯示 Jenkinsfile
-        if request.POST['action'] == 'update' and form.is_valid():
+        if 'action' in request.POST and request.POST['action'] == 'update' and form.is_valid():
             # 讀取選擇的分支與測試
             selected_branch = request.POST.get('selected_branch')
             selected_tests = form.cleaned_data['selected_tests']
             pipe_content = update_jenkinsfile(repo_name, selected_branch, selected_tests)
         # 將前端顯示的 Jenkisfile 推至儲存庫
-        elif request.POST['action'] == 'push':
+        elif 'action' in request.POST and request.POST['action'] == 'push':
             selected_branch = request.POST.get('selected_branch')
             pipe_content = request.POST.get('pipe_content')
             push_jenkinsfile(repo_name, selected_branch, pipe_content)
@@ -44,11 +44,21 @@ def build_view(request, user, project, branch):
     job_name = get_job_name(user, project, branch)
 
     build_results = {}
+    not_built = False  # 是否還在建置中
+    jenkins_url = f'{JENKINS_URL}/job/{user}_{project}'
 
     if JENKINS_.job_exists(job_name):
         multibr_default_job = JENKINS_.get_job_info(job_name)
-        # 取得該 branch 最新的建置編號 (先確認是否有建置結果)
-        if 'lastCompletedBuild' in multibr_default_job.keys() and \
+        jenkins_url = f'{JENKINS_URL}/job/{user}_{project}/job/{branch}'
+        # 仍在建置中
+        if 'color' in multibr_default_job.keys() and \
+                multibr_default_job['color'] == 'notbuilt_anime':
+            not_built = True
+        elif 'lastCompletedBuild' in multibr_default_job.keys() and \
+                multibr_default_job['lastCompletedBuild'] is None:
+            not_built = True
+        # 已建置完成
+        elif 'lastCompletedBuild' in multibr_default_job.keys() and \
                 'number' in multibr_default_job['lastCompletedBuild'].keys():
             last_build_number = multibr_default_job['lastCompletedBuild']['number']
             # 取得該 branch 的最新 5 個建置結果 (由新至舊)
@@ -70,14 +80,21 @@ def build_view(request, user, project, branch):
         'info': project_info,
         'branch': branch,
         'build_results': build_results,
+        'not_built': not_built,
+        'jenkins_url': jenkins_url,
     })
 
 
 def build_console_view(request, user, project, branch, number):
     project_info = get_repo_verbose(user, project)
     job_name = get_job_name(user, project, branch)
+    jenkins_url = f'{JENKINS_URL}/job/{user}_{project}/job/{branch}/{number}'
 
     # 取得 console output
     build_info = JENKINS_.get_build_console_output(job_name, number).split('\n')
 
-    return render(request, 'ci/build_console.html', {'info': project_info, 'build_info': build_info})
+    return render(request, 'ci/build_console.html', {
+        'info': project_info,
+        'build_info': build_info,
+        'jenkins_url': jenkins_url,
+    })

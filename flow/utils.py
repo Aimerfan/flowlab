@@ -4,8 +4,10 @@ from xml.etree import ElementTree
 from base64 import b64decode
 from time import sleep
 
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 
+from core.dicts import MESSAGE_DICT
 from core.infra import ENVIRON
 from core.infra import GITLAB_, GITLAB_URL
 from core.infra import JENKINS_, JENKINS_URL
@@ -21,8 +23,8 @@ def load_multibranch_xml():
     config_file = get_data(__name__, 'resources/multibranch_config.xml').decode('utf-8')
     xml = ElementTree.fromstring(config_file)
     xml = ElementTree.tostring(xml).decode()
-    xml = xml.replace('set_username', ENVIRON['GITLAB_ROOT_USERNAME'])
-    xml = xml.replace('set_password', ENVIRON['GITLAB_ROOT_PASSWORD'])
+    xml = xml.replace('set_root_username', ENVIRON['GITLAB_ROOT_USERNAME'])
+    xml = xml.replace('set_root_password', ENVIRON['GITLAB_ROOT_PASSWORD'])
     return xml
 
 
@@ -89,6 +91,16 @@ def push_jenkinsfile(repo_name, selected_branch, pipe_content):
     file.save(branch=selected_branch, commit_message='改變檢測項目')
 
 
+def same_name_repo(request, repo_name):
+    """檢查專案是否同名"""
+    my_projects = GITLAB_.projects.list(owner=True)
+    for project in my_projects:
+        if repo_name == project.name:
+            messages.warning(request, MESSAGE_DICT.get('project_is_exist').format(repo_name))
+            return True
+    return False
+
+
 def export_template(user, project, template_name):
     """匯出 project 作為模板"""
     # 建立匯出模板
@@ -151,7 +163,8 @@ def create_jenkins_job(username, repo_name):
     if JENKINS_.job_exists(job_name):
         raise Exception('job already exists.')
     gitlab_repo_url = f"{GITLAB_URL}/{username}/{repo_name}"
-    config_xml = CONFIG_XML.replace('set_remote', gitlab_repo_url)
+    config_xml = CONFIG_XML.replace('set_username', username)
+    config_xml = config_xml.replace('set_remote', gitlab_repo_url)
     JENKINS_.create_job(job_name, config_xml)
 
 

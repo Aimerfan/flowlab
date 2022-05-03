@@ -7,6 +7,10 @@
     {% include 'cicd_nav.html' with project=info.name %}
     <div class="container_close">
         <div class="content">
+            {% if not_built %}
+                <h2 class="text-center">該分支正在建置中，請稍後再重整頁面</h2>
+            {% endif %}
+
             {% if sonar_info %}
                 <div class="row">
                     <div class="col-sm-2"></div>

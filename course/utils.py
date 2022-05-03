@@ -1,8 +1,17 @@
+import logging
+import requests
+
+from django.contrib import messages
 from django.contrib.auth.models import User
 
 from accounts.models import Teacher, Student
+from core.dicts import MESSAGE_DICT
 from core.infra import GITLAB_
+from core.infra import JENKINS_URL, JENKINS_AUTH
+from core.infra import SONAR_
 from .models import Course, Lab, Question, Option, Answer
+
+logger = logging.getLogger(f'flowlab.{__name__}')
 
 
 def get_nav_side_dict(user, identity):
@@ -24,62 +33,148 @@ def get_nav_side_dict(user, identity):
     }
 
 
-def check_stu_lab_status(lab, students_obj, submit_br):
+def create_user(request, username, password, name, email=''):
+    """
+    建立使用者帳號, 並建立學生身分
+    包含 GitLab, Jenkins, SonarQube
+    return User obj.
+    """
+    # 建立使用者帳號
+    if User.objects.filter(username=username):
+        user = User.objects.get(username=username)
+    else:
+        user = User.objects.create_user(username=username, password=password, email=email)
+        user.save()
+
+        # 建立 GitLab 帳號
+        gl_user = GITLAB_.users.create({'username': username, 'password': password,
+                                        'name': name, 'email': email, 'skip_confirmation': True})
+        gl_user.save()
+        # 建立 Jenkins 帳號
+        create_jenkins_user(request=request, username=username, password=password, email=email)
+        # 建立 SonarQube 帳號
+        SONAR_.users.create_user(login=username, name=name, password=password, email=email)
+
+    return user
+
+
+def create_jenkins_user(request, username, password, email):
+    """建立 Jenkins 帳號"""
+
+    data = {
+        'username': username,
+        'password1': password,
+        'password2': password,
+        'fullname': username,
+        'email': email,
+    }
+
+    api_url = f'{JENKINS_URL}/securityRealm/createAccountByAdmin'
+    result = requests.post(api_url, data=data, auth=JENKINS_AUTH)
+
+    if result.status_code != requests.codes.ok:
+        logger.error(f"create '{username}' jenkins account failed")
+        logger.error(result.text)
+        messages.error(request, MESSAGE_DICT.get('create_jenkins_user_failed'))
+
+
+def create_stu_identity(user, name, course_id):
+    """建立學生身份, 並加入課程"""
+    # 建立學生身分
+    if Student.objects.filter(user=user):
+        student = Student.objects.get(user=user)
+    else:
+        student = Student.objects.create(user=user, full_name=name)
+        student.save()
+
+    # 將學生加入課程
+    course = Course.objects.get(id=course_id)
+    if course.students.filter(user=user):
+        return False
+    else:
+        course.students.add(student)
+        course.save()
+        return True
+
+
+def check_stu_lab_status(lab):
     """
     檢查學生 lab 繳交狀態
     1. 是否指定專案 (stu_repo_name)
     2. 是否繳交指定分支 (is_submit)
     """
-    students = {}
-    for student in students_obj:
-        stu_username = student.user.username
-        stu_id = User.objects.get(username=stu_username)
-        stu_name = Student.objects.get(user=stu_id).full_name
-        stu_repo = lab.project.filter(user=stu_id)
+    lab_prefetch = Lab.objects.filter(id=lab.id).prefetch_related('course__students__user').get()
+    projects_prefetch = lab.project.all().select_related('user')
+    projects_dict = {}
+    for project in projects_prefetch:
+        projects_dict[project.user.username] = project
 
-        stu_repo_name = None
+    students = {}
+    for student in lab_prefetch.course.students.all():
+        uname = student.user.username
+        fullname = student.full_name
+
+        repo_name = None
         is_submit = False
 
-        if stu_repo:
-            stu_repo_name = stu_repo.get().name
-            project = GITLAB_.projects.get(f'{stu_username}/{stu_repo_name}')
+        if uname in projects_dict.keys():
+            repo_name = projects_dict[uname].name
+            project = GITLAB_.projects.get(f'{uname}/{repo_name}')
             branches = project.branches.list()
             # 檢查學生是否建立 lab 指定的 branch 分支
             for branch in branches:
-                if branch.name == submit_br:
+                if branch.name == lab.branch:
                     is_submit = True
                     break
 
-        students[stu_username] = {
-            'stu_name': stu_name,
-            'repo_name': stu_repo_name,
+        students[uname] = {
+            'stu_name': fullname,
+            'repo_name': repo_name,
             'is_submit': is_submit,
         }
     return students
 
 
-def check_stu_evaluation_status(lab, students_obj):
+def check_stu_evaluation_status(lab):
     """
     檢查學生 評量 填寫狀態
     """
+    question_exist = Question.objects.filter(lab=lab)
+    students_set = lab.course.students.all().select_related('user')
     students = {}
-    for student in students_obj:
+    for student in students_set:
         stu_username = student.user.username
 
-        is_finish = False
-        question_exist = Question.objects.filter(lab=lab)
-        if question_exist:
-            for question in question_exist:
-                answer = Answer.objects.filter(student=student, topic=question)
-                if answer:
-                    is_finish = True
-                    break
+        # 學生任意填答一題表示已經作答(前端限制全部必填)
+        answer = Answer.objects.filter(student=student, topic__in=question_exist)
+        is_finish = True if answer else False
 
         students[stu_username] = {
             'full_name': student,
             'is_finish': is_finish,
         }
     return students
+
+
+def count_stu_lab_submit(lab):
+    """計算已繳交 實驗 的學生數量"""
+    students_lab = check_stu_lab_status(lab)
+    # 計算各 lab 學生繳交人數
+    counts = 0
+    for name in students_lab:
+        if students_lab[name]['is_submit']:
+            counts += 1
+    return counts
+
+
+def count_stu_evaluation_submit(lab):
+    """計算已繳交 評量 的學生數量"""
+    students_eva = check_stu_evaluation_status(lab)
+    counts = 0
+    for name in students_eva:
+        if students_eva[name]['is_finish']:
+            counts += 1
+    return counts
 
 
 def question_parser(question_obj, content):
