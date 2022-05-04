@@ -93,9 +93,11 @@ def push_jenkinsfile(repo_name, selected_branch, pipe_content):
 
 def same_name_repo(request, repo_name):
     """檢查專案是否同名"""
-    my_projects = GITLAB_.projects.list(owner=True)
-    for project in my_projects:
-        if repo_name == project.name:
+    gitlab_user = GITLAB_.users.list(username=request.user.username)[0]
+    project_list = gitlab_user.projects.list()
+
+    for project in project_list:
+        if project.user_id == request.user.username and repo_name == project.name:
             messages.warning(request, MESSAGE_DICT.get('project_is_exist').format(repo_name))
             return True
     return False
