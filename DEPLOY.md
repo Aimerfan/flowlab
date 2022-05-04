@@ -20,10 +20,10 @@
     - 將 `./flowlab/secrets.example` 複製並更名為 `secrets.py`, 修改內容
 3. 輸入 `./tools/init.sh` 以修改虛擬記憶體大小
 4. 啟動部分服務 (資料庫, gitlab, jenkins)
-   - 執行 `docker-compose up -d db gitlab jenkins`
+    - 執行 `docker-compose up -d db gitlab jenkins`
 5. 使用 pgAdmin 建立一個名為 sonar 的 database
 6. 啟動 sonarqube 服務
-   - 執行 `docker-compose up -d sonarqube`
+    - 執行 `docker-compose up -d sonarqube`
 
 ### 設定 jenkins
 
@@ -34,33 +34,37 @@
 4. 點選左邊的 Install suggested plugins, 安裝建議的插件
 5. 根據 `.env` 建立 Admin 帳號
 6. 下載 plugins
-   - 管理 Jenkins > 管理外掛程式 >
-   - 查詢並安裝以下套件:
-     - JUnit Plugin (原則上預設會有)
-     - GitLab
-     - GitLab API
-     - JaCoCo Plugin
-     - Docker Plugin
-7. 建立節點
-   - 管理 Jenkins > 管理節點 > Configure Clouds
-   - 依據以下說明進行填寫 (以下未說明到 的表示不更動預設值)
-     - Name: `docker`
-     - 點開 Docker Cloud details...
-       - Docker Host URL: `unix://var/run/docker.sock`
-       - 勾選 `Enabled`
-       - Container Cap: `2`
-     - 點開 Docker Agent templates...
-       - Labels: `inbound`
-       - 勾選 `Enabled`
-       - Name: `inbound`
-       - Docker Image: `jenkins/inbound-agent:4.9-1`
-8. 建立 API token
-   - (右上角) Admin 帳號 > 設定 > API token > Add new Token
-   - 複製 token 到 `.env` 的 `JENKINS_API_TOKEN`
-9. 建立 global credentials (for gitlab and sonarqube)
-   - 管理 Jenkins > manage credentials > Stores scoped to Jenkins 的 (global) > Add Credentials
-   - 建立 GitLab API token, ID 為 `gitlab_token`, API token 為 gitlab 的 access token (待設定完 gitlab)
-   - 建立 Secret text, ID 為 `sonarqube_token`, Secret 為 sonarqube 的 access token (待設定完 sonarqube)
+    - 管理 Jenkins > 管理外掛程式 >
+    - 查詢並安裝以下套件:
+      - JUnit Plugin (原則上預設會有)
+      - GitLab
+      - GitLab API
+      - JaCoCo
+      - Docker Plugin
+7. 設定專案型矩陣授權策略, 以便學生只能檢視自己的專案工作 (作業)
+    - 管理 Jenkins > 設定全域安全性 > 授權 > 專案型矩陣授權策略
+    - 已驗證使用者 (Auth. Users) 僅勾選 整體: Read
+    - 建立專案時, 所套用的 xml 檔案, 會將學生設定成 作業: Read, 讓學生能夠查看自己的作業
+8. 建立節點
+    - 管理 Jenkins > 管理節點 > Configure Clouds
+    - 依據以下說明進行填寫 (以下未說明到 的表示不更動預設值)
+      - Name: `docker`
+      - 點開 Docker Cloud details...
+        - Docker Host URL: `unix://var/run/docker.sock`
+        - 勾選 `Enabled`
+        - Container Cap: `2`
+      - 點開 Docker Agent templates...
+        - Labels: `inbound`
+        - 勾選 `Enabled`
+        - Name: `inbound`
+        - Docker Image: `jenkins/inbound-agent:4.9-1`
+9. 建立 API token
+    - (右上角) Admin 帳號 > 設定 > API token > Add new Token
+    - 複製 token 到 `.env` 的 `JENKINS_API_TOKEN`
+10. 建立 global credentials (for gitlab and sonarqube)
+    - 管理 Jenkins > manage credentials > Stores scoped to Jenkins 的 (global) > Add Credentials
+    - 建立 GitLab API token, ID 為 `gitlab_token`, API token 為 gitlab 的 access token (待設定完 gitlab)
+    - 建立 Secret text, ID 為 `sonarqube_token`, Secret 為 sonarqube 的 access token (待設定完 sonarqube)
 
 ### 設定 gitlab
 
@@ -108,7 +112,7 @@
 由於我們是在虛擬環境中安裝 gunicorn, 因此**以下操作請全程在虛擬環境中執行**
 
 1. 建立 `gunicorn.socket`
-   - `sudo vim /etc/systemd/system/gunicorn.socket`
+    - `sudo vim /etc/systemd/system/gunicorn.socket`
       ```
       [Unit]
       Description=gunicorn socket
@@ -127,9 +131,9 @@
       ```
 2. 確認 gunicorn 路徑: `which gunicorn`, 記住等下有用
 3. 建立 `gunicorn.service`
-   - `sudo vim /etc/systemd/system/gunicorn.service`
-   - `<project_root>` 輸入 Django 專案的路徑
-   - `<gunicorn_path` 輸入 gunicorn 的路徑, 使用 `which gunicorn` 獲得
+    - `sudo vim /etc/systemd/system/gunicorn.service`
+    - `<project_root>` 輸入 Django 專案的路徑
+    - `<gunicorn_path` 輸入 gunicorn 的路徑, 使用 `which gunicorn` 獲得
       ```
       [Unit]
       Description=gunicorn daemon
@@ -159,18 +163,18 @@
 5. 設定允許 gunicorn 操作日誌目錄與檔案
    `sudo chomod -R 777 logs`
 6. 確認 gunicorn.sock 有正常運作
-   - `sudo systemctl status gunicorn.socket`
-   - 如果結果不是綠色 (正常運作)，使用以下指令檢查
-     - `sudo journalctl -u gunicorn.socket`
+    - `sudo systemctl status gunicorn.socket`
+    - 如果結果不是綠色 (正常運作)，使用以下指令檢查
+      - `sudo journalctl -u gunicorn.socket`
 7. 測試 gunicorn
-   - `curl --unix-socket /run/gunicorn.sock localhost`
-   - 如果結果不是綠色 (正常運作)，使用以下指令檢查
-     - `sudo journalctl -u gunicorn`
-     - 問題排除後要重新啟動 gunicorn
-       ```
-       sudo systemctl daemon-reload    # 重新讀取設定，有變更設定(gunicorn.sock, gunicorn.service)必須要下
-       sudo systemctl restart gunicorn # 重新啟動
-       ```
+    - `curl --unix-socket /run/gunicorn.sock localhost`
+    - 如果結果不是綠色 (正常運作)，使用以下指令檢查
+      - `sudo journalctl -u gunicorn`
+      - 問題排除後要重新啟動 gunicorn
+        ```
+        sudo systemctl daemon-reload    # 重新讀取設定，有變更設定(gunicorn.sock, gunicorn.service)必須要下
+        sudo systemctl restart gunicorn # 重新啟動
+        ```
 
 至此，gunicorn 應該可以正常運作，但是監聽位置是使用本機套接字，還沒有辦法從外部連入，因次接下來要設定 nginx 來轉發外部的 requests
 
@@ -179,11 +183,11 @@
 ## 安裝 nginx 提供靜態資源
 
 1. 安裝 nginx
-   - `sudo apt update`
-   - `sudo apt install nginx`
+    - `sudo apt update`
+    - `sudo apt install nginx`
 2. 設定 nginx 轉發
-   - 建立網站設定檔
-     - `sudo vim /etc/nginx/sites-available/<project_name>.conf`
+    - 建立網站設定檔
+      - `sudo vim /etc/nginx/sites-available/<project_name>.conf`
         ```
         server {
             listen 8000;                           # 網站 port number，看需求變更
@@ -199,16 +203,16 @@
             }
         }
         ```
-     - **`static_root_path` 路徑下不要包含 static 目錄本身**
-   - 啟動網站
-     ```
-     sudo ln -s /etc/nginx/sites-available/<project_name>.conf /etc/nginx/sites-enabled
-     sudo nginx -t   # 測試設定檔是否正確，如果正常這邊都只有綠字，黃字紅字都有問題
-     sudo systemctl restart nginx
-     ```
-   - 設定防火牆
-     - `sudo ufw allow 8000`
-   - 成功! 可以連到 `http://domain_name:8000` 去看看了
+      - **`static_root_path` 路徑下不要包含 static 目錄本身**
+    - 啟動網站
+      ```
+      sudo ln -s /etc/nginx/sites-available/<project_name>.conf /etc/nginx/sites-enabled
+      sudo nginx -t   # 測試設定檔是否正確，如果正常這邊都只有綠字，黃字紅字都有問題
+      sudo systemctl restart nginx
+      ```
+    - 設定防火牆
+      - `sudo ufw allow 8000`
+    - 成功! 可以連到 `http://domain_name:8000` 去看看了
 
 ---
 
@@ -218,10 +222,14 @@
    1. 建立一個使用者, 並設定為 teacher
    2. 建立 學期
    3. 建立 課程
-2. **手動** 替該使用者 (teacher) 建立一個 gitlab, sonarqube 帳號
-   - sonarqube: (右上角) 頭貼 > Security > users > create user
+2. **手動** 替該使用者 (teacher) 建立一個 gitlab, jenkins, sonarqube 帳號
    - gitlab: menu > admin > new user
-3. 使用 teacher 帳號在前端...
+   - jenkins: 管理 Jenkins > 管理使用者 > 建立使用者
+   - sonarqube: (右上角) 頭貼 > Security > users > create user
+3. 讓老師能夠檢視所有人的專案
+   - 管理 Jenkins > 設定全域安全性 > 授權 > 專案型矩陣授權策略
+   - Add user... > 填寫老師的 username, 並勾選 整體: Read; 作業: Read;
+4. 使用 teacher 帳號在前端...
    1. 建立學生帳號
       - 進入課程 > 新增學生
    2. 建立專案並匯出成模板 (for 課程需求)
@@ -233,3 +241,15 @@
           sudo systemctl restart gunicorn
           ```
    3. 在課程裡新增實驗, 評量題目等等...
+
+---
+
+## 其他
+- 僅修改程式碼, 須更新網頁伺服器
+  - 重新啟動 gunicorn `sudo systemctl restart gunicorn`
+- 修改到靜態資源 (.png, .js ...), 須更新網頁伺服器
+  - 進入虛擬環境 `. <venv>/bin/activate`
+  - 收集靜態資源 `python3 manage.py collectstatic --clear`
+  - 重新啟動 nginx `sudo systemctl restart nginx`
+- 網頁有誤 (ex: 500...)
+  - 查看 gunicorn logs `sudo journalctl -eu gunicorn`
