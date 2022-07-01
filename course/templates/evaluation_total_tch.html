@@ -10,10 +10,10 @@
         <div class="content">
             <div class="row">
                 <div class="col-sm-2"></div>
-                <div class="col-sm-8"><h2>{{ course.name }} - {{ lab.name }}</h2><br><h1>互動式評量</h1></div>
+                <div class="col-sm-8"><h2>{{ course.name }} - {{ lab.name }}</h2><br><h1>Self-Report Inventory</h1></div>
                 <div class="col-sm-2 d-flex align-items-end"></div>
             </div>
-            <h4>已繳交: {{ stu_ans }}　　未繳交: {{ stu_noans }}</h4>
+            <h4>Submitted: {{ stu_ans }}　　Unsubmitted: {{ stu_noans }}</h4>
         </div>
     </div>
     <div class="container container_close">
@@ -21,12 +21,12 @@
             <table class="table table-light table-hover">
                 <thead class="table-secondary">
                     <tr>
-                        <th scope="col">題目</th>
-                        <th scope="col">非常同意</th>
-                        <th scope="col">同意</th>
-                        <th scope="col">普通</th>
-                        <th scope="col">不同意</th>
-                        <th scope="col">非常不同意</th>
+                        <th class="align-middle" scope="col">Title</th>
+                        <th class="align-middle" scope="col">strongly agree</th>
+                        <th class="align-middle" scope="col">agree</th>
+                        <th class="align-middle" scope="col">average</th>
+                        <th class="align-middle" scope="col">disagree</th>
+                        <th class="align-middle" scope="col">strongly disagree</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -13,7 +13,7 @@
     </div>
     <div class="col-sm-2 d-flex align-items-center">
         <button type="button" class="btn btn-light" data-bs-toggle="offcanvas" data-bs-target="#tips" aria-controls="tips">
-            小提示
+            Tips
         </button>
         <div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="tips" aria-labelledby=tipsLabel">
             <div class="offcanvas-header">
@@ -50,7 +50,7 @@
     <div class="container container_close">
         <div class="align_both_sides">
             <div class="col-md-5">
-                <button type="button" class="btn btn-info" style="float: right;" id="switch_mode" value="puzzleMode">簡單模式</button>
+                <button type="button" class="btn btn-info" style="float: right;" id="switch_mode" value="puzzleMode">Simple Mode</button>
                 <div id="simpleMode" style="display: none;">
                     <h5>Simple Setting</h5>
                     <form id="config_form" method="post" action="">
@@ -103,7 +103,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-primary float-end btn_pipe">確認修改</button>
+                        <button type="button" class="btn btn-primary float-end btn_pipe">Save</button>
                     </form>
                 </div>
             </div>
@@ -139,13 +139,13 @@
             $('#puzzleMode').css('display', 'block');
             $('#push_pipeline').css('display', 'none');
             mode.val('puzzleMode');
-            mode.text('簡單模式');
+            mode.text('Simple Mode');
         }
         else if(mode.val() === 'puzzleMode'){
             $('#simpleMode').css('display', 'block');
             $('#puzzleMode').css('display', 'none');
             mode.val('simpleMode');
-            mode.text('進階模式');
+            mode.text('Puzzle Mode');
         }
     });
     {# 畫面載入後帶出固定必要的 Jenkinsfile 欄位 #}

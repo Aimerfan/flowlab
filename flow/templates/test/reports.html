@@ -13,23 +13,23 @@
 
             {% if sonar_info %}
                 <div class="row">
-                    <div class="col-sm-2"></div>
-                    <div class="col-sm-8">
-                        <h1>SonarQube 測試報告</h1>
-                        <p>僅顯示最新的一筆結果</p>
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-6">
+                        <h1>SonarQube Test Report</h1>
+                        <p>Show only the latest results.</p>
                     </div>
-                    <div class="col-sm-2">
+                    <div class="col-sm-3">
                         <div class="right_content">
-                            <h5><a href="{{ sonar_url }}" target="_blank">查看詳細報告</a></h5>
+                            <h5><a href="{{ sonar_url }}" target="_blank">View Detailed Report</a></h5>
                         </div>
                     </div>
                     <table class="table table-bordered table-warning table-striped">
                         <thead>
                             <tr>
-                                <th>錯誤 (Bugs)</th>
-                                <th>漏洞 (Vulnerabilities)</th>
-                                <th>安全疑慮 (Security Hotspots)</th>
-                                <th>程式碼異味 (Code Smells)</th>
+                                <th>Bugs</th>
+                                <th>Vulnerabilities</th>
+                                <th>Security Hotspots</th>
+                                <th>Code Smells</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -53,14 +53,14 @@
                     </ul>
                 </div>
                 {% if junit_info %}
-                    <h1>Junit 測試結果</h1>
+                    <h1>Junit Test Result</h1>
                     <table class="table table-bordered table-success table-striped">
                         <thead>
                             <tr>
-                                <th>失敗</th>
-                                <th>略過</th>
-                                <th>通過</th>
-                                <th>總計</th>
+                                <th>Failure</th>
+                                <th>Skip</th>
+                                <th>Pass</th>
+                                <th>Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -74,11 +74,11 @@
                     </table>
                 {% endif %}
                 {% if coverage_info %}
-                    <h1>覆蓋率測試結果</h1>
+                    <h1>Coverage Test Report</h1>
                     <table class="table table-bordered table-primary table-striped">
                         <thead>
                             <tr>
-                                <th>名稱</th>
+                                <th>Name</th>
                                 <th>instruction</th>
                                 <th>branch</th>
                                 <th>complexity</th>
@@ -89,7 +89,7 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <th>所有類別</th>
+                                <th>All Categories</th>
                                 <td>{% include 'test/coverage_chart.html' with data=coverage_info.instruction %}</td>
                                 <td>{% include 'test/coverage_chart.html' with data=coverage_info.branch %}</td>
                                 <td>{% include 'test/coverage_chart.html' with data=coverage_info.complexity %}</td>
